@@ -1,18 +1,28 @@
 package com.liquid.kochanowski;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class KochanowskiMainActivity extends Activity
 {
+    protected List <String> urls = new ArrayList <String> ();
+
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_kochanowski_main);
+
+        TimeTableDbHelper helper = new TimeTableDbHelper (this);
+
+        new MasterlistDownloadTask (this, helper.getWritableDatabase ()).execute ("http://liquidpl.github.io/Kochanowski/masterlist");
     }
 
 
