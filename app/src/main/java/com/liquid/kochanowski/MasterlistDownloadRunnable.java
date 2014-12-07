@@ -2,8 +2,7 @@ package com.liquid.kochanowski;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Handler;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CompactHtmlSerializer;
@@ -12,12 +11,11 @@ import org.htmlcleaner.TagNode;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,35 +23,38 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Created by liquid on 02.12.14.
+ * Created by liquid on 06.12.14.
  */
-public class MasterlistDownloadTask extends AsyncTask <String, Void, List<String>>
+public class MasterlistDownloadRunnable implements Runnable
 {
-    private Context context;
+    private List <String> urls;
     private SQLiteDatabase db;
+    private SyncActivity context;
+    private Handler handler;
 
-    public MasterlistDownloadTask (Context context, SQLiteDatabase db)
+    public MasterlistDownloadRunnable (List<String> urls, Context context, Handler handler)
     {
-        this.context = context;
-        this.db = db;
+        this.urls = urls;
+        db = KochanowskiMainActivity.getHelper ().getWritableDatabase ();
+        this.context = (SyncActivity) context;
+        this.handler = handler;
     }
 
     @Override
-    protected List<String> doInBackground (String... params)
+    public void run ()
     {
-        List <String> urls = new ArrayList <String> ();
         String masterlist_url = "";
 
         try
         {
-            URL url = new URL (params[0]);
-            InputStream str = url.openStream ();
+            URL url = new URL ("http://liquidpl.github.io/Kochanowski/masterlist");
+            InputStream istr = url.openStream ();
 
-            int data = str.read ();
+            int data = istr.read ();
             while (data != -1)
             {
                 masterlist_url += (char) data;
-                data = str.read ();
+                data = istr.read ();
             }
         }
         catch (java.io.IOException e)
@@ -72,16 +73,17 @@ public class MasterlistDownloadTask extends AsyncTask <String, Void, List<String
             URLConnection conn = url.openConnection ();
 
             TagNode node = cleaner.clean (conn.getInputStream (), "iso-8859-2");
-            File file = new File (context.getFilesDir (), "lista.html");
 
-            FileOutputStream ostr = new FileOutputStream (file);
+            ByteArrayOutputStream ostr = new ByteArrayOutputStream ();
             new CompactHtmlSerializer (props).writeToStream (node, ostr, "utf-8");
+            ByteArrayInputStream istr = new ByteArrayInputStream (ostr.toByteArray ());
 
             SAXParserFactory factory = SAXParserFactory.newInstance ();
             SAXParser parser = factory.newSAXParser ();
 
             DefaultHandler handler = new MasterlistHandler (urls, db);
-            parser.parse (file, handler);
+            parser.parse (istr, handler);
+
         }
         catch (java.io.IOException e)
         {
@@ -96,12 +98,13 @@ public class MasterlistDownloadTask extends AsyncTask <String, Void, List<String
             e.printStackTrace ();
         }
 
-        return urls;
-    }
-
-    @Override
-    protected void onPostExecute (List<String> strings)
-    {
-
+        handler.post (new Runnable ()
+        {
+            @Override
+            public void run ()
+            {
+                context.beginSync (urls);
+            }
+        });
     }
 }

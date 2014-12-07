@@ -4,9 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.liquid.kochanparser.Lesson;
-import com.liquid.kochanparser.TimeTableType;
-
 public class TimeTableDbHelper extends SQLiteOpenHelper
 {
     private static final String TEXT_TYPE = " TEXT";
@@ -26,18 +23,18 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + TEXT_TYPE + ");";
 
-    private static final String SQL_CREATE_TABLE_DAYS =
+    /*private static final String SQL_CREATE_TABLE_DAYS =
             "CREATE TABLE " + TimeTableContract.DaysTable.TABLE_NAME + " (" +
                     TimeTableContract.DaysTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
-                    TimeTableContract.DaysTable.COLUMN_NAME_DAY_NAME + TEXT_TYPE + ");";
+                    TimeTableContract.DaysTable.COLUMN_NAME_DAY_NAME + TEXT_TYPE + ");";*/
 
     private static final String SQL_CREATE_TABLE_HOURS =
-            "CREATE TABLE " + TimeTableContract.HoursTable.TABLE_NAME + " (" +
-                    TimeTableContract.HoursTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
-                    TimeTableContract.HoursTable.COLUMN_NAME_START_HOUR + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HoursTable.COLUMN_NAME_START_MINUTE + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HoursTable.COLUMN_NAME_END_HOUR + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HoursTable.COLUMN_NAME_END_MINUTE + INT_TYPE + ");";
+            "CREATE TABLE " + TimeTableContract.HourTable.TABLE_NAME + " (" +
+                    TimeTableContract.HourTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
+                    TimeTableContract.HourTable.COLUMN_NAME_START_HOUR + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.HourTable.COLUMN_NAME_START_MINUTE + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.HourTable.COLUMN_NAME_END_HOUR + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.HourTable.COLUMN_NAME_END_MINUTE + INT_TYPE + ");";
 
     private static final String SQL_CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TimeTableContract.LessonTable.TABLE_NAME + " (" +
@@ -52,10 +49,10 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
 
     private static final String SQL_DELETE_TABLES =
             "DROP TABLE IF EXISTS " + TimeTableContract.TeacherTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS" + TimeTableContract.ClassTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS" + TimeTableContract.DaysTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS" + TimeTableContract.HoursTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS" + TimeTableContract.LessonTable.TABLE_NAME + ";";
+                    " DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME +
+                    //" DROP TABLE IF EXISTS" + TimeTableContract.DaysTable.TABLE_NAME +
+                    " DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME +
+                    " DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME + ";";
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "timetables.db";
@@ -70,7 +67,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     {
         db.execSQL (SQL_CREATE_TABLE_TEACHERS);
         db.execSQL (SQL_CREATE_TABLE_CLASSES);
-        db.execSQL (SQL_CREATE_TABLE_DAYS);
+        //db.execSQL (SQL_CREATE_TABLE_DAYS);
         db.execSQL (SQL_CREATE_TABLE_HOURS);
         db.execSQL (SQL_CREATE_TABLE_LESSONS);
     }

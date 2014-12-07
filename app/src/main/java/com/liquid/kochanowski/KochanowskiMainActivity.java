@@ -1,18 +1,30 @@
 package com.liquid.kochanowski;
 
-import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
 
-
-public class KochanowskiMainActivity extends Activity
+public class KochanowskiMainActivity extends ActionBarActivity
 {
-    protected List <String> urls = new ArrayList <String> ();
+    private static TimeTableDbHelper helper;
+
+    private SharedPreferences prefs;
+
+    private Button syncButton;
+    private TextView noTimeTablesAlert;
+
+    public KochanowskiMainActivity ()
+    {
+        helper = new TimeTableDbHelper (this);
+    }
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -20,11 +32,47 @@ public class KochanowskiMainActivity extends Activity
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_kochanowski_main);
 
-        TimeTableDbHelper helper = new TimeTableDbHelper (this);
+        syncButton = (Button) findViewById (R.id.syncButton);
+        noTimeTablesAlert = (TextView) findViewById (R.id.noTimeTablesAlert);
 
-        new MasterlistDownloadTask (this, helper.getWritableDatabase ()).execute ("http://liquidpl.github.io/Kochanowski/masterlist");
+        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
+
+        Toolbar toolbar = (Toolbar) findViewById (R.id.toolbar);
+
+        if (toolbar != null)
+        {
+            setSupportActionBar (toolbar);
+            toolbar.setNavigationIcon (R.drawable.ic_menu_black);
+        }
+
+        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false) == false)
+        {
+            syncButton.setVisibility (View.VISIBLE);
+            noTimeTablesAlert.setVisibility (View.VISIBLE);
+        }
+        else
+        {
+            syncButton.setVisibility (View.INVISIBLE);
+            noTimeTablesAlert.setVisibility (View.INVISIBLE);
+        }
     }
 
+    @Override
+    protected void onResume ()
+    {
+        super.onResume ();
+
+        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false) == false)
+        {
+            syncButton.setVisibility (View.VISIBLE);
+            noTimeTablesAlert.setVisibility (View.VISIBLE);
+        }
+        else
+        {
+            syncButton.setVisibility (View.INVISIBLE);
+            noTimeTablesAlert.setVisibility (View.INVISIBLE);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu)
@@ -49,5 +97,16 @@ public class KochanowskiMainActivity extends Activity
         }
 
         return super.onOptionsItemSelected (item);
+    }
+
+    public void onSyncClick (View view)
+    {
+        Intent intent = new Intent (this, SyncActivity.class);
+        startActivity (intent);
+    }
+
+    public static TimeTableDbHelper getHelper ()
+    {
+        return helper;
     }
 }

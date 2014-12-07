@@ -1,13 +1,6 @@
 package com.liquid.kochanowski;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-
-import com.liquid.kochanparser.Time;
-
-import java.io.InputStreamReader;
 
 public final class TimeTableContract
 {
@@ -26,13 +19,13 @@ public final class TimeTableContract
         public static final String COLUMN_NAME_NAME_LONG = "longname";
     }
 
-    public static abstract class DaysTable implements BaseColumns
+    /*public static abstract class DaysTable implements BaseColumns
     {
         public static final String TABLE_NAME = "days";
         public static final String COLUMN_NAME_DAY_NAME = "'name'";
-    }
+    }*/
 
-    public static abstract class HoursTable implements BaseColumns
+    public static abstract class HourTable implements BaseColumns
     {
         public static final String TABLE_NAME = "hours";
         public static final String COLUMN_NAME_START_HOUR = "starthour";

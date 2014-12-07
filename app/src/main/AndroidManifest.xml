@@ -8,7 +8,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.liquid.kochanowski.KochanowskiMainActivity"
             android:label="@string/app_name" >
@@ -17,6 +17,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.liquid.kochanowski.SyncActivity"
+            android:label="@string/title_activity_sync"
+            android:parentActivityName="com.liquid.kochanowski.KochanowskiMainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liquid.kochanowski.KochanowskiMainActivity" />
         </activity>
     </application>
 

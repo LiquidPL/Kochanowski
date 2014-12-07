@@ -2,7 +2,6 @@ package com.liquid.kochanowski;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.liquid.kochanparser.TimeTableType;
 
@@ -14,7 +13,9 @@ import java.util.List;
 
 public class MasterlistHandler extends DefaultHandler
 {
-    private List <String> urls = null;
+    private static String school_url = "http://kochanowski.iq.pl/plan20140915/";
+
+    private List <String> urls;
     private SQLiteDatabase db;
 
     private String currentName = "";
@@ -36,7 +37,7 @@ public class MasterlistHandler extends DefaultHandler
             {
                 if (checkType (attributes.getValue (i)) == TimeTableType.TIMETABLE_TYPE_CLASS)
                 {
-                    urls.add (attributes.getValue (i));
+                    urls.add (school_url + attributes.getValue (i));
                 }
                 if (checkType (attributes.getValue (i)) == TimeTableType.TIMETABLE_TYPE_TEACHER)
                 {
@@ -55,7 +56,7 @@ public class MasterlistHandler extends DefaultHandler
         if (currentAttribute == "teacher")
         {
             String[] teacher = value.split (" ");
-            teacher[2] = new String (teacher[2].toCharArray (), 1, teacher[2].length () - 1);
+            teacher[2] = new String (teacher[2].toCharArray (), 1, teacher[2].length () - 2);
 
             ContentValues values = new ContentValues ();
             values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[2]);
@@ -63,6 +64,7 @@ public class MasterlistHandler extends DefaultHandler
             values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME, teacher[1]);
 
             db.insert (TimeTableContract.TeacherTable.TABLE_NAME, null, values);
+            //Log.i ("asdf", teacher[0] + " " + teacher[1] + " (" + teacher[2] + ")");
             currentAttribute = "";
         }
     }
