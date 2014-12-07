@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Settings</string>
+    <string name="button_continue">Continue</string>
+    <string name="downloaded_timetable">Downloaded timetable:</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="sync_result_failure">Synchronization failed</string>
+    <string name="sync_result_success">Synchronization completed successfully</string>
+    <string name="title_activity_sync">Synchronizing</string>
+    <string name="app_name" translatable="false">Kochanowski</string>
+    <string name="downloading_metadata">Downloading timetable list…</string>
+    <string name="button_sync">Synchronize now</string>
+    <string name="tables_not_found">No timetables found</string>
+    <string name="pref_timetables_synced" translatable="false">pref_timetables_synced</string>
+    <string name="shared_prefs_name" translatable="false">prefs_kochanowski</string>
+</resources>
