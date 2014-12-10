@@ -67,6 +67,7 @@ public class DbWriteRunnable implements Runnable
                 values.put (LessonTable.COLUMN_NAME_SUBJECT, l.getSubject ());
                 values.put (LessonTable.COLUMN_NAME_TEACHER_CODE, l.getTeacherCode ());
                 values.put (LessonTable.COLUMN_NAME_CLASSROOM, l.getClassroom ());
+                values.put (LessonTable.COLUMN_NAME_GROUP_ID, l.getGroup ());
                 values.put (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT, table.getShortName ());
 
                 db.insert (LessonTable.TABLE_NAME, null, values);
