@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.liquid.kochanowski"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -23,4 +23,5 @@ dependencies {
     compile files ('libs/htmlcleaner/htmlcleaner-2.10.jar')
     compile project (':kochanparser')
     compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
 }

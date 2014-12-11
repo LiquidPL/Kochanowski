@@ -10,4 +10,10 @@
     <string name="downloading_metadata">Downloading timetable list…</string>
     <string name="button_sync">Synchronize now</string>
     <string name="tables_not_found">No timetables found</string>
+    <string name="day_name_0">Monday</string>
+    <string name="day_name_1">Tuesday</string>
+    <string name="day_name_2">Thursday</string>
+    <string name="day_name_3">Wednesday</string>
+    <string name="day_name_4">Friday</string>
+    <string name="day_name_today">Today</string>
 </resources>

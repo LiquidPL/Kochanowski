@@ -43,7 +43,7 @@ public class SyncActivity extends ActionBarActivity
         prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
         prefEditor = prefs.edit ();
 
-        Toolbar toolbar = (Toolbar) findViewById (R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById (R.id.activity_sync_toolbar);
         if (toolbar != null)
         {
             setSupportActionBar (toolbar);

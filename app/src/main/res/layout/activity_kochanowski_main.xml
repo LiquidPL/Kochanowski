@@ -5,8 +5,22 @@
                 android:layout_height="match_parent"
                 tools:context=".KochanowskiMainActivity">
 
-    <include layout="@layout/layout_toolbar"
-             android:id="@+id/include"/>
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/activity_main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="6dp">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_activity_spinner"
+            android:paddingLeft="-4dp"/>
+
+    </android.support.v7.widget.Toolbar>
 
     <Button
         android:layout_width="wrap_content"
@@ -27,5 +41,13 @@
         android:layout_above="@id/syncButton"
         android:layout_centerHorizontal="true"
         android:visibility="invisible"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragmentStub"
+        android:layout_below="@+id/activity_main_toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>

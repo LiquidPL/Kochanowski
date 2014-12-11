@@ -10,4 +10,10 @@
     <string name="downloading_metadata">Pobieranie listy planów lekcji…</string>
     <string name="button_sync">Synchronizuj teraz</string>
     <string name="tables_not_found">Nie znaleziono żadnych planów</string>
+    <string name="day_name_0">Poniedziałek</string>
+    <string name="day_name_1">Wtorek</string>
+    <string name="day_name_2">Środa</string>
+    <string name="day_name_3">Czwartek</string>
+    <string name="day_name_4">Piątek</string>
+    <string name="day_name_today">Dzisiaj</string>
 </resources>
