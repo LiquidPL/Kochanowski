@@ -2,6 +2,7 @@ package com.liquid.kochanowski;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.liquid.kochanparser.TimeTableType;
 
@@ -56,15 +57,20 @@ public class MasterlistHandler extends DefaultHandler
         if (currentAttribute == "teacher")
         {
             String[] teacher = value.split (" ");
-            teacher[2] = new String (teacher[2].toCharArray (), 1, teacher[2].length () - 2);
+            teacher[teacher.length - 1] = new String (teacher[teacher.length - 1].toCharArray (), 1, teacher[teacher.length - 1].length () - 2);
+
+            if (teacher.length == 4)
+            {
+                teacher[0] += " " + teacher[1];
+                teacher[1] = teacher[2];
+            }
 
             ContentValues values = new ContentValues ();
-            values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[2]);
+            values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[teacher.length - 1]);
             values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME, teacher[0]);
             values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME, teacher[1]);
 
             db.insert (TimeTableContract.TeacherTable.TABLE_NAME, null, values);
-            //Log.i ("asdf", teacher[0] + " " + teacher[1] + " (" + teacher[2] + ")");
             currentAttribute = "";
         }
     }
