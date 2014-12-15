@@ -58,13 +58,22 @@
         android:layout_marginTop="80dp"
         android:visibility="invisible"/>
 
+    <Spinner
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/class_select"
+        android:layout_above="@+id/continueButton"
+        android:layout_marginLeft="16dp"
+        android:visibility="invisible"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_continue"
         android:id="@+id/continueButton"
-        android:layout_below="@+id/syncResult"
-        android:layout_centerHorizontal="true"
         android:visibility="invisible"
-        android:onClick="onContinueClick"/>
+        android:onClick="onContinueClick"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="149dp"/>
 </RelativeLayout>

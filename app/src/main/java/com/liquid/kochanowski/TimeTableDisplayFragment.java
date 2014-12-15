@@ -1,15 +1,18 @@
 package com.liquid.kochanowski;
 
 import android.app.Activity;
-import android.net.Uri;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.liquid.kochanparser.TimeTableType;
 
@@ -19,7 +22,7 @@ import com.liquid.kochanparser.TimeTableType;
  * Use the {@link TimeTableDisplayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TimeTableDisplayFragment extends Fragment
+public class TimeTableDisplayFragment extends Fragment implements View.OnClickListener
 {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TABLE_NAME = "tablename";
@@ -39,7 +42,15 @@ public class TimeTableDisplayFragment extends Fragment
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    private RecyclerView.ItemAnimator animator;
+    private Button syncButton;
+    private TextView noTimeTablesAlert;
+
+    private SharedPreferences prefs;
+
+    interface Clickable
+    {
+        void onSyncButtonClick (View v);
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -47,19 +58,17 @@ public class TimeTableDisplayFragment extends Fragment
      *
      * @param tableName Name of the timetable, corresponding to a column in the database
      * @param tableType The timetable type to display (class/teacher/classroom)
-     * @param dayId The day to be displayed
      * @param groupId The group to be displayed
      *
      * @return A new instance of fragment TimeTableDisplayFragment.
      */
-    public static TimeTableDisplayFragment newInstance (String tableName, TimeTableType tableType, int dayId, int groupId)
+    public static TimeTableDisplayFragment newInstance (String tableName, TimeTableType tableType, int groupId)
     {
         TimeTableDisplayFragment fragment = new TimeTableDisplayFragment ();
         Bundle args = new Bundle ();
 
         args.putString (ARG_TABLE_NAME, tableName);
         args.putString (ARG_TABLE_TYPE, tableType.getValue ());
-        args.putInt (ARG_DAY_ID, dayId);
         args.putInt (ARG_GROUP_ID, groupId);
 
         fragment.setArguments (args);
@@ -82,6 +91,8 @@ public class TimeTableDisplayFragment extends Fragment
             dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
         }
+
+        prefs = getActivity ().getSharedPreferences (getString (R.string.shared_prefs_name), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -93,12 +104,28 @@ public class TimeTableDisplayFragment extends Fragment
 
         recyclerView = (RecyclerView) view.findViewById (R.id.timeTableList);
 
+        syncButton = (Button) view.findViewById (R.id.button_sync);
+        syncButton.setOnClickListener (this);
+
+        noTimeTablesAlert = (TextView) view.findViewById (R.id.alert_no_timetables);
+
+        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+        {
+            recyclerView.setVisibility (View.VISIBLE);
+            syncButton.setVisibility (View.INVISIBLE);
+            noTimeTablesAlert.setVisibility (View.INVISIBLE);
+        }
+        else
+        {
+            syncButton.setVisibility (View.VISIBLE);
+            noTimeTablesAlert.setVisibility (View.VISIBLE);
+            recyclerView.setVisibility (View.INVISIBLE);
+        }
+
         layoutManager = new LinearLayoutManager (activity);
         recyclerView.setLayoutManager (layoutManager);
 
         adapter = new TimeTableAdapter (KochanowskiMainActivity.getHelper ().getReadableDatabase (), tableName, tableType, dayId, groupId, this.getActivity ());
-
-        recyclerView.setAdapter (adapter);
 
         return view;
     }
@@ -116,4 +143,23 @@ public class TimeTableDisplayFragment extends Fragment
         super.onDetach ();
     }
 
+    public void setDay (int day)
+    {
+        this.dayId = day;
+
+        adapter = new TimeTableAdapter (KochanowskiMainActivity.getHelper ().getReadableDatabase (), tableName, tableType, dayId, groupId, this.getActivity ());
+        recyclerView.setAdapter (adapter);
+    }
+
+    @Override
+    public void onClick (View v)
+    {
+        switch (v.getId ())
+        {
+            case R.id.button_sync:
+                Intent intent = new Intent (getActivity (), SyncActivity.class);
+                startActivity (intent);
+                break;
+        }
+    }
 }

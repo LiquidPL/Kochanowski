@@ -13,6 +13,8 @@
     <string name="button_sync">Synchronize now</string>
     <string name="tables_not_found">No timetables found</string>
     <string name="pref_timetables_synced" translatable="false">pref_timetables_synced</string>
+    <string name="pref_table_name" translatable="false">pref_table_name</string>
+    <string name="pref_group" translatable="false">pref_group</string>
     <string name="shared_prefs_name" translatable="false">prefs_kochanowski</string>
     <string name="day_name_0">Monday</string>
     <string name="day_name_1">Tuesday</string>
@@ -20,4 +22,6 @@
     <string name="day_name_3">Wednesday</string>
     <string name="day_name_4">Friday</string>
     <string name="day_name_today">Today</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
 </resources>

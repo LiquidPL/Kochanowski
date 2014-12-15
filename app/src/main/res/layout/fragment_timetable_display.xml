@@ -1,8 +1,27 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              tools:context="com.liquid.kochanowski.TimeTableDisplayFragment">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_sync"
+        android:id="@+id/button_sync"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/tables_not_found"
+        android:id="@+id/alert_no_timetables"
+        android:layout_above="@id/button_sync"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"/>
 
     <!-- A RecyclerView with some commonly used attributes -->
     <android.support.v7.widget.RecyclerView
@@ -10,5 +29,7 @@
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="right|center_vertical"/>
-</FrameLayout>
+        android:layout_gravity="right|center_vertical"
+        android:visibility="invisible"/>
+
+</RelativeLayout>
