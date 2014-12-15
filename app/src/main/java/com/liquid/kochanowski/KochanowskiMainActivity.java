@@ -76,6 +76,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             getSupportActionBar ().setDisplayShowTitleEnabled (false);
 
             drawerLayout.setDrawerListener (toggle);
+            drawerLayout.setStatusBarBackgroundColor (getResources ().getColor (android.R.color.darker_gray));
         }
 
         DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item, DaySelectAdapter.getDays (this));
