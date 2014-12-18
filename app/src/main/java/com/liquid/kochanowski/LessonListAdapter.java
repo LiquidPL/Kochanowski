@@ -18,7 +18,7 @@ import com.liquid.kochanowski.TimeTableContract.TeacherTable;
 /**
  * Created by liquid on 09.12.14.
  */
-public class TimeTableAdapter extends RecyclerView.Adapter<TimeTableAdapter.LessonViewHolder>
+public class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
 {
     private Cursor cur;
 
@@ -53,7 +53,7 @@ public class TimeTableAdapter extends RecyclerView.Adapter<TimeTableAdapter.Less
         }
     }
 
-    public TimeTableAdapter (SQLiteDatabase db, String tableName, String tableType, int dayId, int groupId, Context context)
+    public LessonListAdapter (SQLiteDatabase db, String tableName, String tableType, int dayId, int groupId, Context context)
     {
         this.tableName = tableName;
         this.tableType = tableType;
