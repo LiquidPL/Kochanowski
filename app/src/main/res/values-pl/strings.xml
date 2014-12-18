@@ -16,4 +16,7 @@
     <string name="day_name_3">Czwartek</string>
     <string name="day_name_4">Piątek</string>
     <string name="day_name_today">Dzisiaj</string>
+    <string name="classes">Klasy</string>
+    <string name="teachers">Nauczyciele</string>
+    <string name="classrooms">Sale</string>
 </resources>
