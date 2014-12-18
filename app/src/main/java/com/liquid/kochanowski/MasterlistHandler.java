@@ -2,7 +2,6 @@ package com.liquid.kochanowski;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.liquid.kochanparser.TimeTableType;
 
@@ -31,16 +30,16 @@ public class MasterlistHandler extends DefaultHandler
     @Override
     public void startElement (String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
-        TimeTableType attrValue = TimeTableType.TIMETABLE_TYPE_NONE;
+        int attrValue = TimeTableType.NONE;
         for (int i = 0; i < attributes.getLength (); i++)
         {
             if (attributes.getQName (i) == "href")
             {
-                if (checkType (attributes.getValue (i)) == TimeTableType.TIMETABLE_TYPE_CLASS)
+                if (checkType (attributes.getValue (i)) == TimeTableType.CLASS)
                 {
                     urls.add (school_url + attributes.getValue (i));
                 }
-                if (checkType (attributes.getValue (i)) == TimeTableType.TIMETABLE_TYPE_TEACHER)
+                if (checkType (attributes.getValue (i)) == TimeTableType.TEACHER)
                 {
                     currentAttribute = "teacher";
                 }
@@ -75,21 +74,21 @@ public class MasterlistHandler extends DefaultHandler
         }
     }
 
-    private TimeTableType checkType (String url)
+    private int checkType (String url)
     {
         String values[] = url.split ("/");
-        TimeTableType ret = TimeTableType.TIMETABLE_TYPE_NONE;
-        if (values.length != 2) return TimeTableType.TIMETABLE_TYPE_NONE;
+        int ret = TimeTableType.NONE;
+        if (values.length != 2) return TimeTableType.NONE;
         switch (values[1].charAt (0))
         {
             case 'o':
-                ret = TimeTableType.TIMETABLE_TYPE_CLASS;
+                ret = TimeTableType.CLASS;
                 break;
             case 'n':
-                ret = TimeTableType.TIMETABLE_TYPE_TEACHER;
+                ret = TimeTableType.TEACHER;
                 break;
             case 's':
-                ret = TimeTableType.TIMETABLE_TYPE_CLASSROOM;
+                ret = TimeTableType.CLASSROOM;
                 break;
         }
         return ret;
