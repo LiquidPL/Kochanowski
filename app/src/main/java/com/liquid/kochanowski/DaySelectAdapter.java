@@ -54,7 +54,7 @@ public class DaySelectAdapter extends ArrayAdapter <DaySelectAdapter.DayDate>
         View view = getCustomView (position, convertView, parent);
 
         View separator = view.findViewById (R.id.separator);
-        separator.setVisibility (View.INVISIBLE);
+        separator.setVisibility (View.GONE);
 
         return view;
     }
