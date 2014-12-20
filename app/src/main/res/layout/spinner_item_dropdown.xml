@@ -28,4 +28,8 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:textColor="@android:color/black"/>
+
+    <View
+        style="@style/Divider"
+        android:layout_below="@+id/date"/>
 </RelativeLayout>

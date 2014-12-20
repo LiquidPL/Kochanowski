@@ -51,21 +51,16 @@ public class DaySelectAdapter extends ArrayAdapter <DaySelectAdapter.DayDate>
     @Override
     public View getView (int position, View convertView, ViewGroup parent)
     {
-        View view = getCustomView (position, convertView, parent);
-
-        View separator = view.findViewById (R.id.separator);
-        separator.setVisibility (View.GONE);
-
-        return view;
+        return getCustomView (resource, position, convertView, parent);
     }
 
     @Override
     public View getDropDownView (int position, View convertView, ViewGroup parent)
     {
-        return getCustomView (position, convertView, parent);
+        return getCustomView (R.layout.spinner_item_dropdown, position, convertView, parent);
     }
 
-    private View getCustomView (int position, View convertView, ViewGroup parent)
+    private View getCustomView (int resource, int position, View convertView, ViewGroup parent)
     {
         View view = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
 
