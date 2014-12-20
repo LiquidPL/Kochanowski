@@ -226,13 +226,14 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
      *
      * @return A new instance of fragment TimeTableDisplayFragment.
      */
-    public static TimeTableDisplayFragment newInstance (String tableName, int tableType, int groupId)
+    public static TimeTableDisplayFragment newInstance (String tableName, int tableType, int dayId, int groupId)
     {
         TimeTableDisplayFragment fragment = new TimeTableDisplayFragment ();
         Bundle args = new Bundle ();
 
         args.putString (ARG_TABLE_NAME, tableName);
         args.putInt (ARG_TABLE_TYPE, tableType);
+        args.putInt (ARG_DAY_ID, dayId);
         args.putInt (ARG_GROUP_ID, groupId);
 
         fragment.setArguments (args);
@@ -252,6 +253,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         {
             tableName = getArguments ().getString (ARG_TABLE_NAME);
             tableType = getArguments ().getInt (ARG_TABLE_TYPE);
+            dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
         }
 
@@ -264,10 +266,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     {
         // Inflate the layout for this fragment
         View view = inflater.inflate (R.layout.fragment_timetable_display, container, false);
-
         recyclerView = (RecyclerView) view.findViewById (R.id.lesson_list);
 
         syncButton = (Button) view.findViewById (R.id.button_sync);
+
         syncButton.setOnClickListener (this);
 
         noTimeTablesAlert = (TextView) view.findViewById (R.id.alert_no_timetables);
@@ -288,7 +290,15 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         layoutManager = new LinearLayoutManager (activity);
         recyclerView.setLayoutManager (layoutManager);
 
-        refresh ();
+        adapter = new LessonListAdapter (R.layout.lesson_item,
+                KochanowskiMainActivity.getHelper ().getReadableDatabase (),
+                tableName,
+                tableType,
+                dayId,
+                groupId,
+                this.getActivity ());
+
+        recyclerView.setAdapter (adapter);
 
         return view;
     }
