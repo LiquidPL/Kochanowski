@@ -1,6 +1,7 @@
 package com.liquid.kochanowski;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import org.lucasr.twowayview.ItemClickSupport;
 import org.lucasr.twowayview.TwoWayLayoutManager;
 import org.lucasr.twowayview.widget.ListLayoutManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -121,6 +124,117 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         }
     }
 
+    private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
+    {
+        public class DayDate
+        {
+            int id;
+
+            String day;
+            String date;
+
+            public DayDate (int id, String day, String date)
+            {
+                this.id = id;
+                this.day = day;
+                this.date = date;
+            }
+        }
+
+        private List<DayDate> days = new ArrayList<> ();
+        private int resource;
+
+        private Context context;
+
+        public DaySelectAdapter (Context context, int resource)
+        {
+            super (context, resource);
+
+            this.context = context;
+            this.resource = resource;
+            this.days = getDays (context);
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (resource, position, convertView, parent);
+        }
+
+        @Override
+        public View getDropDownView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.spinner_item_dropdown, position, convertView, parent);
+        }
+
+        private View getCustomView (int resource, int position, View convertView, ViewGroup parent)
+        {
+            View view = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
+
+            TextView dayName = (TextView) view.findViewById (R.id.day_name);
+            TextView date = (TextView) view.findViewById (R.id.date);
+
+            dayName.setText (days.get (position).day);
+            date.setText (days.get (position).date);
+
+            return view;
+        }
+
+        @Override
+        public int getCount ()
+        {
+            return days.size ();
+        }
+
+        private List <DayDate> getDays (Context context)
+        {
+            List <DayDate> days = new ArrayList<> ();
+
+            Calendar cal = Calendar.getInstance ();
+            int today = cal.get (Calendar.DAY_OF_WEEK);
+
+            SimpleDateFormat format = new SimpleDateFormat ("dd MMMM");
+
+            int diff = -cal.get (Calendar.DAY_OF_WEEK) + 2;
+            cal.add (Calendar.DAY_OF_MONTH, diff);
+            for (int i = 0; i < 5; i++)
+            {
+                if (cal.get (Calendar.DAY_OF_WEEK) == today)
+                {
+                    days.add (new DayDate (i, context.getResources ().getString (R.string.day_name_today), format.format (cal.getTime ())));
+                    cal.add (Calendar.DAY_OF_MONTH, 1);
+                    continue;
+                }
+
+                String day = "";
+
+                switch (cal.get (Calendar.DAY_OF_WEEK))
+                {
+                    case 2:
+                        day = context.getResources ().getString (R.string.day_name_0);
+                        break;
+                    case 3:
+                        day = context.getResources ().getString (R.string.day_name_1);
+                        break;
+                    case 4:
+                        day = context.getResources ().getString (R.string.day_name_2);
+                        break;
+                    case 5:
+                        day = context.getResources ().getString (R.string.day_name_3);
+                        break;
+                    case 6:
+                        day = context.getResources ().getString (R.string.day_name_4);
+                        break;
+                }
+
+                days.add (new DayDate (i, day, format.format (cal.getTime ())));
+                cal.add (Calendar.DAY_OF_MONTH, 1);
+            }
+
+            return days;
+        }
+    }
+
     public KochanowskiMainActivity ()
     {
         helper = new TimeTableDbHelper (this);
@@ -194,10 +308,11 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         if (toolbar != null)
         {
             setSupportActionBar (toolbar);
-            toolbar.setNavigationIcon (R.drawable.ic_menu_black);
+            toolbar.setNavigationIcon (R.drawable.ic_menu_white);
+            toolbar.setTitleTextColor (getResources ().getColor (R.color.white_100));
 
             drawerLayout.setDrawerListener (toggle);
-            drawerLayout.setStatusBarBackgroundColor (getResources ().getColor (android.R.color.darker_gray));
+            drawerLayout.setStatusBarBackgroundColor (getResources ().getColor (R.color.primary_dark));
 
             drawerList.setLayoutManager (drawerLayoutManager);
             drawerList.setAdapter (drawerAdapter);
@@ -226,13 +341,25 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             });
         }
 
-        DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item, DaySelectAdapter.getDays (this));
+        DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item);
         spinner.setAdapter (adapter);
         spinner.setOnItemSelectedListener (this);
 
         selectScreen (currentScreen, currentTable, currentDay, currentType);
 
         Log.i ("liquid", "onResume ()");
+    }
+
+    @Override
+    protected void onRestart ()
+    {
+        super.onRestart ();
+
+        // pulling the default table name saved in shared preferences in case we just got back from a sync
+        currentTable = prefs.getString (getString (R.string.pref_table_name), "");
+
+        // reinitializing the fragment when returning to the activity
+        selectScreen (currentScreen, currentTable, currentDay, currentType);
     }
 
     @Override

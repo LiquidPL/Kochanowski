@@ -6,7 +6,7 @@
     <string name="downloaded_timetable">Downloaded timetable:</string>
     <string name="hello_world">Hello world!</string>
     <string name="sync_result_failure">Synchronization failed</string>
-    <string name="sync_result_success">Synchronization completed successfully</string>
+    <string name="sync_result_success">Synchronization completed successfully\n\nPlease choose your class:</string>
     <string name="title_activity_sync">Synchronizing</string>
     <string name="app_name" translatable="false">Kochanowski</string>
     <string name="downloading_metadata">Downloading timetable list…</string>

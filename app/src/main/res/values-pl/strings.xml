@@ -5,7 +5,7 @@
     <string name="downloaded_timetable">Pobrano plan lekcji</string>
     <string name="hello_world">Witaj świecie!</string>
     <string name="sync_result_failure">Synchronizacja nie powiodła się</string>
-    <string name="sync_result_success">Synchronizacja powiodła się</string>
+    <string name="sync_result_success">Synchronizacja powiodła się\n\nWybierz swoją klasę:</string>
     <string name="title_activity_sync">Synchronizacja</string>
     <string name="downloading_metadata">Pobieranie listy planów lekcji…</string>
     <string name="button_sync">Synchronizuj teraz</string>
