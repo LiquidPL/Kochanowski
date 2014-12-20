@@ -4,6 +4,8 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -30,6 +32,7 @@ import org.lucasr.twowayview.widget.ListLayoutManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -71,13 +74,13 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private int currentDay = -1;
     private int currentType = -1;
 
-    private List <String> values = new ArrayList <> ();
-    private List <Integer> icons = new ArrayList <> ();
+    private List <String> values;
+    private TypedArray icons;
 
     private class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.DrawerViewHolder>
     {
         private List <String> values;
-        private List <Integer> icons;
+        private TypedArray icons;
 
         private int resource;
 
@@ -95,7 +98,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             }
         }
 
-        public NavDrawerAdapter (int resource, List <String> values, List<Integer> icons)
+        public NavDrawerAdapter (int resource, List <String> values, TypedArray icons)
         {
             this.resource = resource;
             this.values = values;
@@ -114,7 +117,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         public void onBindViewHolder (DrawerViewHolder holder, int position)
         {
             holder.name.setText (values.get (position));
-            holder.icon.setImageDrawable (getResources ().getDrawable (icons.get (position)));
+            holder.icon.setImageDrawable (icons.getDrawable (position));
         }
 
         @Override
@@ -246,15 +249,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_kochanowski_main);
 
-        values.add (getString (R.string.day_name_today));
-        values.add (getString (R.string.classes));
-        values.add (getString (R.string.teachers));
-        values.add (getString (R.string.classrooms));
-
-        icons.add (R.drawable.ic_person_black);
-        icons.add (R.drawable.ic_group_black);
-        icons.add (R.drawable.ic_person_black);
-        icons.add (R.drawable.ic_person_black);
+        values = Arrays.asList (getResources ().getStringArray (R.array.drawer_names));
+        icons = getResources ().obtainTypedArray (R.array.drawer_icons);
 
         toolbar = (Toolbar) findViewById (R.id.activity_main_toolbar);
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
