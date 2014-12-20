@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -86,15 +87,20 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
         public class DrawerViewHolder extends RecyclerView.ViewHolder
         {
+            View v;
+
             TextView name;
             ImageView icon;
+            View separator;
 
             public DrawerViewHolder (View v)
             {
                 super (v);
 
+                this.v = v;
                 name = (TextView) v.findViewById (R.id.text);
                 icon = (ImageView) v.findViewById (R.id.item_icon);
+                separator = v.findViewById (R.id.separator);
             }
         }
 
@@ -116,8 +122,29 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         @Override
         public void onBindViewHolder (DrawerViewHolder holder, int position)
         {
-            holder.name.setText (values.get (position));
-            holder.icon.setImageDrawable (icons.getDrawable (position));
+            if (values.get (position).equals ("separator"))
+            {
+                holder.name.setVisibility (View.GONE);
+                holder.icon.setVisibility (View.GONE);
+                holder.separator.setVisibility (View.VISIBLE);
+
+                final float scale = getResources ().getDisplayMetrics ().density;
+                int height = (int) (8.0f * scale + 0.5f);
+
+                holder.v.setMinimumHeight (height);
+
+                ((RelativeLayout) holder.v).setBackgroundResource (0);
+            }
+            else
+            {
+                holder.name.setText (values.get (position));
+                holder.icon.setImageDrawable (icons.getDrawable (position));
+
+                final float scale = getResources ().getDisplayMetrics ().density;
+                int height = (int) (48.0f * scale + 0.5f);
+
+                holder.v.setMinimumHeight (height);
+            }
         }
 
         @Override

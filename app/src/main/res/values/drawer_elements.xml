@@ -5,12 +5,14 @@
         <item>@string/classes</item>
         <item>@string/teachers</item>
         <item>@string/classrooms</item>
+        <item>@string/separator</item>
     </string-array>
 
     <array name="drawer_icons">
         <item>@drawable/ic_person_black</item>
         <item>@drawable/ic_person_black</item>
         <item>@drawable/ic_group_black</item>
+        <item>@drawable/ic_person_black</item>
         <item>@drawable/ic_person_black</item>
     </array>
 </resources>

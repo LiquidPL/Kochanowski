@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="48dp"
+              android:layout_height="wrap_content"
               android:clickable="true"
               android:focusable="true"
               style="@style/Ripple">
@@ -25,4 +25,10 @@
         android:text="Nauczyciele"
         android:layout_centerVertical="true"
         android:paddingLeft="72dp"/>
+
+    <View
+        style="@style/Divider"
+        android:id="@+id/separator"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
 </RelativeLayout>
