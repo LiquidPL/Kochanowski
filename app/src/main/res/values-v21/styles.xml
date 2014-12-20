@@ -5,6 +5,17 @@
         <!-- Customize your theme here. -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="ToolbarDark">
+        <item name="android:textColorPrimary">@color/white_100</item>
+        <item name="android:textColorPrimaryInverse">@color/white_100</item>
+
+        <item name="android:actionMenuTextColor">@color/white_100</item>
+        <item name="android:textColorSecondary">@color/white_100</item>
     </style>
 
     <style name="Ripple">
