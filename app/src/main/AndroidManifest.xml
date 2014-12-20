@@ -21,7 +21,8 @@
         <activity
             android:name="com.liquid.kochanowski.SyncActivity"
             android:label="@string/title_activity_sync"
-            android:parentActivityName="com.liquid.kochanowski.KochanowskiMainActivity" >
+            android:parentActivityName="com.liquid.kochanowski.KochanowskiMainActivity"
+            android:configChanges="screenSize|orientation">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.liquid.kochanowski.KochanowskiMainActivity" />

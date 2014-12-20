@@ -1,19 +1,26 @@
 package com.liquid.kochanowski;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ProgressBar;
@@ -24,6 +31,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.liquid.kochanowski.TimeTableContract.ClassTable;
 
 public class SyncActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener
 {
@@ -34,6 +42,8 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefEditor;
 
+    private SQLiteDatabase db;
+
     protected TextView currentDownload;
     protected TextView currentCount;
     protected ProgressBar progressBar;
@@ -43,23 +53,66 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     protected Spinner classSelect;
 
+    private class ClassSelectAdapter extends ArrayAdapter<String>
+    {
+        private Cursor cur;
+
+        public ClassSelectAdapter (Context context, int resource)
+        {
+            super (context, resource);
+            cur = KochanowskiMainActivity.getHelper ().getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.sync_spinner_item, position, parent);
+        }
+
+        @Override
+        public View getDropDownView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.sync_spinner_item, position, parent);
+        }
+
+        private View getCustomView (int resource, int position, ViewGroup parent)
+        {
+            TextView view = (TextView) LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
+
+            cur.moveToPosition (position);
+            String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+            String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+
+            view.setText (longname + " (" + shortname + ")");
+            return (View) view;
+        }
+
+        @Override
+        public int getCount ()
+        {
+            return cur.getCount ();
+        }
+    }
+
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_sync);
 
-        currentDownload = (TextView) findViewById (R.id.currentDownload);
-        currentCount = (TextView) findViewById (R.id.currentCount);
-        progressBar = (ProgressBar) findViewById (R.id.progressBar);
+        currentDownload = (TextView) findViewById (R.id.current_download);
+        currentCount = (TextView) findViewById (R.id.current_count);
+        progressBar = (ProgressBar) findViewById (R.id.progress_bar);
 
-        syncResult = (TextView) findViewById (R.id.syncResult);
-        continueButton = (Button) findViewById (R.id.continueButton);
+        syncResult = (TextView) findViewById (R.id.sync_result);
+        continueButton = (Button) findViewById (R.id.continue_button);
 
         classSelect = (Spinner) findViewById (R.id.class_select);
 
         prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
         prefEditor = prefs.edit ();
+
+        db = KochanowskiMainActivity.getHelper ().getReadableDatabase ();
 
         Toolbar toolbar = (Toolbar) findViewById (R.id.activity_sync_toolbar);
         if (toolbar != null)
@@ -68,7 +121,16 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
             //toolbar.setNavigationIcon (R.drawable.ic_arrow_back);
         }
 
-        if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false) && savedInstanceState == null)
+        // set status bar color (lollipop only)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            Window window = getWindow ();
+            window.addFlags (WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
+        }
+
+        if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
         {
             initSync ();
         }
@@ -76,6 +138,9 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         {
             progressBar.setProgress (progressBar.getMax ());
             currentCount.setText (progressBar.getMax () + "/" + progressBar.getMax ());
+
+            syncResult.setVisibility (View.VISIBLE);
+            classSelect.setVisibility (View.VISIBLE);
         }
     }
 
@@ -130,29 +195,19 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         continueButton.setVisibility (View.VISIBLE);
 
         classSelect.setVisibility (View.VISIBLE);
-        String[] columns = {"shortname"};
-        int[] ids = {android.R.id.text1};
 
-        Cursor cur = KochanowskiMainActivity.getHelper ().getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
-
-        CursorAdapter adapter = new SimpleCursorAdapter (this, android.R.layout.simple_spinner_item, cur, columns, ids, 0);
+        ClassSelectAdapter adapter = new ClassSelectAdapter (this, R.layout.sync_spinner_item);
 
         classSelect.setAdapter (adapter);
         classSelect.setOnItemSelectedListener (this);
     }
 
     @Override
-    protected void onResume ()
+    protected void onStop ()
     {
-        super.onResume ();
+        super.onStop ();
 
-        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
-        {
-            syncResult.setVisibility (View.INVISIBLE);
-            continueButton.setVisibility (View.INVISIBLE);
-
-            classSelect.setVisibility (View.INVISIBLE);
-        }
+        ThreadManager.cancelAll ();
     }
 
     @Override
@@ -181,25 +236,27 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected (item);
     }
 
+    @Override
+    public void onConfigurationChanged (Configuration newConfig)
+    {
+        super.onConfigurationChanged (newConfig);
+    }
+
     public void onContinueClick (View view)
     {
         Intent intent = new Intent (this, KochanowskiMainActivity.class);
         startActivity (intent);
     }
 
-    private void saveSettings ()
-    {
-        TextView view1 = (TextView) classSelect.getSelectedView ();
-        prefEditor.putString (getString (R.string.pref_table_name), view1.getText ().toString ());
-        prefEditor.commit ();
-        Log.i ("liquid", view1.getText ().toString ());
-    }
-
     @Override
     public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
     {
-        Cursor view1 = (Cursor) parent.getItemAtPosition (position);
-        prefEditor.putString (getString (R.string.pref_table_name), view1.getString (view1.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT)));
+        Cursor cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME + " ORDER BY " + ClassTable.COLUMN_NAME_NAME_LONG + " ASC", null);
+        cur.moveToPosition (position);
+        String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+
+        prefEditor.putString (getString (R.string.pref_table_name), shortname);
+
         prefEditor.commit ();
     }
 
@@ -208,4 +265,10 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     {
 
     }
+
+    public void onStopClick (View view)
+    {
+        manager.cancelAll ();
+    }
 }
+
