@@ -17,6 +17,8 @@ import com.liquid.kochanowski.TimeTableContract.*;
 import com.liquid.kochanparser.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
+import org.lucasr.twowayview.TwoWayLayoutManager;
+import org.lucasr.twowayview.widget.ListLayoutManager;
 
 
 /**
@@ -188,7 +190,7 @@ public class TimeTableListFragment extends Fragment
         View v =  inflater.inflate (R.layout.fragment_time_table_list, container, false);
 
         recyclerView = (RecyclerView) v.findViewById (R.id.timetable_list);
-        layoutManager = new LinearLayoutManager (this.getActivity ());
+        layoutManager = new ListLayoutManager (this.getActivity (), TwoWayLayoutManager.Orientation.VERTICAL);
         recyclerView.setLayoutManager (layoutManager);
 
         adapter = new TimeTableListAdapter (tableType);
