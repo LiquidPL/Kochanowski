@@ -49,10 +49,9 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
 
     private static final String SQL_DELETE_TABLES =
             "DROP TABLE IF EXISTS " + TimeTableContract.TeacherTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME +
-                    //" DROP TABLE IF EXISTS" + TimeTableContract.DaysTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME +
-                    " DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME + ";";
+                    "; DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME +
+                    "; DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME +
+                    "; DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME + ";";
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "timetables.db";
