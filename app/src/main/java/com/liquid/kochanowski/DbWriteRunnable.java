@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Process;
+import android.util.Log;
 
 import com.liquid.kochanowski.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.TimeTableContract.HourTable;
@@ -71,11 +72,11 @@ public class DbWriteRunnable implements Runnable
                 values.put (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT, table.getShortName ());
 
                 db.insert (LessonTable.TABLE_NAME, null, values);
-            }
 
-            if (Thread.interrupted ())
-            {
-                throw new InterruptedException ();
+                if (Thread.interrupted ())
+                {
+                    throw new InterruptedException ();
+                }
             }
 
             for (int i = 0; i < table.getStarthours ().size (); i++)
@@ -94,6 +95,11 @@ public class DbWriteRunnable implements Runnable
                 values.put (HourTable.COLUMN_NAME_END_MINUTE, table.getEndhours ().get (i).getMinute ());
 
                 db.insert (HourTable.TABLE_NAME, null, values);
+
+                if (Thread.interrupted ())
+                {
+                    throw new InterruptedException ();
+                }
             }
 
             values = new ContentValues ();
@@ -101,10 +107,15 @@ public class DbWriteRunnable implements Runnable
             values.put (ClassTable.COLUMN_NAME_NAME_LONG, table.getLongName ());
 
             db.insert (ClassTable.TABLE_NAME, null, values);
+
+            if (Thread.interrupted ())
+            {
+                throw new InterruptedException ();
+            }
         }
         catch (InterruptedException e)
         {
-            // do nothing
+            return;
         }
         catch (SQLiteException e)
         {

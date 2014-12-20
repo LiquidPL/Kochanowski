@@ -45,6 +45,11 @@ public class ParseTask implements DownloadRunnableMethods, DbWriteRunnableMethod
         }
     }
 
+    public Thread getCurrentThread ()
+    {
+        return thread;
+    }
+
     @Override
     public void setDbWriteThread (Thread currentThread)
     {
@@ -109,6 +114,16 @@ public class ParseTask implements DownloadRunnableMethods, DbWriteRunnableMethod
         table = null;
         tablename = null;
         db = null;
+    }
+
+    public void cancel ()
+    {
+        recycle ();
+
+        if (thread != null)
+        {
+            thread.interrupt ();
+        }
     }
 
     public URL getUrl ()

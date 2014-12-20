@@ -5,9 +5,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,7 +33,8 @@ public class ThreadManager
 
     private final BlockingQueue <Runnable> downloadQueue;
     private final BlockingQueue <Runnable> dbWriteQueue;
-    private final Queue<ParseTask> parseTaskQueue;
+    //private final Queue<ParseTask> parseTaskQueue;
+    private final List<ParseTask> parseTaskList;
 
     private final ThreadPoolExecutor downloadPool;
     private final ThreadPoolExecutor dbWritePool;
@@ -58,7 +62,8 @@ public class ThreadManager
     {
         downloadQueue = new LinkedBlockingQueue<Runnable> ();
         dbWriteQueue = new LinkedBlockingQueue <Runnable> ();
-        parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
+        //parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
+        parseTaskList = new ArrayList <ParseTask> ();
 
         db = KochanowskiMainActivity.getHelper ().getWritableDatabase ();
 
@@ -84,7 +89,9 @@ public class ThreadManager
             public void handleMessage (Message msg)
             {
                 ParseTask task = (ParseTask) msg.obj;
-                String name = task.getTable ().getLongName () + " (" + task.getTable ().getShortName () + ")";
+                String name;
+                if (task != null) name = task.getTable ().getLongName () + " (" + task.getTable ().getShortName () + ")";
+                else name = "";
 
                 switch (msg.what)
                 {
@@ -101,6 +108,7 @@ public class ThreadManager
                     case DOWNLOAD_FAILED:
                         task.recycle ();
                         result = DOWNLOAD_FAILED;
+                        context.finishSync ();
                         break;
                 }
 
@@ -145,17 +153,13 @@ public class ThreadManager
     {
         task.recycle ();
 
-        parseTaskQueue.offer (task);
+        //parseTaskQueue.offer (task);
+        parseTaskList.remove (task);
     }
 
     public static void parseTimeTable (String url)
     {
-        ParseTask task = instance.parseTaskQueue.poll ();
-
-        if (task == null)
-        {
-            task = new ParseTask (db);
-        }
+        ParseTask task = new ParseTask (db);
 
         try
         {
@@ -166,7 +170,30 @@ public class ThreadManager
             e.printStackTrace ();
         }
 
+        instance.parseTaskList.add (task);
+
         instance.downloadPool.execute (task.getDownloadRunnable ());
+    }
+
+    public static void cancelAll ()
+    {
+        synchronized (instance)
+        {
+            for (ParseTask task : instance.parseTaskList)
+            {
+                Thread thread = task.getCurrentThread ();
+
+                if (thread != null)
+                {
+                    Log.i ("liquid", thread.toString ());
+                    thread.interrupt ();
+                }
+            }
+        }
+        instance.downloadPool.shutdownNow ();
+        instance.dbWritePool.shutdownNow ();
+
+        handler.obtainMessage (DOWNLOAD_FAILED, new ParseTask (db)).sendToTarget ();
     }
 
     public static ThreadManager getInstance ()

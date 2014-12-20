@@ -1,5 +1,7 @@
 package com.liquid.kochanowski;
 
+import android.util.Log;
+
 import com.liquid.kochanparser.TimeTable;
 import com.liquid.kochanparser.TimeTableType;
 
@@ -44,7 +46,7 @@ public class TimeTableDownloadRunnable implements Runnable
     @Override
     public void run ()
     {
-        //task.setDownloadThread (Thread.currentThread ());
+        task.setDownloadThread (Thread.currentThread ());
 
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
@@ -58,6 +60,7 @@ public class TimeTableDownloadRunnable implements Runnable
         {
             if (Thread.interrupted ())
             {
+                Log.i ("liquid", "interrupted");
                 throw new InterruptedException ();
             }
 
@@ -80,6 +83,12 @@ public class TimeTableDownloadRunnable implements Runnable
 
                 table.setType (TimeTableType.CLASS);
                 table.parse (istr);
+
+                if (Thread.interrupted ())
+                {
+                    Log.i ("liquid", "interrupted");
+                    throw new InterruptedException ();
+                }
             }
             catch (java.io.IOException e)
             {
@@ -101,7 +110,7 @@ public class TimeTableDownloadRunnable implements Runnable
         }
         catch (InterruptedException e)
         {
-            // Do nothing
+            return;
         }
         finally
         {
