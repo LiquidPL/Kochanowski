@@ -38,14 +38,23 @@
     </RelativeLayout>
 
 
-    <org.lucasr.twowayview.widget.TwoWayView
-        android:id="@+id/left_drawer"
+    <com.liquid.kochanowski.widget.ScrimInsetsFrameLayout
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@android:color/background_light"
-        android:elevation="8dp"
-        android:fitsSystemWindows="true"/>
+        app:insetForeground="#4000"
+        android:layout_gravity="left|start"
+        android:fitsSystemWindows="true"
+        android:id="@+id/linear_layout"
+        android:elevation="8dp">
+
+        <org.lucasr.twowayview.widget.TwoWayView
+            android:paddingTop="20dp"
+            android:id="@+id/left_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/background_light"/>
+
+    </com.liquid.kochanowski.widget.ScrimInsetsFrameLayout>
 
 </android.support.v4.widget.DrawerLayout>
 
