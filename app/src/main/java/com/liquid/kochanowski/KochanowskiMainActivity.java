@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -335,7 +338,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             toolbar.setTitleTextColor (getResources ().getColor (R.color.white_100));
 
             drawerLayout.setDrawerListener (toggle);
-            drawerLayout.setStatusBarBackgroundColor (getResources ().getColor (R.color.primary_dark));
 
             drawerList.setLayoutManager (drawerLayoutManager);
             drawerList.setAdapter (drawerAdapter);
@@ -362,6 +364,15 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                     }
                 }
             });
+        }
+
+        // set status bar color (lollipop only)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            Window window = getWindow ();
+            window.addFlags (WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
         }
 
         DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item);
