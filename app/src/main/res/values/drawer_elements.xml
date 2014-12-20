@@ -6,6 +6,7 @@
         <item>@string/teachers</item>
         <item>@string/classrooms</item>
         <item>@string/separator</item>
+        <item>@string/action_settings</item>
     </string-array>
 
     <array name="drawer_icons">
@@ -14,5 +15,6 @@
         <item>@drawable/ic_group_black</item>
         <item>@drawable/ic_person_black</item>
         <item>@drawable/ic_person_black</item>
+        <item>@drawable/ic_settings_black</item>
     </array>
 </resources>
