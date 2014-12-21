@@ -17,6 +17,7 @@
 package com.liquid.kochanowski.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
@@ -74,11 +75,15 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private int mTabViewTextViewId;
     private boolean mDistributeEvenly;
 
+    private ColorStateList mColorList = null;
+
     private ViewPager mViewPager;
     private SparseArray<String> mContentDescriptions = new SparseArray<String>();
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
+
+    private View oldSelection = null;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -147,6 +152,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
         mTabViewTextViewId = textViewId;
     }
 
+    public void setColorList (ColorStateList colorList)
+    {
+        this.mColorList = colorList;
+    }
+
     /**
      * Sets the associated view pager. Note that the assumption here is that the pager content
      * (number of tabs and tab titles) does not change after this call has been made.
@@ -186,6 +196,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private void populateTabStrip() {
+        removeOldSelection ();
+        oldSelection = null;
+
         final PagerAdapter adapter = mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
@@ -213,6 +226,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 lp.width = 0;
                 lp.weight = 1;
             }
+
+            if (mColorList != null) tabTitleView.setTextColor(mColorList);
 
             tabTitleView.setText(adapter.getPageTitle(i));
             tabView.setOnClickListener(tabClickListener);
@@ -249,6 +264,12 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         View selectedChild = mTabStrip.getChildAt(tabIndex);
         if (selectedChild != null) {
+            if (positionOffset == 0 && selectedChild != oldSelection) {
+                selectedChild.setSelected (true);
+                removeOldSelection ();
+                oldSelection = selectedChild;
+            }
+
             int targetScrollX = selectedChild.getLeft() + positionOffset;
 
             if (tabIndex > 0 || positionOffset > 0) {
@@ -257,6 +278,14 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
 
             scrollTo(targetScrollX, 0);
+        }
+    }
+
+    private void removeOldSelection ()
+    {
+        if (oldSelection != null)
+        {
+            oldSelection.setSelected (false);
         }
     }
 
@@ -306,7 +335,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
         }
-
     }
 
     private class TabClickListener implements View.OnClickListener {
