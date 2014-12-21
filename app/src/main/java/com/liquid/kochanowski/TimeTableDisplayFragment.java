@@ -19,10 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.db.DatabaseHelper;
-import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
-import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
-import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
 import com.liquid.kochanparser.TimeTableType;
+
+import com.liquid.kochanowski.db.TimeTableContract.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,8 +33,8 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TABLE_NAME = "tablename";
     private static final String ARG_TABLE_TYPE = "tabletype";
-    private static final String ARG_DAY_ID = "dayid";
-    private static final String ARG_GROUP_ID = "groupid";
+    private static final String ARG_DAY_ID     = "dayid";
+    private static final String ARG_GROUP_ID   = "groupid";
 
     // the given fragments parameters
     private String tableName;
@@ -54,9 +53,167 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
     private SharedPreferences prefs;
 
-    public TimeTableDisplayFragment ()
+    private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
-        // Required empty public constructor
+        private Cursor cur;
+
+        private Context context;
+
+        private String tableName;
+        private int tableType;
+        private int dayId;
+        private int groupId;
+
+        private int resource;
+
+        public class LessonViewHolder extends RecyclerView.ViewHolder
+        {
+            public TextView subjectName;
+            public TextView teacherName;
+            public TextView classroomName;
+            public TextView groupName;
+
+            public RelativeLayout container;
+
+            public LessonViewHolder (View v)
+            {
+                super (v);
+
+                subjectName = (TextView) v.findViewById (R.id.subjectName);
+                teacherName = (TextView) v.findViewById (R.id.teacherName);
+                classroomName = (TextView) v.findViewById (R.id.classroomName);
+                groupName = (TextView) v.findViewById (R.id.groupName);
+
+                container = (RelativeLayout) v;
+            }
+        }
+
+        public LessonListAdapter (int resource, SQLiteDatabase db, String tableName, int tableType, int dayId, int groupId, Context context)
+        {
+            this.tableName = tableName;
+            this.tableType = tableType;
+            this.dayId = dayId;
+            this.groupId = groupId;
+            this.context = context;
+
+            this.resource = resource;
+
+            String query = "SELECT * FROM " + LessonTable.TABLE_NAME +
+                    " JOIN " + TeacherTable.TABLE_NAME +
+                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
+                    "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE +
+                    " JOIN " + ClassTable.TABLE_NAME +
+                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
+                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT;
+
+            switch (tableType)
+            {
+                case TimeTableType.CLASS:
+                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "='" + tableName + "'";
+                    break;
+                case TimeTableType.TEACHER:
+                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "='" + tableName + "'";
+                    break;
+                case TimeTableType.CLASSROOM:
+                    query += " WHERE " + LessonTable.COLUMN_NAME_CLASSROOM + "=" + tableName;
+                    break;
+            }
+
+            query += " AND " + LessonTable.COLUMN_NAME_DAY + "=" + dayId;
+
+            if (groupId != 0)
+            {
+                query += " AND (" + LessonTable.COLUMN_NAME_GROUP_ID + "=" + "0" +
+                        " OR " + LessonTable.COLUMN_NAME_GROUP_ID + "=" + groupId + ")";
+            }
+
+            query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
+
+            Log.i ("query", query);
+
+            cur = db.rawQuery (query, null);
+        }
+
+        @Override
+        public void onBindViewHolder (LessonViewHolder holder, int position)
+        {
+            cur.moveToPosition (position);
+
+            String subject = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_SUBJECT));
+            String classroom = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
+            String add = "";
+            String add2 = "";
+            String add3 = "";
+
+            //holder.subjectName.setText (subject);
+            //holder.classroomName.setText (classroom);
+
+            switch (tableType)
+            {
+                case TimeTableType.CLASS:
+                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
+                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
+                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
+
+                    holder.subjectName.setText (subject);
+                    holder.classroomName.setText (classroom);
+                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
+
+                    //Log.i ("liquid", subject + " " + classroom + " " + add);
+
+                    break;
+                case TimeTableType.TEACHER:
+                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
+                    add2 = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+
+                    holder.subjectName.setText (subject);
+                    holder.classroomName.setText (classroom);
+                    holder.teacherName.setText (add2 + " (" + add + ")");
+
+                    break;
+                case TimeTableType.CLASSROOM:
+                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
+                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
+                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
+
+                    String classname = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
+
+                    holder.subjectName.setText (subject);
+                    holder.classroomName.setText (classname);
+                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
+
+
+
+                    break;
+            }
+
+            int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
+            if (group != 0)
+            {
+                holder.groupName.setText ("GRUPA " + group);
+                holder.groupName.setVisibility (View.VISIBLE);
+            }
+        }
+
+        @Override
+        public LessonViewHolder onCreateViewHolder (ViewGroup parent, int viewType)
+        {
+            View v = LayoutInflater.from (parent.getContext ()).inflate (R.layout.lesson_item, parent, false);
+
+            return new LessonViewHolder (v);
+        }
+
+        @Override
+        public int getItemCount ()
+        {
+            return cur.getCount ();
+        }
+    }
+
+
+    interface Clickable
+    {
+        void onSyncButtonClick (View v);
     }
 
     /**
@@ -65,7 +222,8 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
      *
      * @param tableName Name of the timetable, corresponding to a column in the database
      * @param tableType The timetable type to display (class/teacher/classroom)
-     * @param groupId   The group to be displayed
+     * @param groupId The group to be displayed
+     *
      * @return A new instance of fragment TimeTableDisplayFragment.
      */
     public static TimeTableDisplayFragment newInstance (String tableName, int tableType, int dayId, int groupId)
@@ -80,6 +238,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         fragment.setArguments (args);
         return fragment;
+    }
+
+    public TimeTableDisplayFragment ()
+    {
+        // Required empty public constructor
     }
 
     @Override
@@ -202,166 +365,5 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     public int getGroupId ()
     {
         return groupId;
-    }
-
-    interface Clickable
-    {
-        void onSyncButtonClick (View v);
-    }
-
-    private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
-    {
-        private Cursor cur;
-
-        private Context context;
-
-        private String tableName;
-        private int tableType;
-        private int dayId;
-        private int groupId;
-
-        private int resource;
-
-        public LessonListAdapter (int resource, SQLiteDatabase db, String tableName, int tableType, int dayId, int groupId, Context context)
-        {
-            this.tableName = tableName;
-            this.tableType = tableType;
-            this.dayId = dayId;
-            this.groupId = groupId;
-            this.context = context;
-
-            this.resource = resource;
-
-            String query = "SELECT * FROM " + LessonTable.TABLE_NAME +
-                    " JOIN " + TeacherTable.TABLE_NAME +
-                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
-                    "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE +
-                    " JOIN " + ClassTable.TABLE_NAME +
-                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
-                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT;
-
-            switch (tableType)
-            {
-                case TimeTableType.CLASS:
-                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "='" + tableName + "'";
-                    break;
-                case TimeTableType.TEACHER:
-                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "='" + tableName + "'";
-                    break;
-                case TimeTableType.CLASSROOM:
-                    query += " WHERE " + LessonTable.COLUMN_NAME_CLASSROOM + "=" + tableName;
-                    break;
-            }
-
-            query += " AND " + LessonTable.COLUMN_NAME_DAY + "=" + dayId;
-
-            if (groupId != 0)
-            {
-                query += " AND (" + LessonTable.COLUMN_NAME_GROUP_ID + "=" + "0" +
-                        " OR " + LessonTable.COLUMN_NAME_GROUP_ID + "=" + groupId + ")";
-            }
-
-            query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
-
-            Log.i ("query", query);
-
-            cur = db.rawQuery (query, null);
-        }
-
-        @Override
-        public void onBindViewHolder (LessonViewHolder holder, int position)
-        {
-            cur.moveToPosition (position);
-
-            String subject = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_SUBJECT));
-            String classroom = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
-            String add = "";
-            String add2 = "";
-            String add3 = "";
-
-            //holder.subjectName.setText (subject);
-            //holder.classroomName.setText (classroom);
-
-            switch (tableType)
-            {
-                case TimeTableType.CLASS:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classroom);
-                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
-
-                    //Log.i ("liquid", subject + " " + classroom + " " + add);
-
-                    break;
-                case TimeTableType.TEACHER:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classroom);
-                    holder.teacherName.setText (add2 + " (" + add + ")");
-
-                    break;
-                case TimeTableType.CLASSROOM:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-
-                    String classname = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classname);
-                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
-
-
-                    break;
-            }
-
-            int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
-            if (group != 0)
-            {
-                holder.groupName.setText ("GRUPA " + group);
-                holder.groupName.setVisibility (View.VISIBLE);
-            }
-        }
-
-        @Override
-        public LessonViewHolder onCreateViewHolder (ViewGroup parent, int viewType)
-        {
-            View v = LayoutInflater.from (parent.getContext ()).inflate (R.layout.lesson_item, parent, false);
-
-            return new LessonViewHolder (v);
-        }
-
-        @Override
-        public int getItemCount ()
-        {
-            return cur.getCount ();
-        }
-
-        public class LessonViewHolder extends RecyclerView.ViewHolder
-        {
-            public TextView subjectName;
-            public TextView teacherName;
-            public TextView classroomName;
-            public TextView groupName;
-
-            public RelativeLayout container;
-
-            public LessonViewHolder (View v)
-            {
-                super (v);
-
-                subjectName = (TextView) v.findViewById (R.id.subjectName);
-                teacherName = (TextView) v.findViewById (R.id.teacherName);
-                classroomName = (TextView) v.findViewById (R.id.classroomName);
-                groupName = (TextView) v.findViewById (R.id.groupName);
-
-                container = (RelativeLayout) v;
-            }
-        }
     }
 }

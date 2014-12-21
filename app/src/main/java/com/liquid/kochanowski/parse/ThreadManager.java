@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.liquid.kochanowski.KochanowskiMainActivity;
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.SyncActivity;
 import com.liquid.kochanowski.db.DatabaseHelper;
@@ -23,39 +24,49 @@ import java.util.concurrent.TimeUnit;
 public class ThreadManager
 {
     public static final int DOWNLOAD_FAILED = -1;
-    public static final int TASK_COMPLETED = 4;
     static final int DOWNLOAD_STARTED = 1;
     static final int DOWNLOAD_COMPLETE = 2;
     static final int DB_WRITE_STARTED = 3;
+    public static final int TASK_COMPLETED = 4;
+
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT;
     private static final int CORE_POOL_SIZE = 8;
     private static final int MAX_POOL_SIZE = 8;
     private static int CORE_NUMBER = Runtime.getRuntime ().availableProcessors ();
+
+    private final BlockingQueue <Runnable> downloadQueue;
+    private final BlockingQueue <Runnable> dbWriteQueue;
+    private final List<ParseTask> parseTaskList;
+
+    private final ThreadPoolExecutor downloadPool;
+    private final ThreadPoolExecutor dbWritePool;
+
     private static ThreadManager instance;
+
     private static Handler handler;
+
     private static SyncActivity context;
+
     private static SQLiteDatabase db;
+
     private static int currentTimeTable;
     private static int timeTableCount;
+
     private static int result;
+
     static
     {
         KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
         instance = new ThreadManager ();
     }
-    private final BlockingQueue<Runnable> downloadQueue;
-    private final BlockingQueue<Runnable> dbWriteQueue;
-    private final List<ParseTask> parseTaskList;
-    private final ThreadPoolExecutor downloadPool;
-    private final ThreadPoolExecutor dbWritePool;
 
     private ThreadManager ()
     {
         downloadQueue = new LinkedBlockingQueue<Runnable> ();
-        dbWriteQueue = new LinkedBlockingQueue<Runnable> ();
+        dbWriteQueue = new LinkedBlockingQueue <Runnable> ();
         //parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
-        parseTaskList = new ArrayList<ParseTask> ();
+        parseTaskList = new ArrayList <ParseTask> ();
 
         db = DatabaseHelper.getWritableDatabase ();
 
@@ -82,14 +93,8 @@ public class ThreadManager
             {
                 ParseTask task = (ParseTask) msg.obj;
                 String name;
-                if (task != null)
-                {
-                    name = task.getTable ().getLongName () + " (" + task.getTable ().getShortName () + ")";
-                }
-                else
-                {
-                    name = "";
-                }
+                if (task != null) name = task.getTable ().getLongName () + " (" + task.getTable ().getShortName () + ")";
+                else name = "";
 
                 switch (msg.what)
                 {
@@ -130,6 +135,31 @@ public class ThreadManager
         ThreadManager.context = (SyncActivity) context;
     }
 
+    public void handleState (ParseTask task, int state)
+    {
+        switch (state)
+        {
+            case TASK_COMPLETED:
+                Message completeMessage = handler.obtainMessage (state, task);
+                completeMessage.sendToTarget ();
+                break;
+            case DOWNLOAD_COMPLETE:
+                dbWritePool.execute (task.getDbWriteRunnable ());
+                break;
+            default:
+                handler.obtainMessage (state, task).sendToTarget ();
+                break;
+        }
+    }
+
+    private void recycleTask (ParseTask task)
+    {
+        task.recycle ();
+
+        //parseTaskQueue.offer (task);
+        parseTaskList.remove (task);
+    }
+
     public static void parseTimeTable (String url)
     {
         ParseTask task = new ParseTask (db);
@@ -137,7 +167,8 @@ public class ThreadManager
         try
         {
             task.setUrl (new URL (url));
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             e.printStackTrace ();
         }
@@ -171,30 +202,5 @@ public class ThreadManager
     public static ThreadManager getInstance ()
     {
         return instance;
-    }
-
-    public void handleState (ParseTask task, int state)
-    {
-        switch (state)
-        {
-            case TASK_COMPLETED:
-                Message completeMessage = handler.obtainMessage (state, task);
-                completeMessage.sendToTarget ();
-                break;
-            case DOWNLOAD_COMPLETE:
-                dbWritePool.execute (task.getDbWriteRunnable ());
-                break;
-            default:
-                handler.obtainMessage (state, task).sendToTarget ();
-                break;
-        }
-    }
-
-    private void recycleTask (ParseTask task)
-    {
-        task.recycle ();
-
-        //parseTaskQueue.offer (task);
-        parseTaskList.remove (task);
     }
 }

@@ -37,17 +37,17 @@ public class ParseTask implements DownloadRunnableMethods, DbWriteRunnableMethod
         dbWriteRunnable = new DbWriteRunnable (this);
     }
 
-    public Thread getCurrentThread ()
-    {
-        return thread;
-    }
-
     private void setCurrentThread (Thread currentThread)
     {
         synchronized (manager)
         {
             this.thread = currentThread;
         }
+    }
+
+    public Thread getCurrentThread ()
+    {
+        return thread;
     }
 
     @Override

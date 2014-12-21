@@ -30,6 +30,13 @@ public class TimeTableDownloadRunnable implements Runnable
 
     private TimeTable table;
 
+    interface DownloadRunnableMethods
+    {
+        void setDownloadThread (Thread currentThread);
+
+        void handleDownloadState (int state);
+    }
+
     public TimeTableDownloadRunnable (ParseTask task)
     {
         this.task = task;
@@ -41,7 +48,7 @@ public class TimeTableDownloadRunnable implements Runnable
     {
         task.setDownloadThread (Thread.currentThread ());
 
-        android.os.Process.setThreadPriority (android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         // Setting up the HtmlCleaner for cleaning up the sad HTML
         HtmlCleaner cleaner = new HtmlCleaner ();
@@ -82,25 +89,30 @@ public class TimeTableDownloadRunnable implements Runnable
                     Log.i ("liquid", "interrupted");
                     throw new InterruptedException ();
                 }
-            } catch (java.io.IOException e)
+            }
+            catch (java.io.IOException e)
             {
                 task.handleDownloadState (DOWNLOAD_FAILED);
                 e.printStackTrace ();
-            } catch (ParserConfigurationException e)
+            }
+            catch (ParserConfigurationException e)
             {
                 task.handleDownloadState (DOWNLOAD_FAILED);
                 e.printStackTrace ();
-            } catch (SAXException e)
+            }
+            catch (SAXException e)
             {
                 task.handleDownloadState (DOWNLOAD_FAILED);
                 e.printStackTrace ();
             }
 
             task.handleDownloadState (DOWNLOAD_COMPLETED);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             return;
-        } finally
+        }
+        finally
         {
             if (task.getTable ().getLessons ().size () == 0)
             {
@@ -110,12 +122,5 @@ public class TimeTableDownloadRunnable implements Runnable
             task.setDownloadThread (null);
             Thread.interrupted ();
         }
-    }
-
-    interface DownloadRunnableMethods
-    {
-        void setDownloadThread (Thread currentThread);
-
-        void handleDownloadState (int state);
     }
 }
