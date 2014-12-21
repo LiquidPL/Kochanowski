@@ -26,13 +26,13 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;
 import com.liquid.kochanowski.parse.ThreadManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SyncActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener
 {

@@ -3,9 +3,8 @@ package com.liquid.kochanowski.parse;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.liquid.kochanparser.TimeTableType;
-
 import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
+import com.liquid.kochanparser.TimeTableType;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

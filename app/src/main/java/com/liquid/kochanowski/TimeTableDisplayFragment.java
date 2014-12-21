@@ -19,9 +19,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
+import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
 import com.liquid.kochanparser.TimeTableType;
-
-import com.liquid.kochanowski.db.TimeTableContract.*;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.db.DatabaseHelper;
-import com.liquid.kochanowski.db.TimeTableContract.*;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
+import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
 import com.liquid.kochanparser.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
