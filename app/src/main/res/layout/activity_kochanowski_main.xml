@@ -44,7 +44,7 @@
         app:insetForeground="#4000"
         android:layout_gravity="left|start"
         android:fitsSystemWindows="true"
-        android:id="@+id/linear_layout"
+        android:id="@+id/inset_layout"
         android:elevation="8dp">
 
         <org.lucasr.twowayview.widget.TwoWayView

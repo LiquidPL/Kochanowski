@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -18,8 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -27,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.widget.ScrimInsetsFrameLayout;
 import com.liquid.kochanparser.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
@@ -51,6 +49,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
     private DrawerLayout drawerLayout;
 
+    private ScrimInsetsFrameLayout insetLayout;
     private RecyclerView drawerList;
     private RecyclerView.LayoutManager drawerLayoutManager;
     private NavDrawerAdapter drawerAdapter;
@@ -286,6 +285,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
         drawerLayout = (DrawerLayout) findViewById (R.id.drawer_layout);
 
+        insetLayout = (ScrimInsetsFrameLayout) findViewById (R.id.inset_layout);
         drawerList = (RecyclerView) findViewById (R.id.left_drawer);
         drawerLayoutManager = new ListLayoutManager (this, TwoWayLayoutManager.Orientation.VERTICAL);
         drawerAdapter = new NavDrawerAdapter (R.layout.drawer_list_item, values, icons);
@@ -487,7 +487,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         }
         transaction.commit ();
 
-        //drawerLayout.closeDrawer (drawerList);
+        drawerLayout.closeDrawer (insetLayout);
     }
 
     private int getCurrentDay ()
