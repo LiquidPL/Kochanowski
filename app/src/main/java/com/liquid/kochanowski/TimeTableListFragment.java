@@ -118,7 +118,7 @@ public class TimeTableListFragment extends Fragment
 
     public interface OnTimeTableSelectedListener
     {
-        public void onTimeTableSelected (String tableName, int tableType);
+        public void onTimeTableSelected (String shortName, String longName, int tableType);
     }
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -205,7 +205,8 @@ public class TimeTableListFragment extends Fragment
             @Override
             public void onItemClick (RecyclerView recyclerView, View view, int position, long id)
             {
-                String tableName = "";
+                String shortName = "";
+                String longName = "";
 
                 Cursor cur = ((TimeTableListAdapter) adapter).getCursor ();
                 cur.moveToPosition (position);
@@ -213,20 +214,28 @@ public class TimeTableListFragment extends Fragment
                 switch (tableType)
                 {
                     case TimeTableType.CLASS:
-                        tableName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
+                        shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+                        longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
                         break;
                     case TimeTableType.TEACHER:
-                        tableName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE));
+                        shortName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE));
+                        longName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) +
+                                " " + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
                         break;
                     case TimeTableType.CLASSROOM:
-                        tableName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
+                        shortName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
                         break;
                 }
 
-                listener.onTimeTableSelected (tableName, tableType);
+                listener.onTimeTableSelected (shortName, longName, tableType);
             }
         });
 
         return v;
+    }
+
+    public int getTableType ()
+    {
+        return tableType;
     }
 }

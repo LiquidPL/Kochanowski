@@ -66,8 +66,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         private int resource;
 
-        private int lastPosition = -1;
-
         public class LessonViewHolder extends RecyclerView.ViewHolder
         {
             public TextView subjectName;
@@ -347,5 +345,25 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                 startActivity (intent);
                 break;
         }
+    }
+
+    public String getTableName ()
+    {
+        return tableName;
+    }
+
+    public int getTableType ()
+    {
+        return tableType;
+    }
+
+    public int getDayId ()
+    {
+        return dayId;
+    }
+
+    public int getGroupId ()
+    {
+        return groupId;
     }
 }

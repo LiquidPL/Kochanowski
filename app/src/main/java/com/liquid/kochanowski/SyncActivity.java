@@ -22,9 +22,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.ProgressBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -117,7 +115,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
         db = DatabaseHelper.getReadableDatabase ();
 
-        Toolbar toolbar = (Toolbar) findViewById (R.id.activity_sync_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById (R.id.toolbar);
         if (toolbar != null)
         {
             setSupportActionBar (toolbar);

@@ -1,8 +1,10 @@
 package com.liquid.kochanowski;
 
+import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -60,16 +62,16 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private TimeTableDisplayFragment displayFragment;
     private TimeTableListFragment listFragment;
 
-    private static final int SCREEN_TODAY = 0;
-    private static final int SCREEN_CLASSES = 1;
-    private static final int SCREEN_TEACHERS = 2;
-    private static final int SCREEN_CLASSROOMS = 3;
-    private static final int SCREEN_DISPLAY = 4;
+    static final int SCREEN_TODAY = 0;
+    static final int SCREEN_CLASSES = 1;
+    static final int SCREEN_TEACHERS = 2;
+    static final int SCREEN_CLASSROOMS = 3;
+    static final int SCREEN_DISPLAY = 4;
 
-    private static final String ARG_SCREEN = "screen";
-    private static final String ARG_TABLE = "table";
-    private static final String ARG_DAY = "day";
-    private static final String ARG_TYPE = "type";
+    static final String ARG_SCREEN = "screen";
+    static final String ARG_TABLE = "table";
+    static final String ARG_DAY = "day";
+    static final String ARG_TYPE = "type";
 
     private int currentScreen = -1;
     private String currentTable = "";
@@ -78,82 +80,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
     private List <String> values;
     private TypedArray icons;
-
-    private class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.DrawerViewHolder>
-    {
-        private List <String> values;
-        private TypedArray icons;
-
-        private int resource;
-
-        public class DrawerViewHolder extends RecyclerView.ViewHolder
-        {
-            View v;
-
-            TextView name;
-            ImageView icon;
-            View separator;
-
-            public DrawerViewHolder (View v)
-            {
-                super (v);
-
-                this.v = v;
-                name = (TextView) v.findViewById (R.id.text);
-                icon = (ImageView) v.findViewById (R.id.item_icon);
-                separator = v.findViewById (R.id.separator);
-            }
-        }
-
-        public NavDrawerAdapter (int resource, List <String> values, TypedArray icons)
-        {
-            this.resource = resource;
-            this.values = values;
-            this.icons = icons;
-        }
-
-        @Override
-        public DrawerViewHolder onCreateViewHolder (ViewGroup parent, int viewType)
-        {
-            View v = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
-
-            return new DrawerViewHolder (v);
-        }
-
-        @Override
-        public void onBindViewHolder (DrawerViewHolder holder, int position)
-        {
-            if (values.get (position).equals ("separator"))
-            {
-                holder.name.setVisibility (View.GONE);
-                holder.icon.setVisibility (View.GONE);
-                holder.separator.setVisibility (View.VISIBLE);
-
-                final float scale = getResources ().getDisplayMetrics ().density;
-                int height = (int) (8.0f * scale + 0.5f);
-
-                holder.v.setMinimumHeight (height);
-
-                ((RelativeLayout) holder.v).setBackgroundResource (0);
-            }
-            else
-            {
-                holder.name.setText (values.get (position));
-                holder.icon.setImageDrawable (icons.getDrawable (position));
-
-                final float scale = getResources ().getDisplayMetrics ().density;
-                int height = (int) (48.0f * scale + 0.5f);
-
-                holder.v.setMinimumHeight (height);
-            }
-        }
-
-        @Override
-        public int getItemCount ()
-        {
-            return values.size ();
-        }
-    }
 
     private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
     {
@@ -280,7 +206,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         values = Arrays.asList (getResources ().getStringArray (R.array.drawer_names));
         icons = getResources ().obtainTypedArray (R.array.drawer_icons);
 
-        toolbar = (Toolbar) findViewById (R.id.activity_main_toolbar);
+        toolbar = (Toolbar) findViewById (R.id.toolbar);
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
 
         drawerLayout = (DrawerLayout) findViewById (R.id.drawer_layout);
@@ -288,7 +214,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         insetLayout = (ScrimInsetsFrameLayout) findViewById (R.id.inset_layout);
         drawerList = (RecyclerView) findViewById (R.id.left_drawer);
         drawerLayoutManager = new ListLayoutManager (this, TwoWayLayoutManager.Orientation.VERTICAL);
-        drawerAdapter = new NavDrawerAdapter (R.layout.drawer_list_item, values, icons);
+        drawerAdapter = new NavDrawerAdapter (R.layout.drawer_list_item, values, icons, this);
         clickSupport = ItemClickSupport.addTo (drawerList);
 
         toggle = new ActionBarDrawerToggle (
@@ -301,6 +227,13 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
         prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
 
+        Intent parentIntent = getIntent ();
+
+        currentScreen = SCREEN_TODAY;
+        currentTable = prefs.getString (getString (R.string.pref_table_name), "");
+        currentDay = getCurrentDay ();
+        currentType = TimeTableType.CLASS;
+
         if (savedInstanceState != null)
         {
             currentScreen = savedInstanceState.getInt (ARG_SCREEN);
@@ -310,10 +243,12 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         }
         else
         {
-            currentScreen = SCREEN_TODAY;
-            currentTable = prefs.getString (getString (R.string.pref_table_name), "");
-            currentDay = getCurrentDay ();
-            currentType = TimeTableType.CLASS;
+            currentScreen = parentIntent.getIntExtra (ARG_SCREEN, SCREEN_TODAY);
+            currentTable = parentIntent.getStringExtra (ARG_TABLE);
+            if (currentTable == null)
+                currentTable = prefs.getString (getString (R.string.pref_table_name), "");
+            currentDay = parentIntent.getIntExtra (ARG_DAY, getCurrentDay ());
+            currentType = parentIntent.getIntExtra (ARG_TYPE, TimeTableType.CLASS);
         }
     }
 
@@ -328,7 +263,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     @Override
     protected void onResume ()
     {
-        super.onResume ();
+        super.onResume ();        Log.i ("liquid", "onResume ()");
 
         if (toolbar != null)
         {
@@ -367,15 +302,11 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             });
         }
 
-
-
         DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item);
         spinner.setAdapter (adapter);
         spinner.setOnItemSelectedListener (this);
 
         selectScreen (currentScreen, currentTable, currentDay, currentType);
-
-        Log.i ("liquid", "onResume ()");
     }
 
     @Override
@@ -454,11 +385,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 displayFragment = TimeTableDisplayFragment.newInstance (currentTable, currentType, currentDay, 0);
                 transaction.replace (R.id.fragment_stub, displayFragment);
 
-                Log.i ("liquid", "a " + currentScreen + " " + currentTable + " " + currentDay + " " + currentType);
-
                 getSupportActionBar ().setDisplayShowTitleEnabled (false);
                 spinner.setVisibility (View.VISIBLE);
-
                 spinner.setSelection (currentDay);
                 break;
             case SCREEN_CLASSES:
@@ -493,7 +421,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         drawerLayout.closeDrawer (insetLayout);
     }
 
-    private int getCurrentDay ()
+    static public int getCurrentDay ()
     {
         int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
         if (day > 4 || day < 0) day = 0;
@@ -518,8 +446,14 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     }
 
     @Override
-    public void onTimeTableSelected (String tableName, int tableType)
+    public void onTimeTableSelected (String shortName, String longName, int tableType)
     {
+        Intent intent = new Intent (this, TimeTableTabActivity.class);
 
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_SHORT, shortName);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_LONG, longName);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
+
+        startActivity (intent);
     }
 }

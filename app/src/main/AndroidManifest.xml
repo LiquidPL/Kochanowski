@@ -27,6 +27,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.liquid.kochanowski.KochanowskiMainActivity" />
         </activity>
+        <activity
+            android:name=".TimeTableTabActivity"
+            android:label="@string/title_activity_time_table_tab"
+            android:parentActivityName=".KochanowskiMainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liquid.kochanowski.KochanowskiMainActivity" />
+        </activity>
     </application>
 
 </manifest>

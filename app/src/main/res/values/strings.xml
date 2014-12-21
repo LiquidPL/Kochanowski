@@ -28,4 +28,7 @@
     <string name="teachers">Teachers</string>
     <string name="classrooms">Classrooms</string>
     <string name="separator" translatable="false">separator</string>
+    <string name="title_activity_tab_test">TabTestActivity</string>
+    <string name="title_activity_time_table_tab">TimeTableTabActivity</string>
+
 </resources>
