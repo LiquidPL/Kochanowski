@@ -453,6 +453,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 displayFragment = TimeTableDisplayFragment.newInstance (currentTable, currentType, currentDay, 0);
                 transaction.replace (R.id.fragment_stub, displayFragment);
 
+                Log.i ("liquid", "a " + currentScreen + " " + currentTable + " " + currentDay + " " + currentType);
+
                 getSupportActionBar ().setDisplayShowTitleEnabled (false);
                 spinner.setVisibility (View.VISIBLE);
 
@@ -493,7 +495,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private int getCurrentDay ()
     {
         int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
-        if (day > 4) day = 0;
+        if (day > 4 || day < 0) day = 0;
         return day;
     }
 
