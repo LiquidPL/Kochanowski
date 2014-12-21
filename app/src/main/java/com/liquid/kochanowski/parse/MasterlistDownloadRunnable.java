@@ -30,7 +30,7 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class MasterlistDownloadRunnable implements Runnable
 {
-    private List <String> urls;
+    private List<String> urls;
     private SQLiteDatabase db;
     private SyncActivity context;
     private Handler handler;
@@ -59,8 +59,7 @@ public class MasterlistDownloadRunnable implements Runnable
                 masterlist_url += (char) data;
                 data = istr.read ();
             }
-        }
-        catch (java.io.IOException e)
+        } catch (java.io.IOException e)
         {
             e.printStackTrace ();
         }
@@ -87,16 +86,13 @@ public class MasterlistDownloadRunnable implements Runnable
             DefaultHandler handler = new MasterlistHandler (urls, db);
             parser.parse (istr, handler);
 
-        }
-        catch (java.io.IOException e)
+        } catch (java.io.IOException e)
         {
             e.printStackTrace ();
-        }
-        catch (ParserConfigurationException e)
+        } catch (ParserConfigurationException e)
         {
             e.printStackTrace ();
-        }
-        catch (SAXException e)
+        } catch (SAXException e)
         {
             e.printStackTrace ();
         }

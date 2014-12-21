@@ -1,14 +1,12 @@
 package com.liquid.kochanowski;
 
-import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,8 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,157 +40,45 @@ import java.util.List;
 
 public class KochanowskiMainActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, TimeTableListFragment.OnTimeTableSelectedListener
 {
-    private SharedPreferences prefs;
-
-    private Toolbar toolbar;
-    private Spinner spinner;
-
-    private DrawerLayout drawerLayout;
-
-    private ScrimInsetsFrameLayout insetLayout;
-    private RecyclerView drawerList;
-    private RecyclerView.LayoutManager drawerLayoutManager;
-    private NavDrawerAdapter drawerAdapter;
-    private ItemClickSupport clickSupport;
-
-    private ActionBarDrawerToggle toggle;
-
-    private TimeTableDisplayFragment displayFragment;
-    private TimeTableListFragment listFragment;
-
     static final int SCREEN_TODAY = 0;
     static final int SCREEN_CLASSES = 1;
     static final int SCREEN_TEACHERS = 2;
     static final int SCREEN_CLASSROOMS = 3;
     static final int SCREEN_DISPLAY = 4;
-
     static final String ARG_SCREEN = "screen";
     static final String ARG_TABLE = "table";
     static final String ARG_DAY = "day";
     static final String ARG_TYPE = "type";
-
+    private SharedPreferences prefs;
+    private Toolbar toolbar;
+    private Spinner spinner;
+    private DrawerLayout drawerLayout;
+    private ScrimInsetsFrameLayout insetLayout;
+    private RecyclerView drawerList;
+    private RecyclerView.LayoutManager drawerLayoutManager;
+    private NavDrawerAdapter drawerAdapter;
+    private ItemClickSupport clickSupport;
+    private ActionBarDrawerToggle toggle;
+    private TimeTableDisplayFragment displayFragment;
+    private TimeTableListFragment listFragment;
     private int currentScreen = -1;
     private String currentTable = "";
     private int currentDay = -1;
     private int currentType = -1;
 
-    private List <String> values;
+    private List<String> values;
     private TypedArray icons;
-
-    private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
-    {
-        public class DayDate
-        {
-            int id;
-
-            String day;
-            String date;
-
-            public DayDate (int id, String day, String date)
-            {
-                this.id = id;
-                this.day = day;
-                this.date = date;
-            }
-        }
-
-        private List<DayDate> days = new ArrayList<> ();
-        private int resource;
-
-        private Context context;
-
-        public DaySelectAdapter (Context context, int resource)
-        {
-            super (context, resource);
-
-            this.context = context;
-            this.resource = resource;
-            this.days = getDays (context);
-        }
-
-        @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
-            return getCustomView (resource, position, convertView, parent);
-        }
-
-        @Override
-        public View getDropDownView (int position, View convertView, ViewGroup parent)
-        {
-            return getCustomView (R.layout.spinner_item_dropdown, position, convertView, parent);
-        }
-
-        private View getCustomView (int resource, int position, View convertView, ViewGroup parent)
-        {
-            View view = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
-
-            TextView dayName = (TextView) view.findViewById (R.id.day_name);
-            TextView date = (TextView) view.findViewById (R.id.date);
-
-            dayName.setText (days.get (position).day);
-            date.setText (days.get (position).date);
-
-            return view;
-        }
-
-        @Override
-        public int getCount ()
-        {
-            return days.size ();
-        }
-
-        private List <DayDate> getDays (Context context)
-        {
-            List <DayDate> days = new ArrayList<> ();
-
-            Calendar cal = Calendar.getInstance ();
-            int today = cal.get (Calendar.DAY_OF_WEEK);
-
-            SimpleDateFormat format = new SimpleDateFormat ("dd MMMM");
-
-            int diff = -cal.get (Calendar.DAY_OF_WEEK) + 2;
-            cal.add (Calendar.DAY_OF_MONTH, diff);
-            for (int i = 0; i < 5; i++)
-            {
-                if (cal.get (Calendar.DAY_OF_WEEK) == today)
-                {
-                    days.add (new DayDate (i, context.getResources ().getString (R.string.day_name_today), format.format (cal.getTime ())));
-                    cal.add (Calendar.DAY_OF_MONTH, 1);
-                    continue;
-                }
-
-                String day = "";
-
-                switch (cal.get (Calendar.DAY_OF_WEEK))
-                {
-                    case 2:
-                        day = context.getResources ().getString (R.string.day_name_0);
-                        break;
-                    case 3:
-                        day = context.getResources ().getString (R.string.day_name_1);
-                        break;
-                    case 4:
-                        day = context.getResources ().getString (R.string.day_name_2);
-                        break;
-                    case 5:
-                        day = context.getResources ().getString (R.string.day_name_3);
-                        break;
-                    case 6:
-                        day = context.getResources ().getString (R.string.day_name_4);
-                        break;
-                }
-
-                days.add (new DayDate (i, day, format.format (cal.getTime ())));
-                cal.add (Calendar.DAY_OF_MONTH, 1);
-            }
-
-            return days;
-        }
-    }
 
     public KochanowskiMainActivity ()
     {
         DatabaseHelper.initHelper (this);
+    }
+
+    static public int getCurrentDay ()
+    {
+        int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
+        if (day > 4 || day < 0) day = 0;
+        return day;
     }
 
     @Override
@@ -246,7 +130,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             currentScreen = parentIntent.getIntExtra (ARG_SCREEN, SCREEN_TODAY);
             currentTable = parentIntent.getStringExtra (ARG_TABLE);
             if (currentTable == null)
+            {
                 currentTable = prefs.getString (getString (R.string.pref_table_name), "");
+            }
             currentDay = parentIntent.getIntExtra (ARG_DAY, getCurrentDay ());
             currentType = parentIntent.getIntExtra (ARG_TYPE, TimeTableType.CLASS);
         }
@@ -421,13 +307,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         drawerLayout.closeDrawer (insetLayout);
     }
 
-    static public int getCurrentDay ()
-    {
-        int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
-        if (day > 4 || day < 0) day = 0;
-        return day;
-    }
-
     @Override
     public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
     {
@@ -455,5 +334,115 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
 
         startActivity (intent);
+    }
+
+    private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
+    {
+        private List<DayDate> days = new ArrayList<> ();
+        private int resource;
+        private Context context;
+
+        public DaySelectAdapter (Context context, int resource)
+        {
+            super (context, resource);
+
+            this.context = context;
+            this.resource = resource;
+            this.days = getDays (context);
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (resource, position, convertView, parent);
+        }
+
+        @Override
+        public View getDropDownView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.spinner_item_dropdown, position, convertView, parent);
+        }
+
+        private View getCustomView (int resource, int position, View convertView, ViewGroup parent)
+        {
+            View view = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
+
+            TextView dayName = (TextView) view.findViewById (R.id.day_name);
+            TextView date = (TextView) view.findViewById (R.id.date);
+
+            dayName.setText (days.get (position).day);
+            date.setText (days.get (position).date);
+
+            return view;
+        }
+
+        @Override
+        public int getCount ()
+        {
+            return days.size ();
+        }
+
+        private List<DayDate> getDays (Context context)
+        {
+            List<DayDate> days = new ArrayList<> ();
+
+            Calendar cal = Calendar.getInstance ();
+            int today = cal.get (Calendar.DAY_OF_WEEK);
+
+            SimpleDateFormat format = new SimpleDateFormat ("dd MMMM");
+
+            int diff = -cal.get (Calendar.DAY_OF_WEEK) + 2;
+            cal.add (Calendar.DAY_OF_MONTH, diff);
+            for (int i = 0; i < 5; i++)
+            {
+                if (cal.get (Calendar.DAY_OF_WEEK) == today)
+                {
+                    days.add (new DayDate (i, context.getResources ().getString (R.string.day_name_today), format.format (cal.getTime ())));
+                    cal.add (Calendar.DAY_OF_MONTH, 1);
+                    continue;
+                }
+
+                String day = "";
+
+                switch (cal.get (Calendar.DAY_OF_WEEK))
+                {
+                    case 2:
+                        day = context.getResources ().getString (R.string.day_name_0);
+                        break;
+                    case 3:
+                        day = context.getResources ().getString (R.string.day_name_1);
+                        break;
+                    case 4:
+                        day = context.getResources ().getString (R.string.day_name_2);
+                        break;
+                    case 5:
+                        day = context.getResources ().getString (R.string.day_name_3);
+                        break;
+                    case 6:
+                        day = context.getResources ().getString (R.string.day_name_4);
+                        break;
+                }
+
+                days.add (new DayDate (i, day, format.format (cal.getTime ())));
+                cal.add (Calendar.DAY_OF_MONTH, 1);
+            }
+
+            return days;
+        }
+
+        public class DayDate
+        {
+            int id;
+
+            String day;
+            String date;
+
+            public DayDate (int id, String day, String date)
+            {
+                this.id = id;
+                this.day = day;
+                this.date = date;
+            }
+        }
     }
 }

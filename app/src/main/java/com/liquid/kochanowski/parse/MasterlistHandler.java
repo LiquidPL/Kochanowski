@@ -3,9 +3,8 @@ package com.liquid.kochanowski.parse;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.liquid.kochanparser.TimeTableType;
-
 import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
+import com.liquid.kochanparser.TimeTableType;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -17,7 +16,7 @@ public class MasterlistHandler extends DefaultHandler
 {
     private static String school_url = "http://kochanowski.iq.pl/plan20140915/";
 
-    private List <String> urls;
+    private List<String> urls;
     private SQLiteDatabase db;
 
     private String currentName = "";

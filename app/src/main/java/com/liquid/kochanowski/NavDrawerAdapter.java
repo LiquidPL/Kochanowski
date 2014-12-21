@@ -24,26 +24,7 @@ public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.Draw
 
     private Context context;
 
-    public class DrawerViewHolder extends RecyclerView.ViewHolder
-    {
-        View v;
-
-        TextView name;
-        ImageView icon;
-        View separator;
-
-        public DrawerViewHolder (View v)
-        {
-            super (v);
-
-            this.v = v;
-            name = (TextView) v.findViewById (R.id.text);
-            icon = (ImageView) v.findViewById (R.id.item_icon);
-            separator = v.findViewById (R.id.separator);
-        }
-    }
-
-    public NavDrawerAdapter (int resource, List <String> values, TypedArray icons, Context context)
+    public NavDrawerAdapter (int resource, List<String> values, TypedArray icons, Context context)
     {
         this.resource = resource;
         this.values = values;
@@ -91,5 +72,24 @@ public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.Draw
     public int getItemCount ()
     {
         return values.size ();
+    }
+
+    public class DrawerViewHolder extends RecyclerView.ViewHolder
+    {
+        View v;
+
+        TextView name;
+        ImageView icon;
+        View separator;
+
+        public DrawerViewHolder (View v)
+        {
+            super (v);
+
+            this.v = v;
+            name = (TextView) v.findViewById (R.id.text);
+            icon = (ImageView) v.findViewById (R.id.item_icon);
+            separator = v.findViewById (R.id.separator);
+        }
     }
 }

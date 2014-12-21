@@ -1,35 +1,24 @@
 package com.liquid.kochanowski;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.liquid.kochanowski.widget.ScrimInsetsFrameLayout;
 import com.liquid.kochanowski.widget.SlidingTabLayout;
 import com.liquid.kochanparser.TimeTableType;
 
-import org.lucasr.twowayview.ItemClickSupport;
-import org.lucasr.twowayview.TwoWayLayoutManager;
-import org.lucasr.twowayview.widget.ListLayoutManager;
-
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -52,37 +41,8 @@ public class TimeTableTabActivity extends ActionBarActivity
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
 
-    private List <String> values;
+    private List<String> values;
     private TypedArray icons;
-
-    private class ViewPagerAdapter extends FragmentPagerAdapter
-    {
-        private ViewPagerAdapter (FragmentManager fm)
-        {
-            super (fm);
-        }
-
-        @Override
-        public Fragment getItem (int position)
-        {
-            return TimeTableDisplayFragment.newInstance (shortName, tableType, position, 0);
-        }
-
-        @Override
-        public int getCount ()
-        {
-            return 5;
-        }
-
-        @Override
-        public CharSequence getPageTitle (int position)
-        {
-            Calendar cal = Calendar.getInstance ();
-            cal.set (Calendar.DAY_OF_WEEK, position + 2);
-
-            return cal.getDisplayName (Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault ());
-        }
-    }
 
     public TimeTableTabActivity ()
     {
@@ -135,7 +95,6 @@ public class TimeTableTabActivity extends ActionBarActivity
         slidingTabLayout.setSelectedIndicatorColors (getResources ().getColor (R.color.accent));
     }
 
-
     @Override
     public boolean onCreateOptionsMenu (Menu menu)
     {
@@ -161,5 +120,34 @@ public class TimeTableTabActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected (item);
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter
+    {
+        private ViewPagerAdapter (FragmentManager fm)
+        {
+            super (fm);
+        }
+
+        @Override
+        public Fragment getItem (int position)
+        {
+            return TimeTableDisplayFragment.newInstance (shortName, tableType, position, 0);
+        }
+
+        @Override
+        public int getCount ()
+        {
+            return 5;
+        }
+
+        @Override
+        public CharSequence getPageTitle (int position)
+        {
+            Calendar cal = Calendar.getInstance ();
+            cal.set (Calendar.DAY_OF_WEEK, position + 2);
+
+            return cal.getDisplayName (Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault ());
+        }
     }
 }

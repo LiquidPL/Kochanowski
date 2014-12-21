@@ -3,8 +3,6 @@ package com.liquid.kochanowski.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.liquid.kochanowski.KochanowskiMainActivity;
-
 /**
  * Created by liquid on 21.12.14.
  */

@@ -26,74 +26,27 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;
 import com.liquid.kochanowski.parse.ThreadManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SyncActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener
 {
-    private ThreadManager manager;
-
-    private List<String> urls;
-
-    private SharedPreferences prefs;
-    private SharedPreferences.Editor prefEditor;
-
-    private SQLiteDatabase db;
-
     public TextView currentDownload;
     public TextView currentCount;
     public ProgressBar progressBar;
-
     protected TextView syncResult;
     protected Button continueButton;
-
     protected Spinner classSelect;
-
-    private class ClassSelectAdapter extends ArrayAdapter<String>
-    {
-        private Cursor cur;
-
-        public ClassSelectAdapter (Context context, int resource)
-        {
-            super (context, resource);
-            cur = DatabaseHelper.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
-        }
-
-        @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
-            return getCustomView (R.layout.sync_spinner_item, position, parent);
-        }
-
-        @Override
-        public View getDropDownView (int position, View convertView, ViewGroup parent)
-        {
-            return getCustomView (R.layout.sync_spinner_item, position, parent);
-        }
-
-        private View getCustomView (int resource, int position, ViewGroup parent)
-        {
-            TextView view = (TextView) LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
-
-            cur.moveToPosition (position);
-            String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-            String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-
-            view.setText (longname + " (" + shortname + ")");
-            return (View) view;
-        }
-
-        @Override
-        public int getCount ()
-        {
-            return cur.getCount ();
-        }
-    }
+    private ThreadManager manager;
+    private List<String> urls;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor prefEditor;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -149,7 +102,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     {
         urls = new ArrayList<> ();
 
-        currentDownload.setText (getString(R.string.downloading_metadata));
+        currentDownload.setText (getString (R.string.downloading_metadata));
         currentCount.setText ("");
 
         Handler syncActivityHandler = new Handler ();
@@ -270,6 +223,47 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     public void onStopClick (View view)
     {
         manager.cancelAll ();
+    }
+
+    private class ClassSelectAdapter extends ArrayAdapter<String>
+    {
+        private Cursor cur;
+
+        public ClassSelectAdapter (Context context, int resource)
+        {
+            super (context, resource);
+            cur = DatabaseHelper.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.sync_spinner_item, position, parent);
+        }
+
+        @Override
+        public View getDropDownView (int position, View convertView, ViewGroup parent)
+        {
+            return getCustomView (R.layout.sync_spinner_item, position, parent);
+        }
+
+        private View getCustomView (int resource, int position, ViewGroup parent)
+        {
+            TextView view = (TextView) LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
+
+            cur.moveToPosition (position);
+            String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+            String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+
+            view.setText (longname + " (" + shortname + ")");
+            return (View) view;
+        }
+
+        @Override
+        public int getCount ()
+        {
+            return cur.getCount ();
+        }
     }
 }
 

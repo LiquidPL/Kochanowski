@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Process;
-import android.util.Log;
 
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.db.TimeTableContract.HourTable;
@@ -28,13 +27,6 @@ public class DbWriteRunnable implements Runnable
     private SQLiteDatabase db;
 
     private ContentValues values;
-
-    interface DbWriteRunnableMethods
-    {
-        void setDbWriteThread (Thread currentThread);
-
-        void handleDbWriteState (int state);
-    }
 
     public DbWriteRunnable (ParseTask task)
     {
@@ -112,17 +104,22 @@ public class DbWriteRunnable implements Runnable
             {
                 throw new InterruptedException ();
             }
-        }
-        catch (InterruptedException e)
+        } catch (InterruptedException e)
         {
             return;
-        }
-        catch (SQLiteException e)
+        } catch (SQLiteException e)
         {
             task.handleDbWriteState (WRITE_FAILED);
             e.printStackTrace ();
         }
 
         task.handleDbWriteState (WRITE_COMPLETED);
+    }
+
+    interface DbWriteRunnableMethods
+    {
+        void setDbWriteThread (Thread currentThread);
+
+        void handleDbWriteState (int state);
     }
 }
