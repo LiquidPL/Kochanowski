@@ -1,7 +1,8 @@
 package com.liquid.kochanowski;
 
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -347,6 +348,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 @Override
                 public void onItemClick (RecyclerView recyclerView, View view, int position, long id)
                 {
+                    Log.i ("liquid", "" + position);
                     switch (position)
                     {
                         case SCREEN_TODAY:
@@ -378,9 +380,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     }
 
     @Override
-    protected void onRestart ()
+    protected void onResumeFragments ()
     {
-        super.onRestart ();
+        super.onResumeFragments ();
 
         // pulling the default table name saved in shared preferences in case we just got back from a sync
         currentTable = prefs.getString (getString (R.string.pref_table_name), "");
@@ -445,7 +447,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         currentDay = day;
         currentType = type;
 
-        FragmentTransaction transaction = getFragmentManager ().beginTransaction ();
+        FragmentTransaction transaction = getSupportFragmentManager ().beginTransaction ();
 
         switch (currentScreen)
         {
