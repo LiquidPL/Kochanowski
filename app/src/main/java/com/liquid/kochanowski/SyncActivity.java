@@ -181,6 +181,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
             case ThreadManager.DOWNLOAD_FAILED:
                 syncResult.setText (R.string.sync_result_failure);
                 prefEditor.putBoolean (getString (R.string.pref_timetables_synced), false);
+
                 break;
             case ThreadManager.TASK_COMPLETED:
                 syncResult.setText (R.string.sync_result_success);
@@ -208,7 +209,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     {
         super.onStop ();
 
-        ThreadManager.cancelAll ();
+        if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false)) ThreadManager.cancelAll ();
     }
 
     @Override
