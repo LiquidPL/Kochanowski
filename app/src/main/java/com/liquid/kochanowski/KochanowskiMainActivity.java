@@ -263,7 +263,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     @Override
     protected void onResume ()
     {
-        super.onResume ();        Log.i ("liquid", "onResume ()");
+        super.onResume ();
 
         if (toolbar != null)
         {
