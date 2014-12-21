@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.db;
 
 import android.provider.BaseColumns;
 

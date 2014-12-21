@@ -1,9 +1,11 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.parse;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.liquid.kochanparser.TimeTableType;
+
+import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -65,11 +67,11 @@ public class MasterlistHandler extends DefaultHandler
             }
 
             ContentValues values = new ContentValues ();
-            values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[teacher.length - 1]);
-            values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME, teacher[0]);
-            values.put (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME, teacher[1]);
+            values.put (TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[teacher.length - 1]);
+            values.put (TeacherTable.COLUMN_NAME_TEACHER_NAME, teacher[0]);
+            values.put (TeacherTable.COLUMN_NAME_TEACHER_SURNAME, teacher[1]);
 
-            db.insert (TimeTableContract.TeacherTable.TABLE_NAME, null, values);
+            db.insert (TeacherTable.TABLE_NAME, null, values);
             currentAttribute = "";
         }
     }

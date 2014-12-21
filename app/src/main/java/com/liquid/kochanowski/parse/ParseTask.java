@@ -1,9 +1,9 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.parse;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.liquid.kochanowski.DbWriteRunnable.DbWriteRunnableMethods;
-import com.liquid.kochanowski.TimeTableDownloadRunnable.DownloadRunnableMethods;
+import com.liquid.kochanowski.parse.DbWriteRunnable.DbWriteRunnableMethods;
+import com.liquid.kochanowski.parse.TimeTableDownloadRunnable.DownloadRunnableMethods;
 import com.liquid.kochanparser.TimeTable;
 
 import java.net.URL;

@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.parse;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteException;
 import android.os.Process;
 import android.util.Log;
 
-import com.liquid.kochanowski.TimeTableContract.ClassTable;
-import com.liquid.kochanowski.TimeTableContract.HourTable;
-import com.liquid.kochanowski.TimeTableContract.LessonTable;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.db.TimeTableContract.HourTable;
+import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
 import com.liquid.kochanparser.Lesson;
 import com.liquid.kochanparser.TimeTable;
 

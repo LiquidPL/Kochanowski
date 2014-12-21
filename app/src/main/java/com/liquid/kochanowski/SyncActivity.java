@@ -31,7 +31,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.liquid.kochanowski.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;
+import com.liquid.kochanowski.parse.ThreadManager;
 
 public class SyncActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener
 {
@@ -44,9 +47,9 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private SQLiteDatabase db;
 
-    protected TextView currentDownload;
-    protected TextView currentCount;
-    protected ProgressBar progressBar;
+    public TextView currentDownload;
+    public TextView currentCount;
+    public ProgressBar progressBar;
 
     protected TextView syncResult;
     protected Button continueButton;
@@ -60,7 +63,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         public ClassSelectAdapter (Context context, int resource)
         {
             super (context, resource);
-            cur = KochanowskiMainActivity.getHelper ().getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+            cur = DatabaseHelper.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
         }
 
         @Override
@@ -112,7 +115,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
         prefEditor = prefs.edit ();
 
-        db = KochanowskiMainActivity.getHelper ().getReadableDatabase ();
+        db = DatabaseHelper.getReadableDatabase ();
 
         Toolbar toolbar = (Toolbar) findViewById (R.id.activity_sync_toolbar);
         if (toolbar != null)

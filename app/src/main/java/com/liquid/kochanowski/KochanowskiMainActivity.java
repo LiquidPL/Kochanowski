@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.widget.ScrimInsetsFrameLayout;
 import com.liquid.kochanparser.TimeTableType;
 
@@ -41,8 +42,6 @@ import java.util.List;
 
 public class KochanowskiMainActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, TimeTableListFragment.OnTimeTableSelectedListener
 {
-    private static TimeTableDbHelper helper;
-
     private SharedPreferences prefs;
 
     private Toolbar toolbar;
@@ -269,7 +268,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
     public KochanowskiMainActivity ()
     {
-        helper = new TimeTableDbHelper (this);
+        DatabaseHelper.initHelper (this);
     }
 
     @Override
@@ -499,11 +498,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
         if (day > 4 || day < 0) day = 0;
         return day;
-    }
-
-    public static TimeTableDbHelper getHelper ()
-    {
-        return helper;
     }
 
     @Override

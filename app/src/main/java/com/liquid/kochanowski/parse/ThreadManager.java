@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.parse;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,11 +7,15 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.liquid.kochanowski.KochanowskiMainActivity;
+import com.liquid.kochanowski.R;
+import com.liquid.kochanowski.SyncActivity;
+import com.liquid.kochanowski.db.DatabaseHelper;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -19,11 +23,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadManager
 {
-    static final int DOWNLOAD_FAILED = -1;
+    public static final int DOWNLOAD_FAILED = -1;
     static final int DOWNLOAD_STARTED = 1;
     static final int DOWNLOAD_COMPLETE = 2;
     static final int DB_WRITE_STARTED = 3;
-    static final int TASK_COMPLETED = 4;
+    public static final int TASK_COMPLETED = 4;
 
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT;
@@ -33,7 +37,6 @@ public class ThreadManager
 
     private final BlockingQueue <Runnable> downloadQueue;
     private final BlockingQueue <Runnable> dbWriteQueue;
-    //private final Queue<ParseTask> parseTaskQueue;
     private final List<ParseTask> parseTaskList;
 
     private final ThreadPoolExecutor downloadPool;
@@ -65,7 +68,7 @@ public class ThreadManager
         //parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
         parseTaskList = new ArrayList <ParseTask> ();
 
-        db = KochanowskiMainActivity.getHelper ().getWritableDatabase ();
+        db = DatabaseHelper.getWritableDatabase ();
 
         downloadPool = new ThreadPoolExecutor (
                 CORE_POOL_SIZE,

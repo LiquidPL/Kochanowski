@@ -1,8 +1,11 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.parse;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
+
+import com.liquid.kochanowski.SyncActivity;
+import com.liquid.kochanowski.db.DatabaseHelper;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CompactHtmlSerializer;
@@ -35,7 +38,7 @@ public class MasterlistDownloadRunnable implements Runnable
     public MasterlistDownloadRunnable (List<String> urls, Context context, Handler handler)
     {
         this.urls = urls;
-        db = KochanowskiMainActivity.getHelper ().getWritableDatabase ();
+        db = DatabaseHelper.getWritableDatabase ();
         this.context = (SyncActivity) context;
         this.handler = handler;
     }

@@ -13,7 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.liquid.kochanowski.TimeTableContract.*;
+import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.db.TimeTableContract.*;
 import com.liquid.kochanparser.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
@@ -49,7 +50,7 @@ public class TimeTableListFragment extends Fragment
 
         public TimeTableListAdapter (int tableType)
         {
-            db = KochanowskiMainActivity.getHelper ().getReadableDatabase ();
+            db = DatabaseHelper.getReadableDatabase ();
             this.tableType = tableType;
 
             switch (tableType)
