@@ -15,13 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.db.DatabaseHelper;
-import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
-import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
-import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
+import com.liquid.kochanowski.db.TimeTableContract.*;
 import com.liquid.kochanparser.TimeTableType;
 
 /**
@@ -73,19 +70,17 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             public TextView teacherName;
             public TextView classroomName;
             public TextView groupName;
-
-            public RelativeLayout container;
+            public TextView hour;
 
             public LessonViewHolder (View v)
             {
                 super (v);
 
-                subjectName = (TextView) v.findViewById (R.id.subjectName);
-                teacherName = (TextView) v.findViewById (R.id.teacherName);
-                classroomName = (TextView) v.findViewById (R.id.classroomName);
-                groupName = (TextView) v.findViewById (R.id.groupName);
-
-                container = (RelativeLayout) v;
+                subjectName = (TextView) v.findViewById (R.id.subject_name);
+                teacherName = (TextView) v.findViewById (R.id.teacher_name);
+                classroomName = (TextView) v.findViewById (R.id.classroom_name);
+                groupName = (TextView) v.findViewById (R.id.group_name);
+                hour = (TextView) v.findViewById (R.id.hour_label);
             }
         }
 
@@ -105,7 +100,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE +
                     " JOIN " + ClassTable.TABLE_NAME +
                     " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
-                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT;
+                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
+                    " JOIN " + HourTable.TABLE_NAME +
+                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_HOUR_ID +
+                    "=" + HourTable.TABLE_NAME + "." + HourTable._ID;
 
             switch (tableType)
             {
@@ -145,6 +143,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             String add = "";
             String add2 = "";
             String add3 = "";
+            int starthour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_HOUR));
+            int startminute = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_MINUTE));
+            int endhour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_HOUR));
+            int endminute = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_MINUTE));
 
             //holder.subjectName.setText (subject);
             //holder.classroomName.setText (classroom);
@@ -183,10 +185,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     holder.classroomName.setText (classname);
                     holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
 
-
-
                     break;
             }
+
+            holder.hour.setText ("" + starthour + ":" + startminute + "-" + endhour + ":" + endminute);
 
             int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
             if (group != 0)
