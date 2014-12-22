@@ -16,6 +16,9 @@
         android:textSize="20sp"
         android:fontFamily="sans-serif"
         android:id="@+id/timetable_name"
-        android:text="test"
-        android:autoText="false"/>
+        android:text="test"/>
+
+    <View
+        style="@style/Divider"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>
