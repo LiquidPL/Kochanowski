@@ -223,6 +223,13 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
         prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
 
+        displayFragment = TimeTableDisplayFragment.newInstance (
+                prefs.getString (getString (R.string.pref_table_name), ""),
+                TimeTableType.CLASS,
+                getCurrentDay (),
+                0
+        );
+
         Intent parentIntent = getIntent ();
 
         currentScreen = SCREEN_TODAY;
