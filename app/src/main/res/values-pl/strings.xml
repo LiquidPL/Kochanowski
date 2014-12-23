@@ -19,4 +19,6 @@
     <string name="classes">Klasy</string>
     <string name="teachers">Nauczyciele</string>
     <string name="classrooms">Sale</string>
+    <string name="no_internet">Sprawdź połączenie i ponów próbę</string>
+    <string name="button_retry">Ponów próbę</string>
 </resources>

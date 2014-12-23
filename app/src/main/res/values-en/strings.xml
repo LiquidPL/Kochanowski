@@ -19,4 +19,6 @@
     <string name="classes">Classes</string>
     <string name="teachers">Teachers</string>
     <string name="classrooms">Classrooms</string>
+    <string name="no_internet">Check your connection and retry</string>
+    <string name="button_retry">Retry</string>
 </resources>

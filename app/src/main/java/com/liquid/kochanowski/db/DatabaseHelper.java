@@ -29,4 +29,14 @@ public class DatabaseHelper
     {
         return helper.getReadableDatabase ();
     }
+
+    public static void dropTables ()
+    {
+        helper.onUpgrade (helper.getWritableDatabase (), helper.DATABASE_VERSION, helper.DATABASE_VERSION);
+    }
+
+    public static void initTables ()
+    {
+        helper.onCreate (helper.getWritableDatabase ());
+    }
 }

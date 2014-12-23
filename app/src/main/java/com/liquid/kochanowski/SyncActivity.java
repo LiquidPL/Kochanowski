@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -147,19 +149,42 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     public void initSync ()
     {
-        urls = new ArrayList<> ();
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService (Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo ();
 
-        currentDownload.setText (getString(R.string.downloading_metadata));
-        currentCount.setText ("");
+        if (networkInfo != null && networkInfo.isConnected ())
+        {
+            urls = new ArrayList<> ();
 
-        Handler syncActivityHandler = new Handler ();
-        Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
+            currentDownload.setText (getString (R.string.downloading_metadata));
+            currentCount.setText ("");
 
-        new Thread (runnable).start ();
+            progressBar.setVisibility (View.VISIBLE);
+            progressBar.setIndeterminate (true);
+
+            syncResult.setVisibility (View.INVISIBLE);
+            continueButton.setVisibility (View.INVISIBLE);
+
+            Handler syncActivityHandler = new Handler ();
+            Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
+
+            new Thread (runnable).start ();
+        }
+        else
+        {
+            progressBar.setVisibility (View.INVISIBLE);
+
+            syncResult.setVisibility (View.VISIBLE);
+            syncResult.setText (getString (R.string.no_internet));
+
+            continueButton.setVisibility (View.VISIBLE);
+            continueButton.setText (getString (R.string.button_continue));
+        }
     }
 
     public void beginSync (List<String> urls)
     {
+        progressBar.setIndeterminate (false);
         progressBar.setMax (urls.size ());
         currentCount.setText ("0/" + urls.size ());
         manager.setTimeTableCount (urls.size ());
@@ -246,8 +271,15 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     public void onContinueClick (View view)
     {
-        Intent intent = new Intent (this, KochanowskiMainActivity.class);
-        startActivity (intent);
+        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+        {
+            Intent intent = new Intent (this, KochanowskiMainActivity.class);
+            startActivity (intent);
+        }
+        else
+        {
+            initSync ();
+        }
     }
 
     @Override
