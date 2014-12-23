@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -285,7 +284,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 @Override
                 public void onItemClick (RecyclerView recyclerView, View view, int position, long id)
                 {
-                    Log.i ("liquid", "" + position);
                     switch (position)
                     {
                         case SCREEN_TODAY:

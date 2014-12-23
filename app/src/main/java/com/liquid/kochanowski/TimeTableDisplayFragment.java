@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,8 +127,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
 
-            Log.i ("query", query);
-
             cur = db.rawQuery (query, null);
         }
 
@@ -162,8 +159,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     holder.subjectName.setText (subject);
                     holder.classroomName.setText (classroom);
                     holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
-
-                    //Log.i ("liquid", subject + " " + classroom + " " + add);
 
                     break;
                 case TimeTableType.TEACHER:

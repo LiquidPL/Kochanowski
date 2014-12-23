@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.SyncActivity;
@@ -187,7 +186,6 @@ public class ThreadManager
 
                 if (thread != null)
                 {
-                    Log.i ("liquid", thread.toString ());
                     thread.interrupt ();
                 }
             }
