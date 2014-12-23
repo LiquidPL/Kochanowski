@@ -1,7 +1,5 @@
 package com.liquid.kochanowski.parse;
 
-import android.util.Log;
-
 import com.liquid.kochanparser.TimeTable;
 import com.liquid.kochanparser.TimeTableType;
 
@@ -60,7 +58,6 @@ public class TimeTableDownloadRunnable implements Runnable
         {
             if (Thread.interrupted ())
             {
-                Log.i ("liquid", "interrupted");
                 throw new InterruptedException ();
             }
 
@@ -86,7 +83,6 @@ public class TimeTableDownloadRunnable implements Runnable
 
                 if (Thread.interrupted ())
                 {
-                    Log.i ("liquid", "interrupted");
                     throw new InterruptedException ();
                 }
             }
