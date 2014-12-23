@@ -8,9 +8,8 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="ToolbarDark">
+    <style name="ToolbarDark" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimary">@color/white_100</item>
-        <item name="android:textColorPrimaryInverse">@color/white_100</item>
 
         <item name="android:actionMenuTextColor">@color/white_100</item>
         <item name="android:textColorSecondary">@color/white_100</item>

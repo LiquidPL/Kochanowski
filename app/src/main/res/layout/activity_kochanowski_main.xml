@@ -14,9 +14,9 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             android:minHeight="@dimen/toolbar_height"
-            style="@style/ToolbarDark"
             android:background="@color/primary"
             android:elevation="6dp"
+            app:theme="@style/ToolbarDark"
             app:popupTheme="@style/Theme.AppCompat.Light">
 
             <Spinner
