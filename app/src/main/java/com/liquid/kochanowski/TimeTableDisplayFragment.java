@@ -140,9 +140,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             String subject = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_SUBJECT));
             String classroom = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
-            String add = "";
-            String add2 = "";
-            String add3 = "";
+            String add;
+            String add2;
+            String add3;
+
             int starthour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_HOUR));
             int startminute = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_MINUTE));
             int endhour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_HOUR));
@@ -188,7 +189,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     break;
             }
 
-            holder.hour.setText ("" + starthour + ":" + startminute + "-" + endhour + ":" + endminute);
+            String hour = "" + starthour + ":" + startminute; if (startminute == 0) hour += "0";
+            hour += "-" + endhour + ":" + endminute; if (endminute == 0) hour += "0";
+
+            holder.hour.setText (hour);
 
             int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
             if (group != 0)
@@ -224,7 +228,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
      * this fragment using the provided parameters.
      *
      * @param tableName Name of the timetable, corresponding to a column in the database
-     * @param tableType The timetable type to display (class/teacher/classroom)
+     * @param tableType The timetable type to display (class/classroom)
      * @param groupId The group to be displayed
      *
      * @return A new instance of fragment TimeTableDisplayFragment.
