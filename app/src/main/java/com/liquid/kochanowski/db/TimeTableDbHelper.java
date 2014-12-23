@@ -47,11 +47,19 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
                     TimeTableContract.LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_GROUP_ID + INT_TYPE + ");";
 
-    private static final String SQL_DELETE_TABLES =
-            "DROP TABLE IF EXISTS " + TimeTableContract.TeacherTable.TABLE_NAME +
-                    "; DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME +
-                    "; DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME +
-                    "; DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME + ";";
+    private static final String SQL_DELETE_TABLE_TEACHERS =
+            "DROP TABLE IF EXISTS " + TimeTableContract.TeacherTable.TABLE_NAME;
+
+    private static final String SQL_DELETE_TABLE_CLASSES =
+            "DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME;
+
+    private static final String SQL_DELETE_TABLE_HOURS =
+            "DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME;
+
+    private static final String SQL_DELETE_TABLE_LESSONS =
+            "DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME;
+
+
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "timetables.db";
@@ -74,7 +82,10 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL (SQL_DELETE_TABLES);
+        db.execSQL (SQL_DELETE_TABLE_TEACHERS);
+        db.execSQL (SQL_DELETE_TABLE_CLASSES);
+        db.execSQL (SQL_DELETE_TABLE_HOURS);
+        db.execSQL (SQL_DELETE_TABLE_LESSONS);
         onCreate (db);
     }
 

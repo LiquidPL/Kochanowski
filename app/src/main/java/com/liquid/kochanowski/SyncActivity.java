@@ -165,6 +165,11 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
             syncResult.setVisibility (View.INVISIBLE);
             continueButton.setVisibility (View.INVISIBLE);
 
+            if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+            {
+                DatabaseHelper.resetTables ();
+            }
+
             Handler syncActivityHandler = new Handler ();
             Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
 

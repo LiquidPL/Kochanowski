@@ -71,7 +71,6 @@
         android:id="@+id/class_select"
         android:layout_below="@+id/sync_result"
         android:layout_centerHorizontal="true"
-        android:paddingTop="16dp"
         android:visibility="invisible"/>
 
     <Button
