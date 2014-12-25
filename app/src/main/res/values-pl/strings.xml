@@ -21,4 +21,7 @@
     <string name="classrooms">Sale</string>
     <string name="no_internet">Sprawdź połączenie i ponów próbę</string>
     <string name="button_retry">Ponów próbę</string>
+    <string name="label_class">Klasa</string>
+    <string name="class_select_label">Wyberz klasę</string>
+    <string name="title_activity_settings">Ustawienia</string>
 </resources>

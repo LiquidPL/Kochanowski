@@ -16,7 +16,7 @@
     </style>
 
     <style name="Ripple">
-        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
     <style name="Divider">

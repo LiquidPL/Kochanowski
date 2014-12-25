@@ -31,5 +31,8 @@
     <string name="title_activity_time_table_tab" translatable="false">TimeTableTabActivity</string>
     <string name="no_internet">Check your connection and retry</string>
     <string name="button_retry">Retry</string>
+    <string name="label_class">Class</string>
+    <string name="class_select_label">Select your class</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

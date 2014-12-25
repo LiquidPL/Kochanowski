@@ -61,7 +61,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     static final int SCREEN_CLASSES = 1;
     static final int SCREEN_TEACHERS = 2;
     static final int SCREEN_CLASSROOMS = 3;
-    static final int SCREEN_DISPLAY = 4;
+    static final int SCREEN_SETTINGS = 5;
+    static final int SCREEN_DISPLAY = 10;
 
     static final String ARG_SCREEN = "screen";
     static final String ARG_TABLE = "table";
@@ -298,6 +299,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                         case SCREEN_CLASSROOMS:
                             selectScreen (SCREEN_CLASSROOMS, "", -1, -1);
                             break;
+                        case SCREEN_SETTINGS:
+                            Intent intent = new Intent (getApplicationContext (), SettingsActivity.class);
+                            startActivity (intent);
                     }
                 }
             });

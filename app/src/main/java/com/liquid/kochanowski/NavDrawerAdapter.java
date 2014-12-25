@@ -73,7 +73,7 @@ public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.Draw
 
             holder.v.setMinimumHeight (height);
 
-            ((RelativeLayout) holder.v).setBackgroundResource (0);
+            holder.v.setBackgroundResource (0);
         }
         else
         {
