@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 
 import android.app.Activity;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.db.TimeTableContract.LessonTable;

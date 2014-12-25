@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.liquid.kochanowski.R;
 
 import java.util.List;
 

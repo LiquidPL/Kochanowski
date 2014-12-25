@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.support.v7.widget.Toolbar;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract;
 

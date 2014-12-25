@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 
-import com.liquid.kochanowski.SyncActivity;
+import com.liquid.kochanowski.ui.SyncActivity;
 import com.liquid.kochanowski.db.DatabaseHelper;
 
 import org.htmlcleaner.CleanerProperties;

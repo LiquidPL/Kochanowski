@@ -1,10 +1,5 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;

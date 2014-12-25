@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.widget.ScrimInsetsFrameLayout;
 import com.liquid.kochanparser.TimeTableType;

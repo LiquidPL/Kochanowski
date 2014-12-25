@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.*;
 import com.liquid.kochanparser.TimeTableType;

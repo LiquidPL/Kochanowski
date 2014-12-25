@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.SyncActivity;
+import com.liquid.kochanowski.ui.SyncActivity;
 import com.liquid.kochanowski.db.DatabaseHelper;
 
 import java.net.MalformedURLException;

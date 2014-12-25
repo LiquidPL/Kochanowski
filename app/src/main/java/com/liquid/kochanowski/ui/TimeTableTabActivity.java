@@ -1,4 +1,4 @@
-package com.liquid.kochanowski;
+package com.liquid.kochanowski.ui;
 
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.widget.SlidingTabLayout;
 import com.liquid.kochanparser.TimeTableType;
 
