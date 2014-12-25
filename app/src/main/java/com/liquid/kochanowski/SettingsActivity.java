@@ -1,0 +1,141 @@
+package com.liquid.kochanowski;
+
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.support.v7.widget.Toolbar;
+
+import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.db.TimeTableContract;
+
+
+public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener
+{
+    SQLiteDatabase db;
+    Cursor cur;
+    CharSequence[] entries;
+    CharSequence[] values;
+
+    SharedPreferences prefs;
+
+    ListPreference classes;
+
+    @Override
+    protected void onCreate (Bundle savedInstanceState)
+    {
+        super.onCreate (savedInstanceState);
+        getPreferenceManager ().setSharedPreferencesName (getString (R.string.shared_prefs_name));
+        addPreferencesFromResource (R.xml.preferences);
+
+        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener (this);
+
+        db = DatabaseHelper.getReadableDatabase ();
+        cur = db.rawQuery ("SELECT * FROM classes", null);
+        int length = cur.getCount ();
+
+        entries = new CharSequence[length];
+        values = new CharSequence[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            cur.moveToPosition (i);
+
+            CharSequence shortname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT));
+            CharSequence longname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG));
+
+            entries[i] = longname + " (" + shortname + ")";
+            values[i] = shortname;
+        }
+
+        classes = (ListPreference) findPreference ("pref_table_name");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            Window window = getWindow ();
+            window.addFlags (WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
+        }
+    }
+
+    @Override
+    protected void onResume ()
+    {
+        super.onResume ();
+
+        classes.setEntries (entries);
+        classes.setEntryValues (values);
+
+        if (classes.getEntry () != null)
+        {
+            classes.setSummary (classes.getEntry ());
+        }
+    }
+
+    @Override
+    protected void onPostCreate (Bundle savedInstanceState)
+    {
+        super.onPostCreate (savedInstanceState);
+
+        LinearLayout root = (LinearLayout) findViewById (android.R.id.list).getParent ().getParent ().getParent ();
+        Toolbar toolbar = (Toolbar) LayoutInflater.from (this).inflate (R.layout.settings_toolbar, root, false);
+
+        root.addView (toolbar, 0);
+
+        toolbar.setNavigationOnClickListener (new View.OnClickListener ()
+        {
+            @Override
+            public void onClick (View v)
+            {
+                finish ();
+            }
+        });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged (SharedPreferences sharedPreferences, String key)
+    {
+        Preference preference = findPreference (key);
+
+        if (preference instanceof ListPreference)
+        {
+            Log.i ("liquid", "bum");
+            ListPreference listPreference = ((ListPreference) preference);
+            preference.setSummary (listPreference.getEntry ());
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater ().inflate (R.menu.menu_settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId ();
+
+        return super.onOptionsItemSelected (item);
+    }
+}

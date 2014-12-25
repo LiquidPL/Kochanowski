@@ -1,5 +1,10 @@
 package com.liquid.kochanowski;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -97,6 +102,45 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         }
     }
 
+    public static class ResetDialogFragment extends DialogFragment
+    {
+        private Context context;
+
+        public ResetDialogFragment (Context context)
+        {
+            this.context = context;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog (Bundle savedInstanceState)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder (getActivity ());
+
+            builder.setMessage (getString (R.string.dialog_remove_timetables));
+
+            builder.setPositiveButton (getString(R.string.action_yes), new DialogInterface.OnClickListener ()
+            {
+                @Override
+                public void onClick (DialogInterface dialog, int which)
+                {
+                    ((SyncActivity) context).prefEditor.putBoolean (getString (R.string.pref_timetables_synced), false);
+                    ((SyncActivity) context).initSync ();
+                }
+            });
+            builder.setNegativeButton (getString(R.string.action_no), new DialogInterface.OnClickListener ()
+            {
+                @Override
+                public void onClick (DialogInterface dialog, int which)
+                {
+                    getActivity ().finish ();
+                }
+            });
+
+            return builder.create ();
+        }
+    }
+
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
@@ -139,6 +183,8 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         }
         else
         {
+            new ResetDialogFragment (this).show (getSupportFragmentManager (), null);
+
             progressBar.setProgress (progressBar.getMax ());
             currentCount.setText (progressBar.getMax () + "/" + progressBar.getMax ());
 
@@ -164,11 +210,9 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
             syncResult.setVisibility (View.INVISIBLE);
             continueButton.setVisibility (View.INVISIBLE);
+            classSelect.setVisibility (View.INVISIBLE);
 
-            if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
-            {
-                DatabaseHelper.resetTables ();
-            }
+            DatabaseHelper.resetTables ();
 
             Handler syncActivityHandler = new Handler ();
             Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
@@ -232,6 +276,8 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
         classSelect.setAdapter (adapter);
         classSelect.setOnItemSelectedListener (this);
+
+        manager.resetManager ();
     }
 
     @Override

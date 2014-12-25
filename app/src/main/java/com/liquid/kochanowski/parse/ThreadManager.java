@@ -118,6 +118,17 @@ public class ThreadManager
         };
     }
 
+    public void resetManager ()
+    {
+        currentTimeTable = 0;
+        timeTableCount = 0;
+        result = 0;
+
+        parseTaskList.clear ();
+        downloadQueue.clear ();
+        dbWriteQueue.clear ();
+    }
+
     public static void setTimeTableCount (int timeTableCount)
     {
         ThreadManager.timeTableCount = timeTableCount;

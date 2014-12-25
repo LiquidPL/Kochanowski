@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_table_name"
+        android:title="@string/label_class"
+        android:defaultValue=""
+        android:dialogTitle="@string/class_select_label"/>
+
+    <Preference
+        android:key="pref_db_reset"
+        android:title="@string/remove_timetables">
+
+       <intent android:action="android.intent.action.VIEW"
+           android:targetPackage="com.liquid.kochanowski"
+           android:targetClass="com.liquid.kochanowski.SyncActivity"/>
+
+    </Preference>
+</PreferenceScreen>

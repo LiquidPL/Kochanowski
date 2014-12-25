@@ -32,6 +32,7 @@ public class DatabaseHelper
 
     public static void resetTables ()
     {
-        helper.onUpgrade (helper.getWritableDatabase (), helper.DATABASE_VERSION, helper.DATABASE_VERSION);
+        helper.dropTables (helper.getWritableDatabase ());
+        helper.createTables (helper.getWritableDatabase ());
     }
 }

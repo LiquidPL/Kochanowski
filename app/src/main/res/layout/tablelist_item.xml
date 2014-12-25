@@ -15,10 +15,11 @@
         android:paddingRight="16dp"
         android:textSize="20sp"
         android:fontFamily="sans-serif"
-        android:id="@+id/timetable_name"
-        android:text="test"/>
+        android:id="@+id/timetable_name"/>
 
     <View
         style="@style/Divider"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
 </RelativeLayout>

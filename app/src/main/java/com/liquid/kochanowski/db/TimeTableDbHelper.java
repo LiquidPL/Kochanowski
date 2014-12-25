@@ -89,6 +89,23 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
         onCreate (db);
     }
 
+    public void dropTables (SQLiteDatabase db)
+    {
+        db.execSQL (SQL_DELETE_TABLE_TEACHERS);
+        db.execSQL (SQL_DELETE_TABLE_CLASSES);
+        db.execSQL (SQL_DELETE_TABLE_HOURS);
+        db.execSQL (SQL_DELETE_TABLE_LESSONS);
+    }
+
+    public void createTables (SQLiteDatabase db)
+    {
+        db.execSQL (SQL_CREATE_TABLE_TEACHERS);
+        db.execSQL (SQL_CREATE_TABLE_CLASSES);
+        //db.execSQL (SQL_CREATE_TABLE_DAYS);
+        db.execSQL (SQL_CREATE_TABLE_HOURS);
+        db.execSQL (SQL_CREATE_TABLE_LESSONS);
+    }
+
     @Override
     public void onDowngrade (SQLiteDatabase db, int oldVersion, int newVersion)
     {

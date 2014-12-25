@@ -31,8 +31,11 @@
     <string name="title_activity_time_table_tab" translatable="false">TimeTableTabActivity</string>
     <string name="no_internet">Check your connection and retry</string>
     <string name="button_retry">Retry</string>
-    <string name="label_class">Class</string>
+    <string name="label_class">Default class</string>
     <string name="class_select_label">Select your class</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
+    <string name="remove_timetables">Remove downloaded timetables</string>
+    <string name="dialog_remove_timetables">Remove downloaded timetables?</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
 </resources>

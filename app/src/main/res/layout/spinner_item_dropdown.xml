@@ -31,5 +31,7 @@
 
     <View
         style="@style/Divider"
-        android:layout_below="@+id/date"/>
+        android:layout_below="@+id/date"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"/>
 </RelativeLayout>
