@@ -102,45 +102,6 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         }
     }
 
-    public static class ResetDialogFragment extends DialogFragment
-    {
-        private Context context;
-
-        public ResetDialogFragment (Context context)
-        {
-            this.context = context;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog (Bundle savedInstanceState)
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder (getActivity ());
-
-            builder.setMessage (getString (R.string.dialog_remove_timetables));
-
-            builder.setPositiveButton (getString(R.string.action_yes), new DialogInterface.OnClickListener ()
-            {
-                @Override
-                public void onClick (DialogInterface dialog, int which)
-                {
-                    ((SyncActivity) context).prefEditor.putBoolean (getString (R.string.pref_timetables_synced), false);
-                    ((SyncActivity) context).initSync ();
-                }
-            });
-            builder.setNegativeButton (getString(R.string.action_no), new DialogInterface.OnClickListener ()
-            {
-                @Override
-                public void onClick (DialogInterface dialog, int which)
-                {
-                    getActivity ().finish ();
-                }
-            });
-
-            return builder.create ();
-        }
-    }
-
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
@@ -183,8 +144,6 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         }
         else
         {
-            new ResetDialogFragment (this).show (getSupportFragmentManager (), null);
-
             progressBar.setProgress (progressBar.getMax ());
             currentCount.setText (progressBar.getMax () + "/" + progressBar.getMax ());
 
@@ -351,9 +310,9 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     }
 
-    public void onStopClick (View view)
+    public Context getActivity ()
     {
-        manager.cancelAll ();
+        return this;
     }
 }
 

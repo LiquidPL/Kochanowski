@@ -24,9 +24,10 @@
     <string name="label_class">Domyślna klasa</string>
     <string name="class_select_label">Wyberz klasę</string>
     <string name="title_activity_settings">Ustawienia</string>
-    <string name="remove_timetables">Usuń pobrane plany lekcji</string>
+    <string name="remove_timetables">Usuń zapisane plany lekcji</string>
     <string name="action_no">Nie</string>
-    <string name="app_name" translatable="false"></string>
+    <string name="app_name" translatable="false">Kochanowski</string>
     <string name="action_yes">Tak</string>
-    <string name="dialog_remove_timetables">Usunąć pobrane plany lekcji?</string>
+    <string name="dialog_remove_timetables">Usunąć zapisane plany lekcji?</string>
+    <string name="dialog_remove_timetables_message">Będziesz musiał je pobrać ponownie!</string>
 </resources>

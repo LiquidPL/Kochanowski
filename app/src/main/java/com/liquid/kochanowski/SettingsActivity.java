@@ -1,5 +1,7 @@
 package com.liquid.kochanowski;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,7 +25,7 @@ import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract;
 
 
-public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener
+public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
     SQLiteDatabase db;
     Cursor cur;
@@ -63,6 +65,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
 
         classes = (ListPreference) findPreference ("pref_table_name");
+        findPreference ("pref_db_reset").setOnPreferenceClickListener (this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
@@ -114,10 +117,46 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         if (preference instanceof ListPreference)
         {
-            Log.i ("liquid", "bum");
             ListPreference listPreference = ((ListPreference) preference);
             preference.setSummary (listPreference.getEntry ());
         }
+    }
+
+    @Override
+    public boolean onPreferenceClick (Preference preference)
+    {
+        if (preference.getKey ().equals ("pref_db_reset"))
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder (this);
+
+            builder.setTitle (getString (R.string.dialog_remove_timetables));
+            builder.setMessage (getString(R.string.dialog_remove_timetables_message));
+
+            builder.setPositiveButton (getString(R.string.action_yes), new DialogInterface.OnClickListener ()
+            {
+                @Override
+                public void onClick (DialogInterface dialog, int which)
+                {
+                    SharedPreferences.Editor editor = prefs.edit ();
+                    editor.putBoolean (getString (R.string.pref_timetables_synced), false);
+                    editor.commit ();
+                }
+            });
+            builder.setNegativeButton (getString (R.string.action_no), new DialogInterface.OnClickListener ()
+            {
+                @Override
+                public void onClick (DialogInterface dialog, int which)
+                {
+
+                }
+            });
+
+            builder.create ().show ();
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override

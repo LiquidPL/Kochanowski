@@ -8,11 +8,5 @@
 
     <Preference
         android:key="pref_db_reset"
-        android:title="@string/remove_timetables">
-
-       <intent android:action="android.intent.action.VIEW"
-           android:targetPackage="com.liquid.kochanowski"
-           android:targetClass="com.liquid.kochanowski.SyncActivity"/>
-
-    </Preference>
+        android:title="@string/remove_timetables"/>
 </PreferenceScreen>

@@ -8,7 +8,7 @@
     <string name="sync_result_failure">Synchronization failed</string>
     <string name="sync_result_success">Synchronization completed successfully\n\nPlease choose your class:</string>
     <string name="title_activity_sync">Synchronizing</string>
-    <string name="app_name" translatable="false">Kochanowski</string>
+    <string name="app_name">Kochanowski</string>
     <string name="downloading_metadata">Downloading timetable list…</string>
     <string name="button_sync">Synchronize now</string>
     <string name="tables_not_found">No timetables found</string>
@@ -34,8 +34,9 @@
     <string name="label_class">Default class</string>
     <string name="class_select_label">Select your class</string>
     <string name="title_activity_settings">SettingsActivity</string>
-    <string name="remove_timetables">Remove downloaded timetables</string>
-    <string name="dialog_remove_timetables">Remove downloaded timetables?</string>
+    <string name="remove_timetables">Remove stored timetables</string>
+    <string name="dialog_remove_timetables">Remove stored timetables?</string>
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
+    <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
 </resources>

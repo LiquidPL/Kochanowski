@@ -24,8 +24,10 @@
     <string name="label_class">Default class</string>
     <string name="class_select_label">Select your class</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="remove_timetables">Remove downloaded timetables</string>
+    <string name="remove_timetables">Remove stored timetables</string>
     <string name="action_no">No</string>
     <string name="action_yes">Yes</string>
-    <string name="dialog_remove_timetables">Remove downloaded timetables?</string>
+    <string name="dialog_remove_timetables">Remove stored timetables?</string>
+    <string name="app_name">Kochanowski</string>
+    <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
 </resources>
