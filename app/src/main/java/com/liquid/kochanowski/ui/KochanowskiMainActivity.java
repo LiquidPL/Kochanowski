@@ -242,16 +242,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             currentType = savedInstanceState.getInt (ARG_TYPE);
             currentGroup = savedInstanceState.getInt (ARG_GROUP);
         }
-        /*else
-        {
-            currentScreen = parentIntent.getIntExtra (ARG_SCREEN, SCREEN_TODAY);
-            currentTable = parentIntent.getStringExtra (ARG_TABLE);
-            if (currentTable == null)
-                currentTable = prefs.getString (getString (R.string.pref_table_name), "");
-            currentDay = parentIntent.getIntExtra (ARG_DAY, getCurrentDay ());
-            currentType = parentIntent.getIntExtra (ARG_TYPE, TimeTableType.CLASS);
-            currentGroup = parentIntent.getIntExtra (ARG_GROUP, 0);
-        }*/
     }
 
     protected void onPostCreate (Bundle savedInstanceState)
@@ -506,7 +496,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     {
         if (menu != null)
         {
-            currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
+            if (currentGroup == -1)
+                currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
 
             setItemChecked (menu.findItem (R.id.group_1), true);
             setItemChecked (menu.findItem (R.id.group_2), true);
