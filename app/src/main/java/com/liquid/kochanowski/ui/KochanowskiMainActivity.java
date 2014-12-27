@@ -57,6 +57,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private ActionBarDrawerToggle toggle;
 
     private TimeTableDisplayFragment displayFragment;
+    @SuppressWarnings("FieldCanBeLocal")
     private TimeTableListFragment listFragment;
 
     static final int SCREEN_TODAY = 0;
@@ -64,7 +65,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     static final int SCREEN_TEACHERS = 2;
     static final int SCREEN_CLASSROOMS = 3;
     static final int SCREEN_SETTINGS = 5;
-    static final int SCREEN_DISPLAY = 10;
 
     static final String ARG_SCREEN = "screen";
     static final String ARG_TABLE = "table";
@@ -77,9 +77,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private int currentDay = -1;
     private int currentType = -1;
     private int currentGroup = -1;
-
-    private List <String> values;
-    private TypedArray icons;
 
     private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
     {
@@ -101,13 +98,10 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         private List<DayDate> days = new ArrayList<> ();
         private int resource;
 
-        private Context context;
-
         public DaySelectAdapter (Context context, int resource)
         {
             super (context, resource);
 
-            this.context = context;
             this.resource = resource;
             this.days = getDays (context);
         }
@@ -115,16 +109,16 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         @Override
         public View getView (int position, View convertView, ViewGroup parent)
         {
-            return getCustomView (resource, position, convertView, parent);
+            return getCustomView (resource, position, parent);
         }
 
         @Override
         public View getDropDownView (int position, View convertView, ViewGroup parent)
         {
-            return getCustomView (R.layout.spinner_item_dropdown, position, convertView, parent);
+            return getCustomView (R.layout.spinner_item_dropdown, position, parent);
         }
 
-        private View getCustomView (int resource, int position, View convertView, ViewGroup parent)
+        private View getCustomView (int resource, int position, ViewGroup parent)
         {
             View view = LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
 
@@ -203,8 +197,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_kochanowski_main);
 
-        values = Arrays.asList (getResources ().getStringArray (R.array.drawer_names));
-        icons = getResources ().obtainTypedArray (R.array.drawer_icons);
+        List<String> values = Arrays.asList (getResources ().getStringArray (R.array.drawer_names));
+        TypedArray icons = getResources ().obtainTypedArray (R.array.drawer_icons);
 
         toolbar = (Toolbar) findViewById (R.id.toolbar);
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
@@ -233,8 +227,6 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 getCurrentDay (),
                 0
         );
-
-        Intent parentIntent = getIntent ();
 
         currentScreen = SCREEN_TODAY;
         currentTable = prefs.getString (getString (R.string.pref_table_name), "");
@@ -500,11 +492,11 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         switch (id)
         {
             case R.id.group_1:
-                if (state == true) item.setIcon (R.drawable.ic_group_1_white);
+                if (state) item.setIcon (R.drawable.ic_group_1_white);
                 else item.setIcon (R.drawable.ic_group_1_white_disabled);
                 break;
             case R.id.group_2:
-                if (state == true) item.setIcon (R.drawable.ic_group_2_white);
+                if (state) item.setIcon (R.drawable.ic_group_2_white);
                 else item.setIcon (R.drawable.ic_group_2_white_disabled);
                 break;
         }
@@ -521,6 +513,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
             if (currentGroup == 1) setItemChecked (menu.findItem (R.id.group_2), false);
             if (currentGroup == 2) setItemChecked (menu.findItem (R.id.group_1), false);
+
+            if (currentScreen == SCREEN_TODAY) menu.setGroupVisible (R.id.group_switch, true);
+            else menu.setGroupVisible (R.id.group_switch, false);
         }
     }
 
