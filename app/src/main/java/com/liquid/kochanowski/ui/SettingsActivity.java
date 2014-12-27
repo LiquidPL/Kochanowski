@@ -21,7 +21,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.DatabaseHelper;
-import com.liquid.kochanowski.db.TimeTableContract;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
@@ -47,7 +47,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         prefs.registerOnSharedPreferenceChangeListener (this);
 
         db = DatabaseHelper.getReadableDatabase ();
-        cur = db.rawQuery ("SELECT * FROM classes", null);
+        cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME +
+                " ORDER BY " + ClassTable.COLUMN_NAME_NAME_SHORT +
+                " ASC", null);
         int length = cur.getCount ();
 
         entries = new CharSequence[length];
@@ -57,8 +59,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         {
             cur.moveToPosition (i);
 
-            CharSequence shortname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT));
-            CharSequence longname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG));
+            CharSequence shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+            CharSequence longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
 
             entries[i] = longname + " (" + shortname + ")";
             values[i] = shortname;
