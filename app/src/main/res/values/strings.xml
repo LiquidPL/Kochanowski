@@ -39,4 +39,10 @@
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
+    <string name="pref_default_group">pref_default_group</string>
+    <string name="group_1">Group 1</string>
+    <string name="group_2">Group 2</string>
+    <string name="both_groups">Both groups</string>
+    <string name="pref_default_group_name">Default group</string>
+    <string name="pref_default_group_dialog">Select your preferred group</string>
 </resources>

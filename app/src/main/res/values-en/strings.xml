@@ -30,4 +30,9 @@
     <string name="dialog_remove_timetables">Remove stored timetables?</string>
     <string name="app_name">Kochanowski</string>
     <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
+    <string name="both_groups">Both groups</string>
+    <string name="group_1">Group 1</string>
+    <string name="group_2">Group 2</string>
+    <string name="pref_default_group_name">Default group</string>
+    <string name="pref_default_group_dialog">Select your preferred group</string>
 </resources>

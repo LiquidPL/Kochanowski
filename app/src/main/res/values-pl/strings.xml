@@ -30,4 +30,9 @@
     <string name="action_yes">Tak</string>
     <string name="dialog_remove_timetables">Usunąć zapisane plany lekcji?</string>
     <string name="dialog_remove_timetables_message">Będziesz musiał je pobrać ponownie!</string>
+    <string name="both_groups">Obie grupy</string>
+    <string name="group_1">Grupa 1</string>
+    <string name="group_2">Grupa 2</string>
+    <string name="pref_default_group_name">Domyślna grupa</string>
+    <string name="pref_default_group_dialog">Wybierz grupę</string>
 </resources>

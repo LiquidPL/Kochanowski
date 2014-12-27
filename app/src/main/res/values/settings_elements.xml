@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_group_entries">
+        <item>@string/group_1</item>
+        <item>@string/group_2</item>
+        <item>@string/both_groups</item>
+    </string-array>
+
+    <string-array name="pref_group_values">
+        <item>1</item>
+        <item>2</item>
+        <item>0</item>
+    </string-array>
+</resources>

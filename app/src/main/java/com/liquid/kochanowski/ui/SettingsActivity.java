@@ -9,9 +9,7 @@ import android.os.Build;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +33,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     SharedPreferences prefs;
 
-    ListPreference classes;
+    ListPreference defaultClass;
+    ListPreference defaultGroup;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -65,7 +64,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             values[i] = shortname;
         }
 
-        classes = (ListPreference) findPreference ("pref_table_name");
+        defaultClass = (ListPreference) findPreference (getString (R.string.pref_table_name));
+        defaultGroup = (ListPreference) findPreference (getString (R.string.pref_default_group));
+
         findPreference ("pref_db_reset").setOnPreferenceClickListener (this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -82,12 +83,17 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     {
         super.onResume ();
 
-        classes.setEntries (entries);
-        classes.setEntryValues (values);
+        defaultClass.setEntries (entries);
+        defaultClass.setEntryValues (values);
 
-        if (classes.getEntry () != null)
+        if (defaultClass.getEntry () != null)
         {
-            classes.setSummary (classes.getEntry ());
+            defaultClass.setSummary (defaultClass.getEntry ());
+        }
+
+        if (defaultGroup.getEntry () != null)
+        {
+            defaultGroup.setSummary (defaultGroup.getEntry ());
         }
     }
 

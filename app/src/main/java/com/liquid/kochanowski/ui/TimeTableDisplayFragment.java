@@ -8,8 +8,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +56,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
         private Cursor cur;
+        private Cursor oldCur;
 
         private Context context;
 
@@ -84,7 +87,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             }
         }
 
-        public LessonListAdapter (int resource, SQLiteDatabase db, String tableName, int tableType, int dayId, int groupId, Context context)
+        public LessonListAdapter (int resource, String tableName, int tableType, int dayId, int groupId, Context context)
         {
             this.tableName = tableName;
             this.tableType = tableType;
@@ -94,6 +97,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             this.resource = resource;
 
+            cur = formQuery (tableName, tableType, dayId, groupId);
+        }
+
+        private Cursor formQuery (String tableName, int tableType, int dayId, int groupId)
+        {
             String query = "SELECT * FROM " + LessonTable.TABLE_NAME +
                     " JOIN " + TeacherTable.TABLE_NAME +
                     " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
@@ -128,7 +136,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
 
-            cur = db.rawQuery (query, null);
+            return DatabaseHelper.getReadableDatabase ().rawQuery (query, null);
         }
 
         @Override
@@ -196,6 +204,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                 holder.groupName.setText ("GRUPA " + group);
                 holder.groupName.setVisibility (View.VISIBLE);
             }
+            else
+            {
+                holder.groupName.setText ("");
+                holder.groupName.setVisibility (View.GONE);
+            }
         }
 
         @Override
@@ -210,6 +223,71 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         public int getItemCount ()
         {
             return cur.getCount ();
+        }
+
+        public void setGroup (int groupId)
+        {
+            if (this.groupId == groupId) return;
+
+            oldCur = cur;
+            cur = formQuery (tableName, tableType, dayId, groupId);
+
+            int previousGroup = this.groupId;
+            boolean bothGroups = false;
+            boolean toBothGroups = false;
+
+            if (previousGroup == 0) bothGroups = true;
+
+            this.groupId = groupId;
+
+            if (groupId == 0)
+            {
+                toBothGroups = true;
+
+                switch (previousGroup)
+                {
+                    case 1:
+                        groupId = 2;
+                        break;
+                    case 2:
+                        groupId = 1;
+                        break;
+                }
+            }
+
+            oldCur.moveToFirst ();
+            int offset = 0;
+
+            if (toBothGroups == false) do
+            {
+                int group = oldCur.getInt (oldCur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
+
+                if (group != 0 && group != groupId)
+                {
+                    notifyItemRemoved (oldCur.getPosition () - offset);
+                    offset++;
+                }
+
+                oldCur.moveToNext ();
+            }
+            while (!oldCur.isAfterLast ());
+
+            if (bothGroups) return;
+
+            cur.moveToFirst ();
+
+            do
+            {
+                int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
+
+                if (group == groupId)
+                {
+                    notifyItemInserted (cur.getPosition ());
+                }
+
+                cur.moveToNext ();
+            }
+            while (!cur.isAfterLast ());
         }
     }
 
@@ -292,9 +370,9 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         layoutManager = new LinearLayoutManager (activity);
         recyclerView.setLayoutManager (layoutManager);
+        recyclerView.setItemAnimator (new DefaultItemAnimator ());
 
         adapter = new LessonListAdapter (R.layout.lesson_item,
-                DatabaseHelper.getReadableDatabase (),
                 tableName,
                 tableType,
                 dayId,
@@ -328,7 +406,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     {
         adapter = new LessonListAdapter (
                 R.layout.lesson_item,
-                DatabaseHelper.getReadableDatabase (),
                 tableName,
                 tableType,
                 dayId,
@@ -336,6 +413,13 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                 this.getActivity ());
 
         recyclerView.setAdapter (adapter);
+    }
+
+    public void setGroup (int groupId) // 1,2, or 0 (both groups)
+    {
+        this.groupId = groupId;
+
+        ((LessonListAdapter) adapter).setGroup (groupId);
     }
 
     @Override

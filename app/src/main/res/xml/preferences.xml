@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="pref_table_name"
+        android:key="@string/pref_table_name"
         android:title="@string/label_class"
         android:defaultValue=""
         android:dialogTitle="@string/class_select_label"/>
+
+    <ListPreference
+        android:key="@string/pref_default_group"
+        android:title="@string/pref_default_group_name"
+        android:defaultValue="0"
+        android:dialogTitle="@string/pref_default_group_dialog"
+        android:entries="@array/pref_group_entries"
+        android:entryValues="@array/pref_group_values"/>
 
     <Preference
         android:key="pref_db_reset"

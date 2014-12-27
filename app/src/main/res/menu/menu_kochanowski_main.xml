@@ -1,8 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
       tools:context=".KochanowskiMainActivity">
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          android:showAsAction="never"/>
+
+    <group android:id="@+id/group_switch">
+        <item
+            android:id="@+id/group_1"
+            android:title="@string/group_1"
+            android:icon="@drawable/ic_group_1_white"
+            android:checkable="true"
+            app:showAsAction="always"/>
+
+        <item
+            android:id="@+id/group_2"
+            android:title="@string/group_2"
+            android:icon="@drawable/ic_group_2_white"
+            android:checkable="true"
+            app:showAsAction="always"/>
+    </group>
 </menu>

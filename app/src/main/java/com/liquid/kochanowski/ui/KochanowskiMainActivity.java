@@ -43,6 +43,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     private SharedPreferences prefs;
 
     private Toolbar toolbar;
+    private Menu menu;
     private Spinner spinner;
 
     private DrawerLayout drawerLayout;
@@ -69,11 +70,13 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     static final String ARG_TABLE = "table";
     static final String ARG_DAY = "day";
     static final String ARG_TYPE = "type";
+    static final String ARG_GROUP = "group";
 
     private int currentScreen = -1;
     private String currentTable = "";
     private int currentDay = -1;
     private int currentType = -1;
+    private int currentGroup = -1;
 
     private List <String> values;
     private TypedArray icons;
@@ -237,6 +240,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         currentTable = prefs.getString (getString (R.string.pref_table_name), "");
         currentDay = getCurrentDay ();
         currentType = TimeTableType.CLASS;
+        currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
 
         if (savedInstanceState != null)
         {
@@ -244,8 +248,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
             currentTable = savedInstanceState.getString (ARG_TABLE);
             currentDay = savedInstanceState.getInt (ARG_DAY);
             currentType = savedInstanceState.getInt (ARG_TYPE);
+            currentGroup = savedInstanceState.getInt (ARG_GROUP);
         }
-        else
+        /*else
         {
             currentScreen = parentIntent.getIntExtra (ARG_SCREEN, SCREEN_TODAY);
             currentTable = parentIntent.getStringExtra (ARG_TABLE);
@@ -253,7 +258,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 currentTable = prefs.getString (getString (R.string.pref_table_name), "");
             currentDay = parentIntent.getIntExtra (ARG_DAY, getCurrentDay ());
             currentType = parentIntent.getIntExtra (ARG_TYPE, TimeTableType.CLASS);
-        }
+            currentGroup = parentIntent.getIntExtra (ARG_GROUP, 0);
+        }*/
     }
 
     protected void onPostCreate (Bundle savedInstanceState)
@@ -313,6 +319,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         spinner.setOnItemSelectedListener (this);
 
         selectScreen (currentScreen, currentTable, currentDay, currentType);
+
+        initGroupSwitch ();
     }
 
     @Override
@@ -334,6 +342,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         outState.putString (ARG_TABLE, currentTable);
         outState.putInt (ARG_DAY, currentDay);
         outState.putInt (ARG_TYPE, currentType);
+        outState.putInt (ARG_GROUP, currentGroup);
 
         super.onSaveInstanceState (outState);
     }
@@ -351,6 +360,11 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater ().inflate (R.menu.menu_kochanowski_main, menu);
+
+        this.menu = menu;
+
+        initGroupSwitch ();
+
         return true;
     }
 
@@ -369,8 +383,54 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
         switch (id)
         {
-            case R.id.action_settings:
-                return true;
+            case R.id.group_1:
+                if (currentScreen == SCREEN_TODAY)
+                {
+                    if (currentGroup == 0)
+                    {
+                        displayFragment.setGroup (2);
+                        setItemChecked (item, false);
+                    }
+                    if (currentGroup == 1)
+                    {
+                        displayFragment.setGroup (2);
+                        setItemChecked (item, false);
+
+                        setItemChecked (menu.findItem (R.id.group_2), true);
+                    }
+                    if (currentGroup == 2)
+                    {
+                        displayFragment.setGroup (0);
+                        setItemChecked (item, true);
+                    }
+
+                    currentGroup = displayFragment.getGroupId ();
+                }
+                break;
+            case R.id.group_2:
+                if (currentScreen == SCREEN_TODAY)
+                {
+                    if (currentGroup == 0)
+                    {
+                        displayFragment.setGroup (1);
+                        setItemChecked (item, false);
+                    }
+                    if (currentGroup == 2)
+                    {
+                        displayFragment.setGroup (1);
+                        setItemChecked (item, false);
+
+                        setItemChecked (menu.findItem (R.id.group_1), true);
+                    }
+                    if (currentGroup == 1)
+                    {
+                        displayFragment.setGroup (0);
+                        setItemChecked (item, true);
+                    }
+
+                    currentGroup = displayFragment.getGroupId ();
+                }
+                break;
         }
 
         return super.onOptionsItemSelected (item);
@@ -388,12 +448,13 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         switch (currentScreen)
         {
             case SCREEN_TODAY:
-                displayFragment = TimeTableDisplayFragment.newInstance (currentTable, currentType, currentDay, 0);
+                displayFragment = TimeTableDisplayFragment.newInstance (currentTable, currentType, currentDay, currentGroup);
                 transaction.replace (R.id.fragment_stub, displayFragment);
 
                 getSupportActionBar ().setDisplayShowTitleEnabled (false);
                 spinner.setVisibility (View.VISIBLE);
                 spinner.setSelection (currentDay);
+                if (menu != null) menu.setGroupVisible (R.id.group_switch, true);
                 break;
             case SCREEN_CLASSES:
                 listFragment = TimeTableListFragment.newInstance (TimeTableType.CLASS);
@@ -402,6 +463,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 getSupportActionBar ().setDisplayShowTitleEnabled (true);
                 getSupportActionBar ().setTitle (getString (R.string.classes));
                 spinner.setVisibility (View.GONE);
+
+                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
                 break;
             case SCREEN_TEACHERS:
                 listFragment = TimeTableListFragment.newInstance (TimeTableType.TEACHER);
@@ -410,6 +473,8 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 getSupportActionBar ().setDisplayShowTitleEnabled (true);
                 getSupportActionBar ().setTitle (getString (R.string.teachers));
                 spinner.setVisibility (View.GONE);
+
+                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
                 break;
             case SCREEN_CLASSROOMS:
                 listFragment = TimeTableListFragment.newInstance (TimeTableType.CLASSROOM);
@@ -418,13 +483,45 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
                 getSupportActionBar ().setDisplayShowTitleEnabled (true);
                 getSupportActionBar ().setTitle (getString (R.string.classrooms));
                 spinner.setVisibility (View.GONE);
-                break;
-            case SCREEN_DISPLAY:
+
+                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
                 break;
         }
         transaction.commit ();
 
         drawerLayout.closeDrawer (insetLayout);
+    }
+
+    private void setItemChecked (MenuItem item, boolean state)
+    {
+        item.setChecked (state);
+        int id = item.getItemId ();
+
+        switch (id)
+        {
+            case R.id.group_1:
+                if (state == true) item.setIcon (R.drawable.ic_group_1_white);
+                else item.setIcon (R.drawable.ic_group_1_white_disabled);
+                break;
+            case R.id.group_2:
+                if (state == true) item.setIcon (R.drawable.ic_group_2_white);
+                else item.setIcon (R.drawable.ic_group_2_white_disabled);
+                break;
+        }
+    }
+
+    private void initGroupSwitch ()
+    {
+        if (menu != null)
+        {
+            currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
+
+            setItemChecked (menu.findItem (R.id.group_1), true);
+            setItemChecked (menu.findItem (R.id.group_2), true);
+
+            if (currentGroup == 1) setItemChecked (menu.findItem (R.id.group_2), false);
+            if (currentGroup == 2) setItemChecked (menu.findItem (R.id.group_1), false);
+        }
     }
 
     static public int getCurrentDay ()
