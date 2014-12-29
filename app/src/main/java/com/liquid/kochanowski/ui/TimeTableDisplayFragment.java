@@ -30,6 +30,14 @@ import com.liquid.kochanparser.TimeTableType;
  */
 public class TimeTableDisplayFragment extends Fragment implements View.OnClickListener
 {
+    public class Group
+    {
+        // group type constants
+        public static final int GROUP_ONE = 1;
+        public static final int GROUP_TWO = 2;
+        public static final int GROUP_BOTH = 0;
+    }
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TABLE_NAME = "tablename";
     private static final String ARG_TABLE_TYPE = "tabletype";
