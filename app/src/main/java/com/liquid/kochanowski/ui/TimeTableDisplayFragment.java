@@ -3,9 +3,7 @@ package com.liquid.kochanowski.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,8 +17,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.*;
+import com.liquid.kochanowski.util.DbUtils;
+import com.liquid.kochanowski.util.PrefUtils;
 import com.liquid.kochanparser.TimeTableType;
 
 /**
@@ -58,8 +57,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
     private Button syncButton;
     private TextView noTimeTablesAlert;
-
-    private SharedPreferences prefs;
 
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
@@ -144,7 +141,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
 
-            return DatabaseHelper.getReadableDatabase ().rawQuery (query, null);
+            return DbUtils.getReadableDatabase ().rawQuery (query, null);
         }
 
         @Override
@@ -345,8 +342,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
         }
-
-        prefs = getActivity ().getSharedPreferences (getString (R.string.shared_prefs_name), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -363,7 +358,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         noTimeTablesAlert = (TextView) view.findViewById (R.id.alert_no_timetables);
 
-        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+        if (PrefUtils.hasSyncedTimeTables (getActivity ()))
         {
             recyclerView.setVisibility (View.VISIBLE);
             syncButton.setVisibility (View.INVISIBLE);
@@ -440,6 +435,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                 startActivity (intent);
                 break;
         }
+    }
+
+    public void setTableName (String table)
+    {
+        this.tableName = table;
     }
 
     public String getTableName ()

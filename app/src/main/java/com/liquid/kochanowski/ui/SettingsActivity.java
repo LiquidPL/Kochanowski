@@ -10,6 +10,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,8 +21,8 @@ import android.widget.LinearLayout;
 import android.support.v7.widget.Toolbar;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.db.DatabaseHelper;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.util.DbUtils;
 
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
@@ -40,13 +41,15 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
-        getPreferenceManager ().setSharedPreferencesName (getString (R.string.shared_prefs_name));
+
+        DbUtils.initHelper (this);
+
         addPreferencesFromResource (R.xml.preferences);
 
-        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
+        prefs = PreferenceManager.getDefaultSharedPreferences (this);
         prefs.registerOnSharedPreferenceChangeListener (this);
 
-        db = DatabaseHelper.getReadableDatabase ();
+        db = DbUtils.getReadableDatabase ();
         cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME +
                 " ORDER BY " + ClassTable.COLUMN_NAME_NAME_SHORT +
                 " ASC", null);

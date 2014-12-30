@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 
 import com.liquid.kochanowski.ui.SyncActivity;
-import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.util.DbUtils;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CompactHtmlSerializer;
@@ -38,7 +38,7 @@ public class MasterlistDownloadRunnable implements Runnable
     public MasterlistDownloadRunnable (List<String> urls, Context context, Handler handler)
     {
         this.urls = urls;
-        db = DatabaseHelper.getWritableDatabase ();
+        db = DbUtils.getWritableDatabase ();
         this.context = (SyncActivity) context;
         this.handler = handler;
     }

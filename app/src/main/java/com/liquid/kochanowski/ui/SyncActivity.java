@@ -29,10 +29,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;
 import com.liquid.kochanowski.parse.ThreadManager;
+import com.liquid.kochanowski.util.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +43,6 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     private ThreadManager manager;
 
     private List<String> urls;
-
-    private SharedPreferences prefs;
-    private SharedPreferences.Editor prefEditor;
 
     private SQLiteDatabase db;
 
@@ -64,7 +62,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         public ClassSelectAdapter (Context context, int resource)
         {
             super (context, resource);
-            cur = DatabaseHelper.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+            cur = DbUtils.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
         }
 
         @Override
@@ -113,10 +111,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
         classSelect = (Spinner) findViewById (R.id.class_select);
 
-        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
-        prefEditor = prefs.edit ();
-
-        db = DatabaseHelper.getReadableDatabase ();
+        db = DbUtils.getReadableDatabase ();
 
         Toolbar toolbar = (Toolbar) findViewById (R.id.toolbar);
         if (toolbar != null)
@@ -134,7 +129,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
             window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
         }
 
-        if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+        if (!PrefUtils.hasSyncedTimeTables (this))
         {
             initSync ();
         }
@@ -167,7 +162,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
             continueButton.setVisibility (View.INVISIBLE);
             classSelect.setVisibility (View.INVISIBLE);
 
-            DatabaseHelper.resetTables ();
+            DbUtils.resetTables ();
 
             Handler syncActivityHandler = new Handler ();
             Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
@@ -209,18 +204,16 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         {
             case ThreadManager.DOWNLOAD_FAILED:
                 syncResult.setText (R.string.sync_result_failure);
-                prefEditor.putBoolean (getString (R.string.pref_timetables_synced), false);
+                PrefUtils.setTimeTablesSynced (this, false);
 
                 break;
             case ThreadManager.TASK_COMPLETED:
                 syncResult.setText (R.string.sync_result_success);
-                prefEditor.putBoolean (getString (R.string.pref_timetables_synced), true);
+                PrefUtils.setTimeTablesSynced (this, true);
 
                 getSupportActionBar ().setDisplayHomeAsUpEnabled (true);
                 break;
         }
-
-        prefEditor.commit ();
 
         syncResult.setVisibility (View.VISIBLE);
         continueButton.setVisibility (View.VISIBLE);
@@ -240,7 +233,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     {
         super.onStop ();
 
-        if (!prefs.getBoolean (getString (R.string.pref_timetables_synced), false)) ThreadManager.cancelAll ();
+        if (!PrefUtils.hasSyncedTimeTables (this)) ThreadManager.cancelAll ();
     }
 
     @Override
@@ -277,7 +270,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
 
     public void onContinueClick (View view)
     {
-        if (prefs.getBoolean (getString (R.string.pref_timetables_synced), false))
+        if (PrefUtils.hasSyncedTimeTables (this))
         {
             Intent intent = new Intent (this, KochanowskiMainActivity.class);
             startActivity (intent);
@@ -295,9 +288,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         cur.moveToPosition (position);
         String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
 
-        prefEditor.putString (getString (R.string.pref_table_name), shortname);
-
-        prefEditor.commit ();
+        PrefUtils.setTableName (this, shortname);
     }
 
     @Override

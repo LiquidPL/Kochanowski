@@ -8,7 +8,7 @@ import android.os.Message;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.ui.SyncActivity;
-import com.liquid.kochanowski.db.DatabaseHelper;
+import com.liquid.kochanowski.util.DbUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,7 +66,7 @@ public class ThreadManager
         //parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
         parseTaskList = new ArrayList <ParseTask> ();
 
-        db = DatabaseHelper.getWritableDatabase ();
+        db = DbUtils.getWritableDatabase ();
 
         downloadPool = new ThreadPoolExecutor (
                 CORE_POOL_SIZE,
