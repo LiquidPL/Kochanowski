@@ -1,23 +1,28 @@
-package com.liquid.kochanowski.db;
+package com.liquid.kochanowski.util;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.liquid.kochanowski.db.TimeTableDbHelper;
+
 /**
  * Created by liquid on 21.12.14.
  */
-public class DatabaseHelper
+public class DbUtils
 {
     private static TimeTableDbHelper helper;
 
-    private DatabaseHelper ()
+    private DbUtils ()
     {
 
     }
 
     public static void initHelper (Context context)
     {
-        helper = new TimeTableDbHelper (context);
+        if (helper == null)
+        {
+            helper = new TimeTableDbHelper (context);
+        }
     }
 
     public static SQLiteDatabase getWritableDatabase ()
