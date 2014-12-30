@@ -65,7 +65,7 @@ public class PrefUtils
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        return prefs.getInt (PREF_DEFAULT_GROUP, Group.GROUP_BOTH);
+        return Integer.valueOf (prefs.getString (PREF_DEFAULT_GROUP, "2"));
     }
 
     public static void setDefaultGroup (final Context context, int defaultGroup)
