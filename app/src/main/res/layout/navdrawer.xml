@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.liquid.kochanowski.widget.ScrimInsetsScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="260dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:id="@+id/navdrawer"
+    android:background="@color/white_100"
+    android:fitsSystemWindows="true"
+    app:insetForeground="#4000">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/account_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:src="@drawable/account_view_placeholder"/>
+
+        <LinearLayout
+            android:id="@+id/navdrawer_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:layout_below="@id/account_view"
+            android:orientation="vertical"/>
+
+    </RelativeLayout>
+
+</com.liquid.kochanowski.widget.ScrimInsetsScrollView>

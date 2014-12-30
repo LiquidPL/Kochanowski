@@ -1,17 +1,11 @@
 package com.liquid.kochanowski.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,59 +17,36 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.db.DatabaseHelper;
-import com.liquid.kochanowski.widget.ScrimInsetsFrameLayout;
+import com.liquid.kochanowski.util.DbUtils;
+import com.liquid.kochanowski.util.PrefUtils;
+import com.liquid.kochanowski.ui.TimeTableDisplayFragment.Group;
 import com.liquid.kochanparser.TimeTableType;
-
-import org.lucasr.twowayview.ItemClickSupport;
-import org.lucasr.twowayview.TwoWayLayoutManager;
-import org.lucasr.twowayview.widget.ListLayoutManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 
-public class KochanowskiMainActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, TimeTableListFragment.OnTimeTableSelectedListener
+public class KochanowskiMainActivity
+        extends BaseActivity
+        implements TimeTableListFragment.OnTimeTableSelectedListener,
+                   AdapterView.OnItemSelectedListener,
+                   SharedPreferences.OnSharedPreferenceChangeListener
 {
     private SharedPreferences prefs;
 
-    private Toolbar toolbar;
     private Menu menu;
     private Spinner spinner;
 
-    private DrawerLayout drawerLayout;
-
-    private ScrimInsetsFrameLayout insetLayout;
-    private RecyclerView drawerList;
-    private RecyclerView.LayoutManager drawerLayoutManager;
-    private NavDrawerAdapter drawerAdapter;
-    private ItemClickSupport clickSupport;
-
-    private ActionBarDrawerToggle toggle;
-
     private TimeTableDisplayFragment displayFragment;
     @SuppressWarnings("FieldCanBeLocal")
-    private TimeTableListFragment listFragment;
 
-    static final int SCREEN_TODAY = 0;
-    static final int SCREEN_CLASSES = 1;
-    static final int SCREEN_TEACHERS = 2;
-    static final int SCREEN_CLASSROOMS = 3;
-    static final int SCREEN_SETTINGS = 5;
-
-    static final String ARG_SCREEN = "screen";
-    static final String ARG_TABLE = "table";
     static final String ARG_DAY = "day";
-    static final String ARG_TYPE = "type";
     static final String ARG_GROUP = "group";
 
-    private int currentScreen = -1;
     private String currentTable = "";
     private int currentDay = -1;
-    private int currentType = -1;
     private int currentGroup = -1;
 
     private class DaySelectAdapter extends ArrayAdapter<DaySelectAdapter.DayDate>
@@ -188,7 +159,7 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
 
     public KochanowskiMainActivity ()
     {
-        DatabaseHelper.initHelper (this);
+        DbUtils.initHelper (this);
     }
 
     @Override
@@ -197,59 +168,20 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_kochanowski_main);
 
-        List<String> values = Arrays.asList (getResources ().getStringArray (R.array.drawer_names));
-        TypedArray icons = getResources ().obtainTypedArray (R.array.drawer_icons);
-
-        toolbar = (Toolbar) findViewById (R.id.toolbar);
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
 
-        drawerLayout = (DrawerLayout) findViewById (R.id.drawer_layout);
-
-        insetLayout = (ScrimInsetsFrameLayout) findViewById (R.id.inset_layout);
-        drawerList = (RecyclerView) findViewById (R.id.left_drawer);
-        drawerLayoutManager = new ListLayoutManager (this, TwoWayLayoutManager.Orientation.VERTICAL);
-        drawerAdapter = new NavDrawerAdapter (R.layout.drawer_list_item, values, icons, this);
-        clickSupport = ItemClickSupport.addTo (drawerList);
-
-        toggle = new ActionBarDrawerToggle (
-                this,
-                drawerLayout,
-                toolbar,
-                R.string.open,
-                R.string.close
-        );
-
-        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
-
-        displayFragment = TimeTableDisplayFragment.newInstance (
-                prefs.getString (getString (R.string.pref_table_name), ""),
-                TimeTableType.CLASS,
-                getCurrentDay (),
-                0
-        );
-
-        currentScreen = SCREEN_TODAY;
-        currentTable = prefs.getString (getString (R.string.pref_table_name), "");
+        currentTable = PrefUtils.getTableName (this);
         currentDay = getCurrentDay ();
-        currentType = TimeTableType.CLASS;
-        currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
+        currentGroup = PrefUtils.getDefaultGroup (this);
 
         if (savedInstanceState != null)
         {
-            currentScreen = savedInstanceState.getInt (ARG_SCREEN);
-            currentTable = savedInstanceState.getString (ARG_TABLE);
             currentDay = savedInstanceState.getInt (ARG_DAY);
-            currentType = savedInstanceState.getInt (ARG_TYPE);
             currentGroup = savedInstanceState.getInt (ARG_GROUP);
         }
-    }
 
-    protected void onPostCreate (Bundle savedInstanceState)
-    {
-        super.onPostCreate (savedInstanceState);
-
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        toggle.syncState ();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (this);
+        prefs.registerOnSharedPreferenceChangeListener (this);
     }
 
     @Override
@@ -257,84 +189,48 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     {
         super.onResume ();
 
-        if (toolbar != null)
+        if (displayFragment == null)
         {
-            setSupportActionBar (toolbar);
-            toolbar.setNavigationIcon (R.drawable.ic_menu_white);
-            toolbar.setTitleTextColor (getResources ().getColor (R.color.white_100));
+            displayFragment = TimeTableDisplayFragment.newInstance (currentTable,
+                                                                    TimeTableType.CLASS, currentDay,
+                                                                    currentGroup);
+            getSupportFragmentManager ().beginTransaction ().
+                    replace (R.id.fragment_stub, displayFragment).commit ();
 
-            drawerLayout.setStatusBarBackgroundColor (getResources ().getColor (R.color.primary_dark));
-            drawerLayout.setDrawerListener (toggle);
-
-            drawerList.setLayoutManager (drawerLayoutManager);
-            drawerList.setAdapter (drawerAdapter);
-
-            clickSupport.setOnItemClickListener (new ItemClickSupport.OnItemClickListener ()
-            {
-                @Override
-                public void onItemClick (RecyclerView recyclerView, View view, int position, long id)
-                {
-                    switch (position)
-                    {
-                        case SCREEN_TODAY:
-                            selectScreen (SCREEN_TODAY, prefs.getString (getString (R.string.pref_table_name), ""), getCurrentDay (), TimeTableType.CLASS);
-                            break;
-                        case SCREEN_CLASSES:
-                            selectScreen (SCREEN_CLASSES, "", -1, -1);
-                            break;
-                        case SCREEN_TEACHERS:
-                            selectScreen (SCREEN_TEACHERS, "", -1, -1);
-                            break;
-                        case SCREEN_CLASSROOMS:
-                            selectScreen (SCREEN_CLASSROOMS, "", -1, -1);
-                            break;
-                        case SCREEN_SETTINGS:
-                            Intent intent = new Intent (getApplicationContext (), SettingsActivity.class);
-                            startActivity (intent);
-                    }
-                }
-            });
+            spinner.setAdapter (new DaySelectAdapter (this, R.layout.spinner_item));
+            spinner.setOnItemSelectedListener (this);
+            spinner.setSelection (currentDay);
         }
 
-        DaySelectAdapter adapter = new DaySelectAdapter (this, R.layout.spinner_item);
-        spinner.setAdapter (adapter);
-        spinner.setOnItemSelectedListener (this);
-
-        selectScreen (currentScreen, currentTable, currentDay, currentType);
-
-        initGroupSwitch ();
-    }
-
-    @Override
-    protected void onResumeFragments ()
-    {
-        super.onResumeFragments ();
-
-        // pulling the default table name saved in shared preferences in case we just got back from a sync
-        currentTable = prefs.getString (getString (R.string.pref_table_name), "");
-
-        // reinitializing the fragment when returning to the activity
-        selectScreen (currentScreen, currentTable, currentDay, currentType);
+        if (PrefUtils.hasSyncedTimeTables (this))
+        {
+            getSupportActionBar ().setDisplayShowTitleEnabled (false);
+            spinner.setVisibility (View.VISIBLE);
+        }
     }
 
     @Override
     protected void onSaveInstanceState (Bundle outState)
     {
-        outState.putInt (ARG_SCREEN, currentScreen);
-        outState.putString (ARG_TABLE, currentTable);
         outState.putInt (ARG_DAY, currentDay);
-        outState.putInt (ARG_TYPE, currentType);
         outState.putInt (ARG_GROUP, currentGroup);
 
         super.onSaveInstanceState (outState);
     }
 
     @Override
-    public void onConfigurationChanged (Configuration newConfig)
+    protected void onDestroy ()
     {
-        super.onConfigurationChanged (newConfig);
+        super.onDestroy ();
 
-        toggle.onConfigurationChanged (newConfig);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (this);
+        prefs.unregisterOnSharedPreferenceChangeListener (this);
+    }
+
+    @Override
+    protected int getSelfNavDrawerItem ()
+    {
+        return NAVDRAWER_ITEM_TODAY;
     }
 
     @Override
@@ -342,10 +238,9 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater ().inflate (R.menu.menu_kochanowski_main, menu);
-
         this.menu = menu;
 
-        initGroupSwitch ();
+        setUpGroupSwitcher ();
 
         return true;
     }
@@ -358,174 +253,83 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId ();
 
-        if (toggle.onOptionsItemSelected (item))
+        if (id == R.id.group_1 || id == R.id.group_2)
         {
-            return true;
-        }
-
-        switch (id)
-        {
-            case R.id.group_1:
-                if (currentScreen == SCREEN_TODAY)
-                {
-                    if (currentGroup == 0)
-                    {
-                        displayFragment.setGroup (2);
-                        setItemChecked (item, false);
-                    }
-                    if (currentGroup == 1)
-                    {
-                        displayFragment.setGroup (2);
-                        setItemChecked (item, false);
-
-                        setItemChecked (menu.findItem (R.id.group_2), true);
-                    }
-                    if (currentGroup == 2)
-                    {
-                        displayFragment.setGroup (0);
-                        setItemChecked (item, true);
-                    }
-
-                    currentGroup = displayFragment.getGroupId ();
-                }
-                break;
-            case R.id.group_2:
-                if (currentScreen == SCREEN_TODAY)
-                {
-                    if (currentGroup == 0)
-                    {
-                        displayFragment.setGroup (1);
-                        setItemChecked (item, false);
-                    }
-                    if (currentGroup == 2)
-                    {
-                        displayFragment.setGroup (1);
-                        setItemChecked (item, false);
-
-                        setItemChecked (menu.findItem (R.id.group_1), true);
-                    }
-                    if (currentGroup == 1)
-                    {
-                        displayFragment.setGroup (0);
-                        setItemChecked (item, true);
-                    }
-
-                    currentGroup = displayFragment.getGroupId ();
-                }
-                break;
+            handleGroupSwitch (id);
         }
 
         return super.onOptionsItemSelected (item);
     }
 
-    private void selectScreen (int screenId, String table, int day, int type)
+    private void handleGroupSwitch (int itemId)
     {
-        currentScreen = screenId;
-        currentTable = table;
-        currentDay = day;
-        currentType = type;
+        MenuItem item = menu.findItem (itemId);
 
-        FragmentTransaction transaction = getSupportFragmentManager ().beginTransaction ();
-
-        switch (currentScreen)
-        {
-            case SCREEN_TODAY:
-                displayFragment = TimeTableDisplayFragment.newInstance (currentTable, currentType, currentDay, currentGroup);
-                transaction.replace (R.id.fragment_stub, displayFragment);
-
-                getSupportActionBar ().setDisplayShowTitleEnabled (false);
-                spinner.setVisibility (View.VISIBLE);
-                spinner.setSelection (currentDay);
-                if (menu != null) menu.setGroupVisible (R.id.group_switch, true);
-                break;
-            case SCREEN_CLASSES:
-                listFragment = TimeTableListFragment.newInstance (TimeTableType.CLASS);
-                transaction.replace (R.id.fragment_stub, listFragment);
-
-                getSupportActionBar ().setDisplayShowTitleEnabled (true);
-                getSupportActionBar ().setTitle (getString (R.string.classes));
-                spinner.setVisibility (View.GONE);
-
-                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
-                break;
-            case SCREEN_TEACHERS:
-                listFragment = TimeTableListFragment.newInstance (TimeTableType.TEACHER);
-                transaction.replace (R.id.fragment_stub, listFragment);
-
-                getSupportActionBar ().setDisplayShowTitleEnabled (true);
-                getSupportActionBar ().setTitle (getString (R.string.teachers));
-                spinner.setVisibility (View.GONE);
-
-                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
-                break;
-            case SCREEN_CLASSROOMS:
-                listFragment = TimeTableListFragment.newInstance (TimeTableType.CLASSROOM);
-                transaction.replace (R.id.fragment_stub, listFragment);
-
-                getSupportActionBar ().setDisplayShowTitleEnabled (true);
-                getSupportActionBar ().setTitle (getString (R.string.classrooms));
-                spinner.setVisibility (View.GONE);
-
-                if (menu != null) menu.setGroupVisible (R.id.group_switch, false);
-                break;
-        }
-        transaction.commit ();
-
-        drawerLayout.closeDrawer (insetLayout);
-    }
-
-    private void setItemChecked (MenuItem item, boolean state)
-    {
-        item.setChecked (state);
-        int id = item.getItemId ();
-
-        switch (id)
+        switch (itemId)
         {
             case R.id.group_1:
-                if (state) item.setIcon (R.drawable.ic_group_1_white);
-                else item.setIcon (R.drawable.ic_group_1_white_disabled);
+                if (currentGroup == Group.GROUP_BOTH) currentGroup = Group.GROUP_TWO;
+                else if (currentGroup == Group.GROUP_ONE) currentGroup = Group.GROUP_TWO;
+                else if (currentGroup == Group.GROUP_TWO) currentGroup = Group.GROUP_BOTH;
+
                 break;
             case R.id.group_2:
-                if (state) item.setIcon (R.drawable.ic_group_2_white);
-                else item.setIcon (R.drawable.ic_group_2_white_disabled);
+                if (currentGroup == Group.GROUP_BOTH) currentGroup = Group.GROUP_ONE;
+                else if (currentGroup == Group.GROUP_ONE) currentGroup = Group.GROUP_BOTH;
+                else if (currentGroup == Group.GROUP_TWO) currentGroup = Group.GROUP_ONE;
+
                 break;
         }
+        displayFragment.setGroup (currentGroup);
+
+        setUpGroupSwitcher ();
     }
 
-    private void initGroupSwitch ()
+    private void setMenuItemChecked (int itemId, boolean checked)
     {
-        if (menu != null)
+        MenuItem item = menu.findItem (itemId);
+
+        if (checked)
         {
-            if (currentGroup == -1)
-                currentGroup = Integer.valueOf (prefs.getString (getString (R.string.pref_default_group), "0"));
+            item.setChecked (true);
 
-            setItemChecked (menu.findItem (R.id.group_1), true);
-            setItemChecked (menu.findItem (R.id.group_2), true);
+            if (itemId == R.id.group_1) item.setIcon (R.drawable.ic_group_1_white);
+            if (itemId == R.id.group_2) item.setIcon (R.drawable.ic_group_2_white);
+        }
+        else
+        {
+            item.setChecked (false);
 
-            if (currentGroup == 1) setItemChecked (menu.findItem (R.id.group_2), false);
-            if (currentGroup == 2) setItemChecked (menu.findItem (R.id.group_1), false);
-
-            if (currentScreen == SCREEN_TODAY) menu.setGroupVisible (R.id.group_switch, true);
-            else menu.setGroupVisible (R.id.group_switch, false);
+            if (itemId == R.id.group_1) item.setIcon (R.drawable.ic_group_1_white_disabled);
+            if (itemId == R.id.group_2) item.setIcon (R.drawable.ic_group_2_white_disabled);
         }
     }
 
-    static public int getCurrentDay ()
+    private void setUpGroupSwitcher ()
     {
-        int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
-        if (day > 4 || day < 0) day = 0;
-        return day;
+        if (menu != null) switch (currentGroup)
+        {
+            case Group.GROUP_BOTH:
+                setMenuItemChecked (R.id.group_1, true);
+                setMenuItemChecked (R.id.group_2, true);
+                break;
+            case Group.GROUP_ONE:
+                setMenuItemChecked (R.id.group_1, true);
+                setMenuItemChecked (R.id.group_2, false);
+                break;
+            case Group.GROUP_TWO:
+                setMenuItemChecked (R.id.group_1, false);
+                setMenuItemChecked (R.id.group_2, true);
+                break;
+        }
     }
 
     @Override
     public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
     {
-        if (currentScreen == SCREEN_TODAY)
-        {
-            currentDay = position;
-            displayFragment.setDay (position);
-            displayFragment.refresh ();
-        }
+        currentDay = position;
+        displayFragment.setDay (currentDay);
+        displayFragment.refresh ();
     }
 
     @Override
@@ -537,12 +341,30 @@ public class KochanowskiMainActivity extends ActionBarActivity implements Adapte
     @Override
     public void onTimeTableSelected (String shortName, String longName, int tableType)
     {
-        Intent intent = new Intent (this, TimeTableTabActivity.class);
 
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_SHORT, shortName);
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_LONG, longName);
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
+    }
 
-        startActivity (intent);
+    @Override
+    public void onSharedPreferenceChanged (SharedPreferences sharedPreferences, String key)
+    {
+        if (key.equals (PrefUtils.PREF_DEFAULT_GROUP))
+        {
+            currentGroup = PrefUtils.getDefaultGroup (this);
+            setUpGroupSwitcher ();
+        }
+
+        if (key.equals (PrefUtils.PREF_TABLE_NAME))
+        {
+            currentTable = PrefUtils.getTableName (this);
+            displayFragment.setTableName (currentTable);
+            displayFragment.refresh ();
+        }
+    }
+
+    static public int getCurrentDay ()
+    {
+        int day = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - 2;
+        if (day > 4 || day < 0) day = 0;
+        return day;
     }
 }

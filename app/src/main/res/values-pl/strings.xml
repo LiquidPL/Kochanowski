@@ -35,4 +35,5 @@
     <string name="group_2">Grupa 2</string>
     <string name="pref_default_group_name">Domyślna grupa</string>
     <string name="pref_default_group_dialog">Wybierz grupę</string>
+    <string name="action_help">Pomoc</string>
 </resources>
