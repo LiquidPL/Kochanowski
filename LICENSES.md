@@ -42,6 +42,7 @@ subject line.
 
 
 ScrimInsetsFrameLayout
+ScrimInsetsScrollLayout
 SlidingTabLayout
 SlidingTabStrip
 ----------------------
