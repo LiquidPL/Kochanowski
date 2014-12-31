@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
+import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanparser.TimeTableType;
 
 import org.xml.sax.Attributes;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class MasterlistHandler extends DefaultHandler
 {
-    private static String school_url = "http://kochanowski.iq.pl/plan20140915/";
+    private String school_url;
 
     private List <String> urls;
     private SQLiteDatabase db;
@@ -22,10 +23,11 @@ public class MasterlistHandler extends DefaultHandler
     private String currentName = "";
     private String currentAttribute = "";
 
-    public MasterlistHandler (List<String> urls, SQLiteDatabase db)
+    public MasterlistHandler (List<String> urls, String school_url)
     {
         this.urls = urls;
-        this.db = db;
+        this.school_url = school_url;
+        db = DbUtils.getWritableDatabase ();
     }
 
     @Override

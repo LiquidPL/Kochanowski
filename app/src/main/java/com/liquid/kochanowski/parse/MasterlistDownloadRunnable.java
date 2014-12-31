@@ -35,6 +35,8 @@ public class MasterlistDownloadRunnable implements Runnable
     private SyncActivity context;
     private Handler handler;
 
+    String header_url[];
+
     public MasterlistDownloadRunnable (List<String> urls, Context context, Handler handler)
     {
         this.urls = urls;
@@ -59,6 +61,8 @@ public class MasterlistDownloadRunnable implements Runnable
                 masterlist_url += (char) data;
                 data = istr.read ();
             }
+
+            header_url = masterlist_url.split ("lista.html");
         }
         catch (java.io.IOException e)
         {
@@ -84,7 +88,7 @@ public class MasterlistDownloadRunnable implements Runnable
             SAXParserFactory factory = SAXParserFactory.newInstance ();
             SAXParser parser = factory.newSAXParser ();
 
-            DefaultHandler handler = new MasterlistHandler (urls, db);
+            DefaultHandler handler = new MasterlistHandler (urls, header_url[0]);
             parser.parse (istr, handler);
 
         }
