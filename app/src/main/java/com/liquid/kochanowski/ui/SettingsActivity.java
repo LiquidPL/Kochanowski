@@ -11,6 +11,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     ListPreference defaultClass;
     ListPreference defaultGroup;
+    Preference removeTables;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -70,8 +72,23 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         defaultClass = (ListPreference) findPreference (getString (R.string.pref_table_name));
         defaultGroup = (ListPreference) findPreference (getString (R.string.pref_default_group));
+        removeTables = findPreference (getString(R.string.pref_db_reset));
 
-        findPreference ("pref_db_reset").setOnPreferenceClickListener (this);
+        removeTables.setOnPreferenceClickListener (this);
+
+        if (PrefUtils.hasSyncedTimeTables (this))
+        {
+            defaultClass.setEnabled (true);
+            removeTables.setEnabled (true);
+            removeTables.setSummary ("");
+        }
+        else
+        {
+            defaultClass.setEnabled (false);
+            defaultClass.setSummary (getString(R.string.download_tables_first));
+            removeTables.setEnabled (false);
+            removeTables.setSummary (getString(R.string.download_tables_first));
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {

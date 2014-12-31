@@ -39,7 +39,7 @@
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
-    <string name="pref_default_group">pref_default_group</string>
+    <string name="pref_default_group" translatable="false">pref_default_group</string>
     <string name="group_1">Group 1</string>
     <string name="group_2">Group 2</string>
     <string name="both_groups">Both groups</string>
@@ -48,5 +48,7 @@
     <string name="action_help">Help</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_time_table_list">TimeTableListActivity</string>
+    <string name="pref_db_reset" translatable="false">pref_db_reset</string>
+    <string name="download_tables_first">You should download timetables first</string>
 
 </resources>
