@@ -239,6 +239,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         {
             case R.id.home:
                 NavUtils.navigateUpFromSameTask (this);
+                finish ();
                 return true;
         }
 
@@ -257,6 +258,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         {
             Intent intent = new Intent (this, MainActivity.class);
             startActivity (intent);
+            finish ();
         }
         else
         {
