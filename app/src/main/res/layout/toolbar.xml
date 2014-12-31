@@ -9,6 +9,4 @@
     android:elevation="6dp"
     android:id="@+id/toolbar"
     app:theme="@style/ToolbarDark"
-    app:popupTheme="@style/Theme.AppCompat.Light"
-    app:navigationIcon="?attr/homeAsUpIndicator"
-    app:title="@string/action_settings"/>
+    app:popupTheme="@style/Theme.AppCompat.Light"/>

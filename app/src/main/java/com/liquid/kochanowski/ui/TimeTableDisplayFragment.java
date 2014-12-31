@@ -358,18 +358,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         noTimeTablesAlert = (TextView) view.findViewById (R.id.alert_no_timetables);
 
-        if (PrefUtils.hasSyncedTimeTables (getActivity ()))
-        {
-            recyclerView.setVisibility (View.VISIBLE);
-            syncButton.setVisibility (View.INVISIBLE);
-            noTimeTablesAlert.setVisibility (View.INVISIBLE);
-        }
-        else
-        {
-            syncButton.setVisibility (View.VISIBLE);
-            noTimeTablesAlert.setVisibility (View.VISIBLE);
-            recyclerView.setVisibility (View.INVISIBLE);
-        }
+        resetVisibility ();
 
         layoutManager = new LinearLayoutManager (activity);
         recyclerView.setLayoutManager (layoutManager);
@@ -405,8 +394,26 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         this.dayId = day;
     }
 
+    private void resetVisibility ()
+    {
+        if (PrefUtils.hasSyncedTimeTables (getActivity ()))
+        {
+            recyclerView.setVisibility (View.VISIBLE);
+            syncButton.setVisibility (View.INVISIBLE);
+            noTimeTablesAlert.setVisibility (View.INVISIBLE);
+        }
+        else
+        {
+            syncButton.setVisibility (View.VISIBLE);
+            noTimeTablesAlert.setVisibility (View.VISIBLE);
+            recyclerView.setVisibility (View.INVISIBLE);
+        }
+    }
+
     public void refresh ()
     {
+        resetVisibility ();
+
         adapter = new LessonListAdapter (
                 R.layout.lesson_item,
                 tableName,

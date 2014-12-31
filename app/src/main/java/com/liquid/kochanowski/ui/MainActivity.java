@@ -3,9 +3,7 @@ package com.liquid.kochanowski.ui;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,19 +26,16 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class KochanowskiMainActivity
+public class MainActivity
         extends BaseActivity
         implements TimeTableListFragment.OnTimeTableSelectedListener,
                    AdapterView.OnItemSelectedListener,
                    SharedPreferences.OnSharedPreferenceChangeListener
 {
-    private SharedPreferences prefs;
-
     private Menu menu;
     private Spinner spinner;
 
     private TimeTableDisplayFragment displayFragment;
-    @SuppressWarnings("FieldCanBeLocal")
 
     static final String ARG_DAY = "day";
     static final String ARG_GROUP = "group";
@@ -157,7 +152,7 @@ public class KochanowskiMainActivity
         }
     }
 
-    public KochanowskiMainActivity ()
+    public MainActivity ()
     {
         DbUtils.initHelper (this);
     }
@@ -166,7 +161,7 @@ public class KochanowskiMainActivity
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_kochanowski_main);
+        setContentView (R.layout.activity_main);
 
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
 
@@ -207,6 +202,13 @@ public class KochanowskiMainActivity
             getSupportActionBar ().setDisplayShowTitleEnabled (false);
             spinner.setVisibility (View.VISIBLE);
         }
+        else
+        {
+            getSupportActionBar ().setDisplayShowTitleEnabled (true);
+            spinner.setVisibility (View.GONE);
+        }
+
+        setUpGroupSwitcher ();
     }
 
     @Override
@@ -263,8 +265,6 @@ public class KochanowskiMainActivity
 
     private void handleGroupSwitch (int itemId)
     {
-        MenuItem item = menu.findItem (itemId);
-
         switch (itemId)
         {
             case R.id.group_1:
@@ -307,20 +307,32 @@ public class KochanowskiMainActivity
 
     private void setUpGroupSwitcher ()
     {
-        if (menu != null) switch (currentGroup)
+        if (menu != null)
         {
-            case Group.GROUP_BOTH:
-                setMenuItemChecked (R.id.group_1, true);
-                setMenuItemChecked (R.id.group_2, true);
-                break;
-            case Group.GROUP_ONE:
-                setMenuItemChecked (R.id.group_1, true);
-                setMenuItemChecked (R.id.group_2, false);
-                break;
-            case Group.GROUP_TWO:
-                setMenuItemChecked (R.id.group_1, false);
-                setMenuItemChecked (R.id.group_2, true);
-                break;
+            switch (currentGroup)
+            {
+                case Group.GROUP_BOTH:
+                    setMenuItemChecked (R.id.group_1, true);
+                    setMenuItemChecked (R.id.group_2, true);
+                    break;
+                case Group.GROUP_ONE:
+                    setMenuItemChecked (R.id.group_1, true);
+                    setMenuItemChecked (R.id.group_2, false);
+                    break;
+                case Group.GROUP_TWO:
+                    setMenuItemChecked (R.id.group_1, false);
+                    setMenuItemChecked (R.id.group_2, true);
+                    break;
+            }
+
+            if (PrefUtils.hasSyncedTimeTables (this))
+            {
+                menu.setGroupVisible (R.id.group_switch, true);
+            }
+            else
+            {
+                menu.setGroupVisible (R.id.group_switch, false);
+            }
         }
     }
 
@@ -350,12 +362,21 @@ public class KochanowskiMainActivity
         if (key.equals (PrefUtils.PREF_DEFAULT_GROUP))
         {
             currentGroup = PrefUtils.getDefaultGroup (this);
+            displayFragment.setGroup (currentGroup);
             setUpGroupSwitcher ();
         }
 
         if (key.equals (PrefUtils.PREF_TABLE_NAME))
         {
             currentTable = PrefUtils.getTableName (this);
+            displayFragment.setTableName (currentTable);
+            displayFragment.refresh ();
+        }
+
+        if (key.equals (PrefUtils.PREF_TABLES_SYNCED))
+        {
+            currentTable = PrefUtils.getTableName (this);
+
             displayFragment.setTableName (currentTable);
             displayFragment.refresh ();
         }

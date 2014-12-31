@@ -2,7 +2,6 @@ package com.liquid.kochanowski.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,7 +37,7 @@ import com.liquid.kochanowski.util.PrefUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SyncActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener
+public class SyncActivity extends BaseActivity implements AdapterView.OnItemSelectedListener
 {
     private ThreadManager manager;
 
@@ -112,22 +111,6 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
         classSelect = (Spinner) findViewById (R.id.class_select);
 
         db = DbUtils.getReadableDatabase ();
-
-        Toolbar toolbar = (Toolbar) findViewById (R.id.toolbar);
-        if (toolbar != null)
-        {
-            setSupportActionBar (toolbar);
-            //toolbar.setNavigationIcon (R.drawable.ic_arrow_back);
-        }
-
-        // set status bar color (lollipop only)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            Window window = getWindow ();
-            window.addFlags (WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
-        }
 
         if (!PrefUtils.hasSyncedTimeTables (this))
         {
@@ -272,7 +255,7 @@ public class SyncActivity extends ActionBarActivity implements AdapterView.OnIte
     {
         if (PrefUtils.hasSyncedTimeTables (this))
         {
-            Intent intent = new Intent (this, KochanowskiMainActivity.class);
+            Intent intent = new Intent (this, MainActivity.class);
             startActivity (intent);
         }
         else

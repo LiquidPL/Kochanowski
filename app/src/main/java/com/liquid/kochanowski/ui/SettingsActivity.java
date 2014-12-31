@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.util.DbUtils;
+import com.liquid.kochanowski.util.PrefUtils;
 
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
@@ -31,8 +32,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     Cursor cur;
     CharSequence[] entries;
     CharSequence[] values;
-
-    SharedPreferences prefs;
 
     ListPreference defaultClass;
     ListPreference defaultGroup;
@@ -46,7 +45,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         addPreferencesFromResource (R.xml.preferences);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences (this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (this);
         prefs.registerOnSharedPreferenceChangeListener (this);
 
         db = DbUtils.getReadableDatabase ();
@@ -108,7 +107,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         super.onPostCreate (savedInstanceState);
 
         LinearLayout root = (LinearLayout) findViewById (android.R.id.list).getParent ().getParent ().getParent ();
-        Toolbar toolbar = (Toolbar) LayoutInflater.from (this).inflate (R.layout.settings_toolbar, root, false);
+        Toolbar toolbar = (Toolbar) LayoutInflater.from (this).inflate (R.layout.toolbar, root, false);
 
         root.addView (toolbar, 0);
 
@@ -120,6 +119,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 finish ();
             }
         });
+
+        toolbar.setTitle (getString (R.string.action_settings));
+        toolbar.setNavigationIcon (R.drawable.ic_arrow_back_white);
     }
 
     @Override
@@ -149,9 +151,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 @Override
                 public void onClick (DialogInterface dialog, int which)
                 {
-                    SharedPreferences.Editor editor = prefs.edit ();
-                    editor.putBoolean (getString (R.string.pref_timetables_synced), false);
-                    editor.commit ();
+                    PrefUtils.setTimeTablesSynced (getApplicationContext (), false);
                 }
             });
             builder.setNegativeButton (getString (R.string.action_no), new DialogInterface.OnClickListener ()

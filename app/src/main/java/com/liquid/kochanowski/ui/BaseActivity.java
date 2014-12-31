@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -55,10 +54,10 @@ public class BaseActivity extends ActionBarActivity
             R.drawable.ic_help_black
     };
 
-    // delay in milliseconds to launch navdrawer item for the close animation to end
-    private static final int NAVDRAWER_LAUNCH_DELAY = 250;
+    // delay in milliseconds to launch activity for the animation to end
+    protected static final int ACTIVITY_LAUNCH_DELAY = 250;
 
-    private Handler handler;
+    protected Handler handler;
 
     // navigation drawer
     private DrawerLayout drawerLayout;
@@ -79,12 +78,6 @@ public class BaseActivity extends ActionBarActivity
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
-
-        ActionBar actionBar = getSupportActionBar ();
-        if (actionBar != null)
-        {
-            actionBar.setDisplayHomeAsUpEnabled (true);
-        }
 
         statusBarColor = getResources ().getColor (R.color.primary_dark);
 
@@ -304,7 +297,7 @@ public class BaseActivity extends ActionBarActivity
                     goToNavDrawerItem (itemId);
 
                 }
-            }, NAVDRAWER_LAUNCH_DELAY);
+            }, ACTIVITY_LAUNCH_DELAY);
 
             setNavDrawerItemSelected (itemId);
         }
@@ -318,15 +311,27 @@ public class BaseActivity extends ActionBarActivity
         switch (itemId)
         {
             case NAVDRAWER_ITEM_TODAY:
-                intent = new Intent (this, KochanowskiMainActivity.class);
+                intent = new Intent (this, MainActivity.class);
                 startActivity (intent);
                 finish ();
                 break;
             case NAVDRAWER_ITEM_CLASSES:
+                intent = new Intent (this, TimeTableListActivity.class);
+                intent.putExtra (TimeTableListActivity.ARG_TYPE, NAVDRAWER_ITEM_CLASSES);
+                startActivity (intent);
+                finish ();
                 break;
             case NAVDRAWER_ITEM_TEACHERS:
+                intent = new Intent (this, TimeTableListActivity.class);
+                intent.putExtra (TimeTableListActivity.ARG_TYPE, NAVDRAWER_ITEM_TEACHERS);
+                startActivity (intent);
+                finish ();
                 break;
             case NAVDRAWER_ITEM_CLASSROOMS:
+                intent = new Intent (this, TimeTableListActivity.class);
+                intent.putExtra (TimeTableListActivity.ARG_TYPE, NAVDRAWER_ITEM_CLASSROOMS);
+                startActivity (intent);
+                finish ();
                 break;
             case NAVDRAWER_ITEM_SETTINGS:
                 intent = new Intent (this, SettingsActivity.class);

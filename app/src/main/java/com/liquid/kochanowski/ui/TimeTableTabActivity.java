@@ -1,31 +1,24 @@
 package com.liquid.kochanowski.ui;
 
-import android.content.SharedPreferences;
-import android.content.res.TypedArray;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.widget.SlidingTabLayout;
 import com.liquid.kochanparser.TimeTableType;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 
-public class TimeTableTabActivity extends ActionBarActivity
+public class TimeTableTabActivity extends BaseActivity
 {
     static final String ARG_TABLE_NAME_SHORT = "shortname";
     static final String ARG_TABLE_NAME_LONG = "longname";
@@ -35,15 +28,8 @@ public class TimeTableTabActivity extends ActionBarActivity
     private String longName;
     private int tableType;
 
-    private SharedPreferences prefs;
-
-    private Toolbar toolbar;
-
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
-
-    private List <String> values;
-    private TypedArray icons;
 
     private class ViewPagerAdapter extends FragmentPagerAdapter
     {
@@ -74,11 +60,6 @@ public class TimeTableTabActivity extends ActionBarActivity
         }
     }
 
-    public TimeTableTabActivity ()
-    {
-
-    }
-
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
@@ -91,30 +72,6 @@ public class TimeTableTabActivity extends ActionBarActivity
         longName = extras.getString (ARG_TABLE_NAME_LONG);
         tableType = extras.getInt (ARG_TABLE_TYPE);
 
-        prefs = getSharedPreferences (getString (R.string.shared_prefs_name), MODE_PRIVATE);
-
-        toolbar = (Toolbar) findViewById (R.id.toolbar);
-
-        if (toolbar != null)
-        {
-            setSupportActionBar (toolbar);
-            toolbar.setNavigationIcon (R.drawable.ic_arrow_back_white);
-            toolbar.setTitleTextColor (getResources ().getColor (R.color.white_100));
-
-            getSupportActionBar ().setDisplayHomeAsUpEnabled (true);
-
-            getSupportActionBar ().setTitle (longName + " (" + shortName + ")");
-            if (tableType == TimeTableType.CLASSROOM) getSupportActionBar ().setTitle (shortName);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            Window window = getWindow ();
-            window.addFlags (WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor (getResources ().getColor (R.color.primary_dark));
-        }
-
         slidingTabLayout = (SlidingTabLayout) findViewById (R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById (R.id.view_pager);
 
@@ -123,8 +80,12 @@ public class TimeTableTabActivity extends ActionBarActivity
         slidingTabLayout.setViewPager (viewPager);
 
         slidingTabLayout.setSelectedIndicatorColors (getResources ().getColor (R.color.accent));
-    }
 
+        getSupportActionBar ().setTitle (longName + " (" + shortName + ")");
+        if (tableType == TimeTableType.CLASSROOM) getSupportActionBar ().setTitle (shortName);
+
+        getSupportActionBar ().setDisplayHomeAsUpEnabled (true);
+    }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu)
@@ -146,7 +107,9 @@ public class TimeTableTabActivity extends ActionBarActivity
         switch (id)
         {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask (this);
+                Intent intent = NavUtils.getParentActivityIntent (this);
+                intent.setFlags (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                NavUtils.navigateUpTo (this, intent);
                 return true;
         }
 

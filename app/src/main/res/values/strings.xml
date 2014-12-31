@@ -47,5 +47,6 @@
     <string name="pref_default_group_dialog">Select your preferred group</string>
     <string name="action_help">Help</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_time_table_list">TimeTableListActivity</string>
 
 </resources>
