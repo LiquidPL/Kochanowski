@@ -37,4 +37,5 @@
     <string name="pref_default_group_dialog">Select your preferred group</string>
     <string name="action_help">Help</string>
     <string name="download_tables_first">You should download timetables first</string>
+    <string name="title_activity_help">Help</string>
 </resources>

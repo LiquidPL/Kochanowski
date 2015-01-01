@@ -285,7 +285,15 @@ public class BaseActivity extends ActionBarActivity
 
         if (isSpecialItem (itemId))
         {
-            goToNavDrawerItem (itemId);
+            handler.postDelayed (new Runnable ()
+            {
+                @Override
+                public void run ()
+                {
+                    goToNavDrawerItem (itemId);
+
+                }
+            }, ACTIVITY_LAUNCH_DELAY);;
         }
         else
         {
@@ -338,6 +346,9 @@ public class BaseActivity extends ActionBarActivity
                 startActivity (intent);
                 break;
             case NAVDRAWER_ITEM_HELP:
+                intent = new Intent (this, HelpActivity.class);
+                startActivity (intent);
+                finish ();
                 break;
         }
     }
@@ -345,7 +356,6 @@ public class BaseActivity extends ActionBarActivity
     private boolean isSpecialItem (int itemId)
     {
         if (itemId == NAVDRAWER_ITEM_SETTINGS) return true;
-        if (itemId == NAVDRAWER_ITEM_HELP) return true;
         return false;
     }
 

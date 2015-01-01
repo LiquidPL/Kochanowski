@@ -37,4 +37,5 @@
     <string name="pref_default_group_dialog">Wybierz grupę</string>
     <string name="action_help">Pomoc</string>
     <string name="download_tables_first">Powinieneś najpierw pobrać plany lekcji</string>
+    <string name="title_activity_help">Pomoc</string>
 </resources>
