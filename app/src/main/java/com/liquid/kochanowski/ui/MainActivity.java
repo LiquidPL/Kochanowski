@@ -15,9 +15,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
+import com.liquid.kochanowski.ui.TimeTableDisplayFragment.Group;
 import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanowski.util.PrefUtils;
-import com.liquid.kochanowski.ui.TimeTableDisplayFragment.Group;
 import com.liquid.kochanparser.TimeTableType;
 
 import java.text.SimpleDateFormat;

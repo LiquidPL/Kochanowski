@@ -33,10 +33,9 @@ public class MasterlistHandler extends DefaultHandler
     @Override
     public void startElement (String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
-        int attrValue = TimeTableType.NONE;
         for (int i = 0; i < attributes.getLength (); i++)
         {
-            if (attributes.getQName (i) == "href")
+            if (attributes.getQName (i).equals ("href"))
             {
                 if (checkType (attributes.getValue (i)) == TimeTableType.CLASS)
                 {
@@ -56,7 +55,7 @@ public class MasterlistHandler extends DefaultHandler
         String value = new String (ch, start, length).trim ();
         if (value.length () == 0) return;
 
-        if (currentAttribute == "teacher")
+        if (currentAttribute.equals ("teacher"))
         {
             String[] teacher = value.split (" ");
             teacher[teacher.length - 1] = new String (teacher[teacher.length - 1].toCharArray (), 1, teacher[teacher.length - 1].length () - 2);

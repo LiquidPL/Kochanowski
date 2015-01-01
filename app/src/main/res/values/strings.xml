@@ -4,7 +4,6 @@
     <string name="action_settings">Settings</string>
     <string name="button_continue">Continue</string>
     <string name="downloaded_timetable">Downloaded timetable:</string>
-    <string name="hello_world">Hello world!</string>
     <string name="sync_result_failure">Synchronization failed</string>
     <string name="sync_result_success">Synchronization completed successfully\n\nPlease choose your class:</string>
     <string name="title_activity_sync">Synchronizing</string>
@@ -12,22 +11,15 @@
     <string name="downloading_metadata">Downloading timetable list…</string>
     <string name="button_sync">Synchronize now</string>
     <string name="tables_not_found">No timetables found</string>
-    <string name="pref_timetables_synced" translatable="false">pref_timetables_synced</string>
-    <string name="pref_table_name" translatable="false">pref_table_name</string>
-    <string name="pref_group" translatable="false">pref_group</string>
-    <string name="shared_prefs_name" translatable="false">prefs_kochanowski</string>
     <string name="day_name_0">Monday</string>
     <string name="day_name_1">Tuesday</string>
     <string name="day_name_2">Thursday</string>
     <string name="day_name_3">Wednesday</string>
     <string name="day_name_4">Friday</string>
     <string name="day_name_today">Today</string>
-    <string name="open" translatable="false">open</string>
-    <string name="close" translatable="false">close</string>
     <string name="classes">Classes</string>
     <string name="teachers">Teachers</string>
     <string name="classrooms">Classrooms</string>
-    <string name="separator" translatable="false">separator</string>
     <string name="title_activity_time_table_tab" translatable="false">TimeTableTabActivity</string>
     <string name="no_internet">Check your connection and retry</string>
     <string name="button_retry">Retry</string>
@@ -39,6 +31,7 @@
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="dialog_remove_timetables_message">You\'ll need to download them again!</string>
+    <string name="pref_table_name" translatable="false">pref_table_name</string>
     <string name="pref_default_group" translatable="false">pref_default_group</string>
     <string name="group_1">Group 1</string>
     <string name="group_2">Group 2</string>
@@ -46,12 +39,11 @@
     <string name="pref_default_group_name">Default group</string>
     <string name="pref_default_group_dialog">Select your preferred group</string>
     <string name="action_help">Help</string>
-    <string name="title_activity_test" translatable="false">TestActivity</string>
     <string name="title_activity_time_table_list" translatable="false">TimeTableListActivity</string>
     <string name="pref_db_reset" translatable="false">pref_db_reset</string>
     <string name="download_tables_first">You should download timetables first</string>
     <string name="title_activity_help">Help</string>
-    <string name="action_about">About...</string>
-    <string name="action_os_licenses">Open source licenses...</string>
+    <string name="action_about">About…</string>
+    <string name="action_os_licenses">Open source licenses…</string>
 
 </resources>

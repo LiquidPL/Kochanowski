@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.liquid.kochanowski.ui.TimeTableDisplayFragment.Group;
-
 /**
  * Created by liquid on 29.12.14.
  */
@@ -44,7 +42,7 @@ public class PrefUtils
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        prefs.edit ().putBoolean (PREF_TABLES_SYNCED, synced).commit ();
+        prefs.edit ().putBoolean (PREF_TABLES_SYNCED, synced).apply ();
     }
 
     public static String getTableName (final Context context)
@@ -58,7 +56,7 @@ public class PrefUtils
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        prefs.edit ().putString (PREF_TABLE_NAME, tableName).commit ();
+        prefs.edit ().putString (PREF_TABLE_NAME, tableName).apply ();
     }
 
     public static int getDefaultGroup (final Context context)
@@ -73,7 +71,7 @@ public class PrefUtils
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
         // this preference is set using a ListPreference that returns a string, so internally we're doing it so
-        prefs.edit ().putString (PREF_DEFAULT_GROUP, Integer.toString (defaultGroup)).commit ();
+        prefs.edit ().putString (PREF_DEFAULT_GROUP, Integer.toString (defaultGroup)).apply ();
     }
 
     public static boolean isWelcomeDone (final Context context)
@@ -87,6 +85,6 @@ public class PrefUtils
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        prefs.edit ().putBoolean (PREF_WELCOME_DONE, true).commit ();
+        prefs.edit ().putBoolean (PREF_WELCOME_DONE, true).apply ();
     }
 }

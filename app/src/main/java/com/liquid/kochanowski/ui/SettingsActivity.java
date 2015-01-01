@@ -6,12 +6,12 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.support.v7.widget.Toolbar;
-import android.widget.ListView;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
@@ -208,7 +205,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId ();
 
         return super.onOptionsItemSelected (item);
     }

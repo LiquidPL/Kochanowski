@@ -104,10 +104,16 @@ public class ThreadManager
 
                         result = TASK_COMPLETED;
 
-                        task.recycle ();
+                        if (task != null)
+                        {
+                            task.recycle ();
+                        }
                         break;
                     case DOWNLOAD_FAILED:
-                        task.recycle ();
+                        if (task != null)
+                        {
+                            task.recycle ();
+                        }
                         result = DOWNLOAD_FAILED;
                         context.finishSync ();
                         break;

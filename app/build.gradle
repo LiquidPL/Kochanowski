@@ -26,8 +26,8 @@ repositories {
 dependencies {
     compile files ('libs/htmlcleaner/htmlcleaner-2.10.jar')
     compile project (':kochanparser')
-    compile 'com.android.support:appcompat-v7:21.0.+'
-    compile 'com.android.support:recyclerview-v7:21.0.+'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:recyclerview-v7:21.0.3'
     compile 'org.lucasr.twowayview:core:1.0.0-SNAPSHOT@aar'
     compile 'org.lucasr.twowayview:layouts:1.0.0-SNAPSHOT@aar'
 }

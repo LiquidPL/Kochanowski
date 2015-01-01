@@ -9,7 +9,8 @@
             android:title="@string/group_1"
             android:icon="@drawable/ic_group_1_white"
             android:checkable="true"
-            app:showAsAction="always"/>
+            app:showAsAction="always"
+            tools:ignore="AlwaysShowAction"/>
 
         <item
             android:id="@+id/group_2"

@@ -11,7 +11,6 @@
     <style name="ToolbarDark" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimary">@color/white_100</item>
 
-        <item name="android:actionMenuTextColor">@color/white_100</item>
         <item name="android:textColorSecondary">@color/white_100</item>
     </style>
 

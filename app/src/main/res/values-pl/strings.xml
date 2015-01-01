@@ -3,7 +3,6 @@
     <string name="action_settings">Ustawienia</string>
     <string name="button_continue">Kontynuuj</string>
     <string name="downloaded_timetable">Pobrano plan lekcji</string>
-    <string name="hello_world">Witaj świecie!</string>
     <string name="sync_result_failure">Synchronizacja nie powiodła się</string>
     <string name="sync_result_success">Synchronizacja powiodła się\n\nWybierz swoją klasę:</string>
     <string name="title_activity_sync">Synchronizacja</string>
@@ -38,6 +37,6 @@
     <string name="action_help">Pomoc</string>
     <string name="download_tables_first">Powinieneś najpierw pobrać plany lekcji</string>
     <string name="title_activity_help">Pomoc</string>
-    <string name="action_about">O programie...</string>
-    <string name="action_os_licenses">Licencje open source...</string>
+    <string name="action_about">O programie…</string>
+    <string name="action_os_licenses">Licencje open source…</string>
 </resources>

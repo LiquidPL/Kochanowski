@@ -193,7 +193,7 @@ public class BaseActivity extends ActionBarActivity
     {
         boolean selected = getSelfNavDrawerItem () == itemId;
 
-        int layoutToInflate = 0;
+        int layoutToInflate;
         switch (itemId)
         {
             case NAVDRAWER_ITEM_SEPARATOR:
@@ -293,7 +293,7 @@ public class BaseActivity extends ActionBarActivity
                     goToNavDrawerItem (itemId);
 
                 }
-            }, ACTIVITY_LAUNCH_DELAY);;
+            }, ACTIVITY_LAUNCH_DELAY);
         }
         else
         {
@@ -355,8 +355,7 @@ public class BaseActivity extends ActionBarActivity
 
     private boolean isSpecialItem (int itemId)
     {
-        if (itemId == NAVDRAWER_ITEM_SETTINGS) return true;
-        return false;
+        return itemId == NAVDRAWER_ITEM_SETTINGS;
     }
 
     @Override

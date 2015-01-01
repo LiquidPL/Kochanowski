@@ -2,13 +2,15 @@
 <com.liquid.kochanowski.widget.ScrimInsetsScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="260dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
     android:id="@+id/navdrawer"
     android:background="@color/white_100"
     android:fitsSystemWindows="true"
-    app:insetForeground="#4000">
+    app:insetForeground="#4000"
+    tools:ignore="Overdraw">
 
     <RelativeLayout
         android:layout_width="match_parent"

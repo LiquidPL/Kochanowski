@@ -7,19 +7,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,10 +23,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
 import com.liquid.kochanowski.parse.MasterlistDownloadRunnable;
 import com.liquid.kochanowski.parse.ThreadManager;
+import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanowski.util.PrefUtils;
 
 import java.util.ArrayList;
@@ -85,7 +80,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
             String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
 
             view.setText (longname + " (" + shortname + ")");
-            return (View) view;
+            return view;
         }
 
         @Override
@@ -160,7 +155,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
             syncResult.setText (getString (R.string.no_internet));
 
             continueButton.setVisibility (View.VISIBLE);
-            continueButton.setText (getString (R.string.button_continue));
+            continueButton.setText (getString (R.string.button_retry));
         }
     }
 

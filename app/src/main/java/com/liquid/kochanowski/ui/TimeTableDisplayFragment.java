@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.liquid.kochanowski.R;
-import com.liquid.kochanowski.db.TimeTableContract.*;
+import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
+import com.liquid.kochanowski.db.TimeTableContract.HourTable;
+import com.liquid.kochanowski.db.TimeTableContract.LessonTable;
+import com.liquid.kochanowski.db.TimeTableContract.TeacherTable;
 import com.liquid.kochanowski.util.DbUtils;
 import com.liquid.kochanowski.util.PrefUtils;
 import com.liquid.kochanparser.TimeTableType;
@@ -263,7 +265,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             oldCur.moveToFirst ();
             int offset = 0;
 
-            if (toBothGroups == false) do
+            if (!toBothGroups) do
             {
                 int group = oldCur.getInt (oldCur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
 
