@@ -16,10 +16,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.support.v7.widget.Toolbar;
+import android.widget.ListView;
 
 import com.liquid.kochanowski.R;
 import com.liquid.kochanowski.db.TimeTableContract.ClassTable;
@@ -123,10 +125,12 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     {
         super.onPostCreate (savedInstanceState);
 
-        LinearLayout root = (LinearLayout) findViewById (android.R.id.list).getParent ().getParent ().getParent ();
+        ViewGroup root = (ViewGroup) findViewById (android.R.id.content);
+        View list = root.getChildAt (0);
         Toolbar toolbar = (Toolbar) LayoutInflater.from (this).inflate (R.layout.toolbar, root, false);
 
         root.addView (toolbar, 0);
+        root.bringChildToFront (toolbar);
 
         toolbar.setNavigationOnClickListener (new View.OnClickListener ()
         {
@@ -139,6 +143,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         toolbar.setTitle (getString (R.string.action_settings));
         toolbar.setNavigationIcon (R.drawable.ic_arrow_back_white);
+
+        list.setPadding (0, (int) getResources ().getDimension (R.dimen.toolbar_height), 0, 0);
     }
 
     @Override
