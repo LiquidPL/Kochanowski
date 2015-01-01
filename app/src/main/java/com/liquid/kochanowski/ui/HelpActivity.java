@@ -40,10 +40,12 @@ public class HelpActivity extends BaseActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId ();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
+        switch (id)
         {
-            return true;
+            case R.id.action_about:
+                break;
+            case R.id.action_os_licenses:
+                break;
         }
 
         return super.onOptionsItemSelected (item);

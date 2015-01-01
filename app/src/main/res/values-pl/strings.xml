@@ -26,7 +26,7 @@
     <string name="title_activity_settings">Ustawienia</string>
     <string name="remove_timetables">Usuń zapisane plany lekcji</string>
     <string name="action_no">Nie</string>
-    <string name="app_name" translatable="false">Kochanowski</string>
+    <string name="app_name">Kochanowski</string>
     <string name="action_yes">Tak</string>
     <string name="dialog_remove_timetables">Usunąć zapisane plany lekcji?</string>
     <string name="dialog_remove_timetables_message">Będziesz musiał je pobrać ponownie!</string>
@@ -38,4 +38,6 @@
     <string name="action_help">Pomoc</string>
     <string name="download_tables_first">Powinieneś najpierw pobrać plany lekcji</string>
     <string name="title_activity_help">Pomoc</string>
+    <string name="action_about">O programie...</string>
+    <string name="action_os_licenses">Licencje open source...</string>
 </resources>
