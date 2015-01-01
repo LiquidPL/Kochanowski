@@ -58,7 +58,7 @@
             android:gravity="center"
             android:layout_below="@+id/progress_bar"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="32dp"
             android:visibility="invisible"/>
 
         <Spinner
@@ -76,9 +76,9 @@
             android:id="@+id/continue_button"
             android:visibility="invisible"
             android:onClick="onContinueClick"
-            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="149dp"/>
+            android:layout_below="@+id/class_select"
+            android:layout_marginBottom="16dp"/>
 
     </RelativeLayout>
 
