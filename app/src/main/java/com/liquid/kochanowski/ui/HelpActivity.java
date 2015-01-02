@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,7 @@ public class HelpActivity extends BaseActivity
 
     public static class AboutDialogFragment extends DialogFragment
     {
+        @NonNull
         @Override
         public Dialog onCreateDialog (Bundle savedInstanceState)
         {
@@ -35,6 +37,8 @@ public class HelpActivity extends BaseActivity
 
             // set the view in Builder
             builder.setView (view);
+
+            builder.setTitle (getString (R.string.action_about));
 
             // add an 'OK' button
             builder.setPositiveButton (getString(R.string.action_ok), null);
