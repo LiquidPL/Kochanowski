@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/drawer_layout"
-    tools:context="com.liquid.kochanowski.TimeTableTabActivity">
+    tools:context="com.github.LiquidPL.kochanowski.TimeTableTabActivity">
 
     <RelativeLayout
         android:layout_height="match_parent"
@@ -13,7 +13,7 @@
 
         <include layout="@layout/toolbar"/>
 
-        <com.liquid.kochanowski.widget.SlidingTabLayout
+        <com.github.LiquidPL.kochanowski.ui.widget.SlidingTabLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:id="@+id/sliding_tabs"

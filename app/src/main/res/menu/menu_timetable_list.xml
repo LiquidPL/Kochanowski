@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.liquid.kochanowski.ui.TimeTableListActivity">
+      tools:context="com.github.LiquidPL.kochanowski.ui.TimeTableListActivity">
 
 </menu>
