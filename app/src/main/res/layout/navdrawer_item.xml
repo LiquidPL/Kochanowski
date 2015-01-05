@@ -20,13 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:layout_centerVertical="true"
         android:paddingLeft="72dp"/>
-
-    <View
-        style="@style/Divider"
-        android:id="@+id/separator"
-        android:layout_centerVertical="true"
-        android:visibility="gone"/>
 </RelativeLayout>
