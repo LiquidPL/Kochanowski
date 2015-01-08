@@ -14,7 +14,6 @@ public class TimeTableListActivity
 {
     public static final String ARG_TYPE = "type";
 
-    private int listType;
     private int tableType;
 
     private TimeTableListFragment listFragment;
@@ -25,26 +24,7 @@ public class TimeTableListActivity
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_timetable_list);
 
-        listType = getIntent ().getIntExtra (ARG_TYPE, NAVDRAWER_ITEM_INVALID);
-
-        switch (listType)
-        {
-            case NAVDRAWER_ITEM_CLASSES:
-                tableType = TimeTableType.CLASS;
-
-                getSupportActionBar ().setTitle (getString (R.string.classes));
-                break;
-            case NAVDRAWER_ITEM_TEACHERS:
-                tableType = TimeTableType.TEACHER;
-
-                getSupportActionBar ().setTitle (getString (R.string.teachers));
-                break;
-            case NAVDRAWER_ITEM_CLASSROOMS:
-                tableType = TimeTableType.CLASSROOM;
-
-                getSupportActionBar ().setTitle (getString (R.string.classrooms));
-                break;
-        }
+        tableType = TimeTableType.CLASS;
 
         listFragment = TimeTableListFragment.newInstance (tableType);
 
@@ -55,7 +35,7 @@ public class TimeTableListActivity
     @Override
     protected int getSelfNavDrawerItem ()
     {
-        return listType;
+        return NAVDRAWER_ITEM_BROWSE_TIMETABLES;
     }
 
     @Override
@@ -63,6 +43,10 @@ public class TimeTableListActivity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater ().inflate (R.menu.menu_timetable_list, menu);
+
+        // setting the toolbar title to the filter selected on activity start
+        getToolbar ().setTitle (getString (R.string.classes));
+
         return true;
     }
 
@@ -72,6 +56,27 @@ public class TimeTableListActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        int id = item.getItemId ();
+
+        switch (id)
+        {
+            case R.id.filter_class:
+                item.setChecked (true);
+                listFragment.setFilter (TimeTableType.CLASS);
+                getToolbar ().setTitle (getString (R.string.classes));
+                return true;
+            case R.id.filter_teachers:
+                item.setChecked (true);
+                listFragment.setFilter (TimeTableType.TEACHER);
+                getToolbar ().setTitle (getString (R.string.teachers));
+                return true;
+            case R.id.filter_classrooms:
+                item.setChecked (true);
+                listFragment.setFilter (TimeTableType.CLASSROOM);
+                getToolbar ().setTitle (getString (R.string.classrooms));
+                return true;
+        }
 
         return super.onOptionsItemSelected (item);
     }

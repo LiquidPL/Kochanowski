@@ -39,4 +39,6 @@
     <string name="title_activity_help">Help</string>
     <string name="action_about">About…</string>
     <string name="action_os_licenses">Open source licenses…</string>
+    <string name="navdrawer_browse_timetables">Timetables</string>
+    <string name="menu_filter">Filter…</string>
 </resources>

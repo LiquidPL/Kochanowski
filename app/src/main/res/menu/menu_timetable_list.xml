@@ -3,4 +3,29 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.github.LiquidPL.kochanowski.ui.TimeTableListActivity">
 
+    <item
+        android:id="@+id/filter"
+        android:title="@string/menu_filter"
+        android:icon="@drawable/ic_filter_white"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/filter_class"
+                    android:title="@string/classes"
+                    android:checked="true"/>
+
+                <item
+                    android:id="@+id/filter_teachers"
+                    android:title="@string/teachers"/>
+
+                <item
+                    android:id="@+id/filter_classrooms"
+                    android:title="@string/classrooms"/>
+            </group>
+        </menu>
+
+    </item>
+
 </menu>

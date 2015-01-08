@@ -39,4 +39,6 @@
     <string name="title_activity_help">Pomoc</string>
     <string name="action_about">O programie…</string>
     <string name="action_os_licenses">Licencje open source…</string>
+    <string name="navdrawer_browse_timetables">Plany lekcji</string>
+    <string name="menu_filter">Filtruj…</string>
 </resources>

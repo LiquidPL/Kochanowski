@@ -46,7 +46,7 @@
         </activity>
         <activity
             android:name=".ui.TimeTableListActivity"
-            android:label="@string/title_activity_time_table_list">
+            android:label="@string/navdrawer_browse_timetables">
         </activity>
         <activity
             android:name=".ui.HelpActivity"

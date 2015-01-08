@@ -236,6 +236,15 @@ public class TimeTableListFragment extends Fragment
         return v;
     }
 
+    public void setFilter (int filter)
+    {
+        if (filter == tableType) return;
+
+        tableType = filter;
+        adapter = new TimeTableListAdapter (tableType);
+        recyclerView.setAdapter (adapter);
+    }
+
     public int getTableType ()
     {
         return tableType;

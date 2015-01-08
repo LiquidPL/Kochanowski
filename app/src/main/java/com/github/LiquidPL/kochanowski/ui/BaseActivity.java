@@ -26,17 +26,19 @@ public class BaseActivity extends ActionBarActivity
 {
     // constants for possible navdrawer items
     protected static final int NAVDRAWER_ITEM_TODAY = 0;
-    protected static final int NAVDRAWER_ITEM_CLASSES = 1;
-    protected static final int NAVDRAWER_ITEM_TEACHERS = 2;
-    protected static final int NAVDRAWER_ITEM_CLASSROOMS = 3;
-    protected static final int NAVDRAWER_ITEM_SETTINGS = 4;
-    protected static final int NAVDRAWER_ITEM_HELP = 5;
+    protected static final int NAVDRAWER_ITEM_BROWSE_TIMETABLES = 1;
+    protected static final int NAVDRAWER_ITEM_CLASSES = 2;
+    protected static final int NAVDRAWER_ITEM_TEACHERS = 3;
+    protected static final int NAVDRAWER_ITEM_CLASSROOMS = 4;
+    protected static final int NAVDRAWER_ITEM_SETTINGS = 5;
+    protected static final int NAVDRAWER_ITEM_HELP = 6;
     protected static final int NAVDRAWER_ITEM_INVALID = -1;
     protected static final int NAVDRAWER_ITEM_SEPARATOR = -2;
 
     // list of titles for navdrawer items (order must be the same as above)
     private static final int[] NAVDRAWER_TITLE_RES_ID = new int[] {
             R.string.day_name_today,
+            R.string.navdrawer_browse_timetables,
             R.string.classes,
             R.string.teachers,
             R.string.classrooms,
@@ -47,6 +49,7 @@ public class BaseActivity extends ActionBarActivity
     // list of icons for navdrawer items (order must be the same as above)
     private static final int[] NAVDRAWER_ICON_RES_ID = new int[] {
             R.drawable.ic_today_black,
+            R.drawable.ic_list_black,
             R.drawable.ic_group_black,
             R.drawable.ic_group_black,
             R.drawable.ic_person_black,
@@ -155,13 +158,18 @@ public class BaseActivity extends ActionBarActivity
 
         navDrawerItems.add (NAVDRAWER_ITEM_TODAY);
 
+        if (PrefUtils.hasSyncedTimeTables (this))
+        {
+            navDrawerItems.add (NAVDRAWER_ITEM_BROWSE_TIMETABLES);
+        }
+
         navDrawerItems.add (NAVDRAWER_ITEM_SEPARATOR);
 
-        navDrawerItems.add (NAVDRAWER_ITEM_CLASSES);
+        /*navDrawerItems.add (NAVDRAWER_ITEM_CLASSES);
         navDrawerItems.add (NAVDRAWER_ITEM_TEACHERS);
         navDrawerItems.add (NAVDRAWER_ITEM_CLASSROOMS);
 
-        navDrawerItems.add (NAVDRAWER_ITEM_SEPARATOR);
+        navDrawerItems.add (NAVDRAWER_ITEM_SEPARATOR);*/
 
         navDrawerItems.add (NAVDRAWER_ITEM_SETTINGS);
         navDrawerItems.add (NAVDRAWER_ITEM_HELP);
@@ -323,7 +331,12 @@ public class BaseActivity extends ActionBarActivity
                 startActivity (intent);
                 finish ();
                 break;
-            case NAVDRAWER_ITEM_CLASSES:
+            case NAVDRAWER_ITEM_BROWSE_TIMETABLES:
+                intent = new Intent (this, TimeTableListActivity.class);
+                startActivity (intent);
+                finish ();
+                break;
+            /*case NAVDRAWER_ITEM_CLASSES:
                 intent = new Intent (this, TimeTableListActivity.class);
                 intent.putExtra (TimeTableListActivity.ARG_TYPE, NAVDRAWER_ITEM_CLASSES);
                 startActivity (intent);
@@ -340,7 +353,7 @@ public class BaseActivity extends ActionBarActivity
                 intent.putExtra (TimeTableListActivity.ARG_TYPE, NAVDRAWER_ITEM_CLASSROOMS);
                 startActivity (intent);
                 finish ();
-                break;
+                break;*/
             case NAVDRAWER_ITEM_SETTINGS:
                 intent = new Intent (this, SettingsActivity.class);
                 startActivity (intent);
