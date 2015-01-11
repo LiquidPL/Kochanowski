@@ -129,7 +129,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "='" + tableName + "'";
                     break;
                 case TimeTableType.CLASSROOM:
-                    query += " WHERE " + LessonTable.COLUMN_NAME_CLASSROOM + "=" + tableName;
+                    query += " WHERE " + LessonTable.COLUMN_NAME_CLASSROOM + "='" + tableName + "'";
                     break;
             }
 
