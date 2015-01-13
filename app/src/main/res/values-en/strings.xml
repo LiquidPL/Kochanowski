@@ -41,4 +41,6 @@
     <string name="action_os_licenses">Open source licenses…</string>
     <string name="navdrawer_browse_timetables">Timetables</string>
     <string name="menu_filter">Filter…</string>
+    <string name="title_activity_search">Search</string>
+    <string name="searchable_hint">Search timetables</string>
 </resources>

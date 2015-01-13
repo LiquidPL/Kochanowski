@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.db.TimeTableContract;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
@@ -34,9 +35,14 @@ public class TimeTableListFragment extends Fragment
     public class TimeTableListAdapter extends RecyclerView.Adapter<TimeTableListAdapter.ListViewHolder>
     {
         private Cursor cur;
-        private SQLiteDatabase db;
 
         private int tableType;
+
+        boolean distinct;
+        String tableName;
+        String[] columns;
+        String selection;
+        String orderBy;
 
         public class ListViewHolder extends RecyclerView.ViewHolder
         {
@@ -50,24 +56,59 @@ public class TimeTableListFragment extends Fragment
             }
         }
 
-        public TimeTableListAdapter (int tableType)
+        public TimeTableListAdapter (int tableType, String query)
         {
-            db = DbUtils.getReadableDatabase ();
             this.tableType = tableType;
 
-            switch (tableType)
+            cur = formQuery (tableType, query);
+        }
+
+        private Cursor formQuery (int type, String query)
+        {
+            SQLiteDatabase db = DbUtils.getReadableDatabase ();
+
+            switch (type)
             {
                 case TimeTableType.CLASS:
-                    cur = db.rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+                    distinct = false;
+                    tableName = TimeTableContract.ClassTable.TABLE_NAME;
+                    columns = null;
+                    orderBy = TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + " ASC";
                     break;
                 case TimeTableType.TEACHER:
-                    cur = db.rawQuery ("SELECT * FROM teachers ORDER BY code ASC" ,null);
+                    distinct = false;
+                    tableName = TimeTableContract.TeacherTable.TABLE_NAME;
+                    columns = null;
+                    orderBy = TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME + " ASC";
                     break;
                 case TimeTableType.CLASSROOM:
-                    cur = db.rawQuery ("SELECT DISTINCT classroom FROM lessons ORDER BY classroom ASC", null);
+                    distinct = true;
+                    tableName = TimeTableContract.LessonTable.TABLE_NAME;
+                    columns = new String[] {TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM};
+                    orderBy = TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM + " ASC";
                     break;
             }
 
+            if (query != null)
+            {
+                switch (tableType)
+                {
+                    case TimeTableType.CLASS:
+                        selection = ClassTable.COLUMN_NAME_NAME_SHORT + " LIKE '%" + searchQuery + "%' OR " +
+                                ClassTable.COLUMN_NAME_NAME_LONG + " LIKE '%" + searchQuery + "%'";
+                        break;
+                    case TimeTableType.TEACHER:
+                        selection = TeacherTable.COLUMN_NAME_TEACHER_CODE + " LIKE '%" + searchQuery + "%' OR " +
+                                TeacherTable.COLUMN_NAME_TEACHER_NAME + " LIKE '%" + searchQuery + "%' OR " +
+                                TeacherTable.COLUMN_NAME_TEACHER_SURNAME + " LIKE '%" + searchQuery + "%'";
+                        break;
+                    case TimeTableType.CLASSROOM:
+                        selection = LessonTable.COLUMN_NAME_CLASSROOM + " LIKE '%" + searchQuery + "%'";
+                        break;
+                }
+            }
+
+            return  db.query (distinct, tableName, columns, selection, null, null, null, orderBy, null);
         }
 
         @Override
@@ -86,20 +127,20 @@ public class TimeTableListFragment extends Fragment
             switch (tableType)
             {
                 case TimeTableType.CLASS:
-                    String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-                    String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+                    String shortname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT));
+                    String longname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG));
 
                     holder.name.setText (longname + " (" + shortname + ")");
                     break;
                 case TimeTableType.TEACHER:
-                    String name = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    String surname = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-                    String code = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE));
+                    String name = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME));
+                    String surname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
+                    String code = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE));
 
                     holder.name.setText (name + " " + surname + " (" + code + ")");
                     break;
                 case TimeTableType.CLASSROOM:
-                    String classroomName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
+                    String classroomName = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM));
 
                     holder.name.setText (classroomName);
                     break;
@@ -123,10 +164,12 @@ public class TimeTableListFragment extends Fragment
         public void onTimeTableSelected (String shortName, String longName, int tableType);
     }
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    // the fragment initialization parameters
     private static final String ARG_TYPE = "type";
+    private static final String ARG_QUERY = "query";
 
     private int tableType;
+    private String searchQuery;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -143,12 +186,13 @@ public class TimeTableListFragment extends Fragment
      * @param tableType
      * @return A new instance of fragment TimeTableListFragment.
      */
-    public static TimeTableListFragment newInstance (int tableType)
+    public static TimeTableListFragment newInstance (int tableType, String query)
     {
         TimeTableListFragment fragment = new TimeTableListFragment ();
         Bundle args = new Bundle ();
 
         args.putInt (ARG_TYPE, tableType);
+        args.putString (ARG_QUERY, query);
 
         fragment.setArguments (args);
         return fragment;
@@ -182,6 +226,7 @@ public class TimeTableListFragment extends Fragment
         if (getArguments () != null)
         {
             tableType = getArguments ().getInt (ARG_TYPE);
+            searchQuery = getArguments ().getString (ARG_QUERY);
         }
     }
 
@@ -196,7 +241,7 @@ public class TimeTableListFragment extends Fragment
         layoutManager = new ListLayoutManager (this.getActivity (), TwoWayLayoutManager.Orientation.VERTICAL);
         recyclerView.setLayoutManager (layoutManager);
 
-        adapter = new TimeTableListAdapter (tableType);
+        adapter = new TimeTableListAdapter (tableType, searchQuery);
 
         recyclerView.setAdapter (adapter);
 
@@ -241,8 +286,13 @@ public class TimeTableListFragment extends Fragment
         if (filter == tableType) return;
 
         tableType = filter;
-        adapter = new TimeTableListAdapter (tableType);
+        adapter = new TimeTableListAdapter (tableType, searchQuery);
         recyclerView.setAdapter (adapter);
+    }
+
+    public void performSearch (String query)
+    {
+
     }
 
     public int getTableType ()

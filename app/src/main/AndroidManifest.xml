@@ -46,11 +46,33 @@
         </activity>
         <activity
             android:name=".ui.TimeTableListActivity"
-            android:label="@string/navdrawer_browse_timetables">
+            android:label="@string/navdrawer_browse_timetables" >
+
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".ui.SearchActivity"/>
+
         </activity>
         <activity
             android:name=".ui.HelpActivity"
             android:label="@string/title_activity_help" >
+        </activity>
+        <activity
+            android:name=".ui.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:parentActivityName=".ui.TimeTableListActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.LiquidPL.kochanowski.ui.TimeTableListActivity" />
         </activity>
     </application>
 

@@ -4,6 +4,13 @@
       tools:context="com.github.LiquidPL.kochanowski.ui.TimeTableListActivity">
 
     <item
+        android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/ic_search_white"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView"/>
+
+    <item
         android:id="@+id/filter"
         android:title="@string/menu_filter"
         android:icon="@drawable/ic_filter_white"
@@ -27,5 +34,7 @@
         </menu>
 
     </item>
+
+
 
 </menu>

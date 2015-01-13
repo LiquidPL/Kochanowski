@@ -1,11 +1,14 @@
 package com.github.LiquidPL.kochanowski.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,9 @@ import java.util.ArrayList;
 /**
  * Created by liquid on 29.12.14.
  */
-public class BaseActivity extends ActionBarActivity
+public class BaseActivity
+        extends ActionBarActivity
+        implements TimeTableListFragment.OnTimeTableSelectedListener
 {
     // constants for possible navdrawer items
     protected static final int NAVDRAWER_ITEM_TODAY = 0;
@@ -59,6 +64,9 @@ public class BaseActivity extends ActionBarActivity
 
     // delay in milliseconds to launch activity for the animation to end
     protected static final int ACTIVITY_LAUNCH_DELAY = 250;
+
+    // drawer layout portrait orientation width in dp units
+    private static final int DRAWER_WIDTH_DP = 56;
 
     protected Handler handler;
 
@@ -115,6 +123,11 @@ public class BaseActivity extends ActionBarActivity
             return;
         }
 
+        // set the drawer layout width to <screen-width-in-dp>-56dp
+        DisplayMetrics metrics = getResources ().getDisplayMetrics ();
+        int screenWidth = ((int) (metrics.widthPixels / metrics.density));
+        int drawerWidth = screenWidth - DRAWER_WIDTH_DP;
+
         drawerLayout.setStatusBarBackgroundColor (statusBarColor);
         ScrimInsetsScrollView navDrawer = (ScrimInsetsScrollView) findViewById (R.id.navdrawer);
 
@@ -150,6 +163,7 @@ public class BaseActivity extends ActionBarActivity
             PrefUtils.setWelcomeDone (this);
             drawerLayout.openDrawer (Gravity.START);
         }
+        navDrawer.setMinimumWidth (drawerWidth);
     }
 
     private void populateNavDrawer ()
@@ -393,5 +407,21 @@ public class BaseActivity extends ActionBarActivity
         return toolbar;
     }
 
+    @Override
+    public void onTimeTableSelected (String shortName, String longName, int tableType)
+    {
+        final Intent intent = new Intent (this, TimeTableTabActivity.class);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_SHORT, shortName);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_LONG, longName);
 
+        handler.postDelayed (new Runnable ()
+        {
+            @Override
+            public void run ()
+            {
+                startActivity (intent);
+            }
+        }, ACTIVITY_LAUNCH_DELAY);
+    }
 }

@@ -48,5 +48,8 @@
     <string name="action_ok" translatable="false">OK</string>
     <string name="navdrawer_browse_timetables">Timetables</string>
     <string name="menu_filter">Filter…</string>
+    <string name="title_activity_search">Search</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="searchable_hint">timetables</string>
 
 </resources>
