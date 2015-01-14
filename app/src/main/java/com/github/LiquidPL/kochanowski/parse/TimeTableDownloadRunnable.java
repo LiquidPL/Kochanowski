@@ -78,7 +78,8 @@ public class TimeTableDownloadRunnable implements Runnable
                     throw new InterruptedException ();
                 }
 
-                table.setType (TimeTableType.CLASS);
+                //TODO: rework this so it can be independent of a handler
+                table.setTableType (TimeTableType.CLASS);
                 table.parse (istr);
 
                 if (Thread.interrupted ())

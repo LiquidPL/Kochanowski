@@ -40,22 +40,6 @@ public class TimeTable
         factory = SAXParserFactory.newInstance ();
     }
 
-    public void parse (File xml) throws ParserConfigurationException, SAXException
-    {
-        try
-        {
-            SAXParser parser = factory.newSAXParser ();
-            setTableType (xml.getName ());
-
-            DefaultHandler handler = new SaxHandler (this);
-            parser.parse (xml, handler);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
-    }
-
     public void parse (InputStream istr) throws ParserConfigurationException, SAXException
     {
         try
@@ -68,29 +52,6 @@ public class TimeTable
         {
             e.printStackTrace ();
         }
-
-
-    }
-
-    public void setTableType (String name)
-    {
-        switch (name.charAt (0))
-        {
-            case 'o':
-                tableType = TimeTableType.CLASS;
-                break;
-            case 's':
-                tableType = TimeTableType.CLASSROOM;
-                break;
-            case 'n':
-                tableType = TimeTableType.TEACHER;
-                break;
-        }
-    }
-
-    public void setType (int type)
-    {
-        this.tableType = type;
     }
 
     public List<Lesson> getLessons ()
@@ -106,6 +67,11 @@ public class TimeTable
     public int getTableType ()
     {
         return tableType;
+    }
+
+    public void setTableType (int tableType)
+    {
+        this.tableType = tableType;
     }
 
     public List<Time> getStarthours ()
