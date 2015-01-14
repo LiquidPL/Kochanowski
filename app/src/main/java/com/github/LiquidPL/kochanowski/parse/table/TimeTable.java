@@ -13,6 +13,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.github.LiquidPL.kochanowski.parse.handler.SaxHandler;
+
 /**
  * A singleton for the entire timetable parsed
  *
