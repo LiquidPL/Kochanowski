@@ -18,7 +18,7 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
-import com.liquid.kochanparser.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
 import org.lucasr.twowayview.TwoWayLayoutManager;

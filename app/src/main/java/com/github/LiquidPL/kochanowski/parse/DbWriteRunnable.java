@@ -9,8 +9,8 @@ import android.os.Process;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.HourTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
-import com.liquid.kochanparser.Lesson;
-import com.liquid.kochanparser.TimeTable;
+import com.github.LiquidPL.kochanowski.parse.table.Lesson;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
 
 /**
  * Created by liquid on 03.12.14.

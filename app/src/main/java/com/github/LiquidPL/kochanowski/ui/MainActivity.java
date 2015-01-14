@@ -18,7 +18,7 @@ import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.ui.TimeTableDisplayFragment.Group;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
-import com.liquid.kochanparser.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

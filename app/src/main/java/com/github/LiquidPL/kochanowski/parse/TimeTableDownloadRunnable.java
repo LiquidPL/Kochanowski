@@ -1,7 +1,7 @@
 package com.github.LiquidPL.kochanowski.parse;
 
-import com.liquid.kochanparser.TimeTable;
-import com.liquid.kochanparser.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CompactHtmlSerializer;

@@ -12,7 +12,7 @@ import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.ui.widget.SlidingTabLayout;
-import com.liquid.kochanparser.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import java.util.Calendar;
 import java.util.Locale;

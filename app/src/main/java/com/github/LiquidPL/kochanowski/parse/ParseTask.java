@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.github.LiquidPL.kochanowski.parse.DbWriteRunnable.DbWriteRunnableMethods;
 import com.github.LiquidPL.kochanowski.parse.TimeTableDownloadRunnable.DownloadRunnableMethods;
-import com.liquid.kochanparser.TimeTable;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
 
 import java.net.URL;
 

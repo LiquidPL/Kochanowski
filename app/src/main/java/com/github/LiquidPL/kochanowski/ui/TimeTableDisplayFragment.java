@@ -22,7 +22,7 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
-import com.liquid.kochanparser.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 /**
  * A simple {@link Fragment} subclass.
