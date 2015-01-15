@@ -43,4 +43,7 @@
     <string name="menu_filter">Filtruj…</string>
     <string name="title_activity_search">Szukaj</string>
     <string name="searchable_hint">Szukaj planów lekcji</string>
+    <string name="pref_should_notify_title">Powiadamiaj o kolejnych lekcjach</string>
+    <string name="pref_should_notify_wearable_summary">Wysyłaj powiadomienia o kolejnych lekcjach do smartwatcha</string>
+    <string name="pref_should_notify_wearable_title">Powiadamiaj smartwatcha</string>
 </resources>

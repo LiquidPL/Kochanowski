@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -35,6 +36,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     ListPreference defaultClass;
     ListPreference defaultGroup;
+    CheckBoxPreference notifyDevice;
+    CheckBoxPreference notifyWearable;
     Preference removeTables;
 
     @Override
@@ -71,6 +74,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         defaultClass = (ListPreference) findPreference (getString (R.string.pref_table_name));
         defaultGroup = (ListPreference) findPreference (getString (R.string.pref_default_group));
+        notifyDevice = (CheckBoxPreference) findPreference (getString (R.string.pref_should_notify));
+        notifyWearable = (CheckBoxPreference) findPreference (getString (R.string.pref_should_notify_wearable));
         removeTables = findPreference (getString(R.string.pref_db_reset));
 
         removeTables.setOnPreferenceClickListener (this);
@@ -79,6 +84,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         {
             defaultClass.setEnabled (true);
             removeTables.setEnabled (true);
+            notifyDevice.setEnabled (true);
+            notifyWearable.setEnabled (true);
             removeTables.setSummary ("");
         }
         else
@@ -87,6 +94,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             defaultClass.setSummary (getString(R.string.download_tables_first));
             removeTables.setEnabled (false);
             removeTables.setSummary (getString(R.string.download_tables_first));
+            notifyDevice.setEnabled (false);
+            notifyWearable.setEnabled (false);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)

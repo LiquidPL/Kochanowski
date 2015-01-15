@@ -31,6 +31,16 @@ public class PrefUtils
      */
     public static final String PREF_WELCOME_DONE = "pref_welcome_done";
 
+    /**
+     * Boolean preference that indicates whether app should send notifications about ongoing lessons.
+     */
+    public static final String PREF_SHOULD_NOTIFY = "pref_notify";
+
+    /**
+     * Boolean preference that indicates whether app should send notification to a wearable.
+     */
+    public static final String PREF_SHOULD_NOTIFY_WEARABLE = "pref_notify_wearable";
+
     public static boolean hasSyncedTimeTables (final Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
@@ -86,5 +96,33 @@ public class PrefUtils
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
         prefs.edit ().putBoolean (PREF_WELCOME_DONE, true).apply ();
+    }
+
+    public static boolean shouldNotify (final Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        return prefs.getBoolean (PREF_SHOULD_NOTIFY, false);
+    }
+
+    public static void setNotifyPreference (final Context context, boolean notify)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        prefs.edit ().putBoolean (PREF_SHOULD_NOTIFY, notify).apply ();
+    }
+
+    public static boolean shouldNotifyWearable (final Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        return prefs.getBoolean (PREF_SHOULD_NOTIFY_WEARABLE, false);
+    }
+
+    public static void setWearableNotifyPreference (final Context context, boolean notify)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        prefs.edit ().putBoolean (PREF_SHOULD_NOTIFY_WEARABLE, notify).apply ();
     }
 }

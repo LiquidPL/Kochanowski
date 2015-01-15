@@ -43,4 +43,7 @@
     <string name="menu_filter">Filter…</string>
     <string name="title_activity_search">Search</string>
     <string name="searchable_hint">Search timetables</string>
+    <string name="pref_should_notify_title">Notify about ongoing lessons</string>
+    <string name="pref_should_notify_wearable_summary">Send notifications about ongoing lessons to a smartwatch</string>
+    <string name="pref_should_notify_wearable_title">Notify a wearable device</string>
 </resources>

@@ -51,5 +51,10 @@
     <string name="title_activity_search">Search</string>
     <string name="hello_world">Hello world!</string>
     <string name="searchable_hint">timetables</string>
+    <string name="pref_should_notify" translatable="false">pref_should_notify</string>
+    <string name="pref_should_notify_title">Notify about ongoing lessons</string>
+    <string name="pref_should_notify_wearable" translatable="false">pref_should_notify_wearable</string>
+    <string name="pref_should_notify_wearable_title">Notify a wearable device</string>
+    <string name="pref_should_notify_wearable_summary">Send notifications about ongoing lessons to a smartwatch</string>
 
 </resources>
