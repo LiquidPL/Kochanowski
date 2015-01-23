@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 
 public class TimeTableListActivity
         extends BaseActivity

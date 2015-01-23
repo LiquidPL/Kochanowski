@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 
 public class SearchActivity
         extends BaseActivity

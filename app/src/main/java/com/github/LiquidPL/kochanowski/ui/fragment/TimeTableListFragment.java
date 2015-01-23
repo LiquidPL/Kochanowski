@@ -1,4 +1,4 @@
-package com.github.LiquidPL.kochanowski.ui;
+package com.github.LiquidPL.kochanowski.ui.fragment;
 
 
 import android.app.Activity;

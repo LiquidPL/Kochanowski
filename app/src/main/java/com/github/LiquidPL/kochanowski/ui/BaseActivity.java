@@ -1,14 +1,12 @@
 package com.github.LiquidPL.kochanowski.ui;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 import com.github.LiquidPL.kochanowski.ui.widget.ScrimInsetsScrollView;
 

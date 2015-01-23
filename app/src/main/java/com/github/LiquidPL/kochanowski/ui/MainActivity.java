@@ -15,7 +15,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.ui.TimeTableDisplayFragment.Group;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment.Group;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;

@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment;
 import com.github.LiquidPL.kochanowski.ui.widget.SlidingTabLayout;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
@@ -41,7 +42,7 @@ public class TimeTableTabActivity extends BaseActivity
         @Override
         public Fragment getItem (int position)
         {
-            return TimeTableDisplayFragment.newInstance (shortName, tableType, position, 0);
+            return TimeTableDisplayFragment.newInstance(shortName, tableType, position, 0);
         }
 
         @Override

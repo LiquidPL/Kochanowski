@@ -1,4 +1,4 @@
-package com.github.LiquidPL.kochanowski.ui;
+package com.github.LiquidPL.kochanowski.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,6 +20,7 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.HourTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
+import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
