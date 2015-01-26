@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
+import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 import com.github.LiquidPL.kochanowski.ui.widget.ScrimInsetsScrollView;
 
@@ -92,6 +93,8 @@ public class BaseActivity
         statusBarColor = getResources ().getColor (R.color.primary_dark);
 
         handler = new Handler ();
+
+        DbUtils.initHelper (getApplicationContext ());
     }
 
     @Override
