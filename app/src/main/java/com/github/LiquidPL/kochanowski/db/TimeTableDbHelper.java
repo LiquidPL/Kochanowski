@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.github.LiquidPL.kochanowski.util.PrefUtils;
+
 public class TimeTableDbHelper extends SQLiteOpenHelper
 {
     private static final String TEXT_TYPE = " TEXT";
@@ -59,7 +61,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     private static final String SQL_DELETE_TABLE_LESSONS =
             "DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME;
 
-
+    private final Context context;
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "timetables.db";
@@ -67,6 +69,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     public TimeTableDbHelper (Context context)
     {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -87,6 +90,12 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
         db.execSQL (SQL_DELETE_TABLE_HOURS);
         db.execSQL (SQL_DELETE_TABLE_LESSONS);
         onCreate (db);
+
+        // setting the upgraded flag so the user is notified of the redownload requirement
+        PrefUtils.setDatabaseUpgradeStatus (context, true);
+
+        // setting the timetables synced flag to false
+        PrefUtils.setTimeTablesSynced (context, false);
     }
 
     public void dropTables (SQLiteDatabase db)

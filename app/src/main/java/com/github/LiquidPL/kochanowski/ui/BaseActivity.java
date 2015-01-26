@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.ui.dialog.DbResetDialog;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
@@ -95,6 +96,17 @@ public class BaseActivity
         handler = new Handler ();
 
         DbUtils.initHelper (getApplicationContext ());
+    }
+
+    @Override
+    protected void onResume ()
+    {
+        super.onResume ();
+
+        if (PrefUtils.isDatabaseUpgraded (this) && !getClass ().getName ().equals ("SyncActivity"))
+        {
+            new DbResetDialog ().show (getSupportFragmentManager (), null);
+        }
     }
 
     @Override

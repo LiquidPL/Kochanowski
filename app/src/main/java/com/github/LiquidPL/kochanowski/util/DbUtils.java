@@ -12,6 +12,9 @@ public class DbUtils
 {
     private static TimeTableDbHelper helper;
 
+    private static SQLiteDatabase readableDb;
+    private static SQLiteDatabase writableDb;
+
     private DbUtils ()
     {
 
@@ -22,22 +25,25 @@ public class DbUtils
         if (helper == null)
         {
             helper = new TimeTableDbHelper (context);
+
+            readableDb = helper.getReadableDatabase ();
+            writableDb = helper.getWritableDatabase ();
         }
     }
 
     public static SQLiteDatabase getWritableDatabase ()
     {
-        return helper.getWritableDatabase ();
+        return writableDb;
     }
 
     public static SQLiteDatabase getReadableDatabase ()
     {
-        return helper.getReadableDatabase ();
+        return readableDb;
     }
 
     public static void resetTables ()
     {
-        helper.dropTables (helper.getWritableDatabase ());
-        helper.createTables (helper.getWritableDatabase ());
+        helper.dropTables (writableDb);
+        helper.createTables (writableDb);
     }
 }

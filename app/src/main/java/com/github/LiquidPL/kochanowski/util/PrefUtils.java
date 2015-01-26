@@ -17,6 +17,11 @@ public class PrefUtils
     public static final String PREF_TABLES_SYNCED = "pref_tables_synced";
 
     /**
+     * Boolean flag indicating whether database has been upgraded.
+     */
+    public static final String PREF_DATABASE_UPGRADED = "pref_database_upgraded";
+
+    /**
      * String preference that holds a name of users preferred timetable.
      */
     public static final String PREF_TABLE_NAME = "pref_table_name";
@@ -53,6 +58,20 @@ public class PrefUtils
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
         prefs.edit ().putBoolean (PREF_TABLES_SYNCED, synced).apply ();
+    }
+
+    public static boolean isDatabaseUpgraded (final Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        return prefs.getBoolean (PREF_DATABASE_UPGRADED, false);
+    }
+
+    public static void setDatabaseUpgradeStatus (final Context context, boolean upgraded)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
+
+        prefs.edit ().putBoolean (PREF_DATABASE_UPGRADED, upgraded).apply ();
     }
 
     public static String getTableName (final Context context)

@@ -56,5 +56,7 @@
     <string name="pref_should_notify_wearable" translatable="false">pref_should_notify_wearable</string>
     <string name="pref_should_notify_wearable_title">Notify a wearable device</string>
     <string name="pref_should_notify_wearable_summary">Send notifications about ongoing lessons to a smartwatch</string>
+    <string name="dbreset_dialog_title">Timetable redownload required</string>
+    <string name="dbreset_dialog_message">You need to redownload your timetables.\nDo you want to continue?</string>
 
 </resources>

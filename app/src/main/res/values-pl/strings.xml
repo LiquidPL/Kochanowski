@@ -46,4 +46,6 @@
     <string name="pref_should_notify_title">Powiadamiaj o kolejnych lekcjach</string>
     <string name="pref_should_notify_wearable_summary">Wysyłaj powiadomienia o kolejnych lekcjach do smartwatcha</string>
     <string name="pref_should_notify_wearable_title">Powiadamiaj smartwatcha</string>
+    <string name="dbreset_dialog_message">Musisz pobrać ponownie plany lekcji.\nCzy chcesz kontynuować?</string>
+    <string name="dbreset_dialog_title">Wymagane ponowne pobranie planów lekcji</string>
 </resources>
