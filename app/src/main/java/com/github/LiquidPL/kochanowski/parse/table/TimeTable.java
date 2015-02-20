@@ -28,8 +28,8 @@ public class TimeTable
 
     private List <Lesson> lessons = new ArrayList <Lesson> ();
 
-    private List<Time> starthours = new ArrayList<Time> ();
-    private List<Time> endhours = new ArrayList<Time> ();
+    private List<String> starttimes = new ArrayList<> ();
+    private List<String> endtimes = new ArrayList<> ();
 
     private int tableType;
 
@@ -74,14 +74,14 @@ public class TimeTable
         this.tableType = tableType;
     }
 
-    public List<Time> getStarthours ()
+    public List<String> getStarttimes ()
     {
-        return starthours;
+        return starttimes;
     }
 
-    public List<Time> getEndhours ()
+    public List<String> getEndtimes ()
     {
-        return endhours;
+        return endtimes;
     }
 
     public String getLongName ()

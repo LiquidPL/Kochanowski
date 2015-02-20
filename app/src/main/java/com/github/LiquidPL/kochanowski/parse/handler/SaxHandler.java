@@ -1,7 +1,6 @@
 package com.github.LiquidPL.kochanowski.parse.handler;
 
 import com.github.LiquidPL.kochanowski.parse.table.Lesson;
-import com.github.LiquidPL.kochanowski.parse.table.Time;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
@@ -131,8 +130,8 @@ public class SaxHandler extends DefaultHandler
         if ("td".equals (currentName) && currentDay == -1) // storing the lessons begin and end hours
         {
             String[] values = new String (value.toCharArray (), 3, value.length () - 3).split ("-");
-            owner.getStarthours ().add (new Time (values[0]));
-            owner.getEndhours ().add (new Time (values[1]));
+            owner.getStarttimes ().add (values[0]);
+            owner.getEndtimes ().add (values[1]);
         }
         if ("span".equals (currentName) && "-------".equals (value)) // this means that only group 2 has a lesson at this hour
         {

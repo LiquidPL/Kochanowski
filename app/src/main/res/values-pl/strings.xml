@@ -48,4 +48,5 @@
     <string name="pref_should_notify_wearable_title">Powiadamiaj smartwatcha</string>
     <string name="dbreset_dialog_message">Musisz pobrać ponownie plany lekcji.\nCzy chcesz kontynuować?</string>
     <string name="dbreset_dialog_title">Wymagane ponowne pobranie planów lekcji</string>
+    <string name="lesson_list_group">GRUPA\u00A0;</string>
 </resources>

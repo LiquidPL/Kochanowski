@@ -20,7 +20,7 @@ public class ParseTask implements DownloadRunnableMethods, DbWriteRunnableMethod
     private Runnable downloadRunnable;
     private Runnable dbWriteRunnable;
 
-    private ThreadManager manager;
+    protected ThreadManager manager;
 
     private TimeTable table;
     private String tablename;

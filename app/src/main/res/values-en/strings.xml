@@ -48,4 +48,5 @@
     <string name="pref_should_notify_wearable_title">Notify a wearable device</string>
     <string name="dbreset_dialog_message">You need to redownload your timetables.\nDo you want to continue?</string>
     <string name="dbreset_dialog_title">Timetable redownload required</string>
+    <string name="lesson_list_group">GROUP\u00A0</string>
 </resources>

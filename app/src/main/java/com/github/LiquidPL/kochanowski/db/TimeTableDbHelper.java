@@ -25,29 +25,28 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + TEXT_TYPE + ");";
 
-    /*private static final String SQL_CREATE_TABLE_DAYS =
-            "CREATE TABLE " + TimeTableContract.DaysTable.TABLE_NAME + " (" +
-                    TimeTableContract.DaysTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
-                    TimeTableContract.DaysTable.COLUMN_NAME_DAY_NAME + TEXT_TYPE + ");";*/
-
     private static final String SQL_CREATE_TABLE_HOURS =
             "CREATE TABLE " + TimeTableContract.HourTable.TABLE_NAME + " (" +
                     TimeTableContract.HourTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
-                    TimeTableContract.HourTable.COLUMN_NAME_START_HOUR + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HourTable.COLUMN_NAME_START_MINUTE + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HourTable.COLUMN_NAME_END_HOUR + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.HourTable.COLUMN_NAME_END_MINUTE + INT_TYPE + ");";
+                    TimeTableContract.HourTable.COLUMN_NAME_START_TIME + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.HourTable.COLUMN_NAME_END_TIME + TEXT_TYPE + ");";
 
     private static final String SQL_CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TimeTableContract.LessonTable.TABLE_NAME + " (" +
                     TimeTableContract.LessonTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_DAY + INT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.LessonTable.COLUMN_NAME_SUBJECT + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_TEACHER_CODE + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_GROUP_ID + INT_TYPE + ");";
+
+    private static final String SQL_CREATE_TABLE_SUBJECTS =
+            "CREATE TABLE " + TimeTableContract.SubjectTable.TABLE_NAME + " (" +
+                    TimeTableContract.SubjectTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
+                    TimeTableContract.SubjectTable.COLUMN_NAME_SUBJECT_NAME + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.SubjectTable.COLUMN_NAME_SUBJECT_COLOR + INT_TYPE + ");";
 
     private static final String SQL_DELETE_TABLE_TEACHERS =
             "DROP TABLE IF EXISTS " + TimeTableContract.TeacherTable.TABLE_NAME;
@@ -60,6 +59,9 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
 
     private static final String SQL_DELETE_TABLE_LESSONS =
             "DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME;
+
+    private static final String SQL_DELETE_TABLE_SUBJECTS =
+            "DROP TABLE IF EXISTS " + TimeTableContract.SubjectTable.TABLE_NAME;
 
     private final Context context;
 
@@ -75,21 +77,14 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     @Override
     public void onCreate (SQLiteDatabase db)
     {
-        db.execSQL (SQL_CREATE_TABLE_TEACHERS);
-        db.execSQL (SQL_CREATE_TABLE_CLASSES);
-        //db.execSQL (SQL_CREATE_TABLE_DAYS);
-        db.execSQL (SQL_CREATE_TABLE_HOURS);
-        db.execSQL (SQL_CREATE_TABLE_LESSONS);
+        createTables (db);
     }
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL (SQL_DELETE_TABLE_TEACHERS);
-        db.execSQL (SQL_DELETE_TABLE_CLASSES);
-        db.execSQL (SQL_DELETE_TABLE_HOURS);
-        db.execSQL (SQL_DELETE_TABLE_LESSONS);
-        onCreate (db);
+        dropTables (db);
+        createTables (db);
 
         // setting the upgraded flag so the user is notified of the redownload requirement
         PrefUtils.setDatabaseUpgradeStatus (context, true);
@@ -98,21 +93,22 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
         PrefUtils.setTimeTablesSynced (context, false);
     }
 
+    public void createTables (SQLiteDatabase db)
+    {
+        db.execSQL (SQL_CREATE_TABLE_TEACHERS);
+        db.execSQL (SQL_CREATE_TABLE_CLASSES);
+        db.execSQL (SQL_CREATE_TABLE_HOURS);
+        db.execSQL (SQL_CREATE_TABLE_LESSONS);
+        db.execSQL (SQL_CREATE_TABLE_SUBJECTS);
+    }
+
     public void dropTables (SQLiteDatabase db)
     {
         db.execSQL (SQL_DELETE_TABLE_TEACHERS);
         db.execSQL (SQL_DELETE_TABLE_CLASSES);
         db.execSQL (SQL_DELETE_TABLE_HOURS);
         db.execSQL (SQL_DELETE_TABLE_LESSONS);
-    }
-
-    public void createTables (SQLiteDatabase db)
-    {
-        db.execSQL (SQL_CREATE_TABLE_TEACHERS);
-        db.execSQL (SQL_CREATE_TABLE_CLASSES);
-        //db.execSQL (SQL_CREATE_TABLE_DAYS);
-        db.execSQL (SQL_CREATE_TABLE_HOURS);
-        db.execSQL (SQL_CREATE_TABLE_LESSONS);
+        db.execSQL (SQL_DELETE_TABLE_SUBJECTS);
     }
 
     @Override

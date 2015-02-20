@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Process;
 
+import com.github.LiquidPL.kochanowski.db.TimeTableContract;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.HourTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
@@ -64,7 +65,7 @@ public class DbWriteRunnable implements Runnable
 
                 values.put (LessonTable.COLUMN_NAME_DAY, l.getDay ());
                 values.put (LessonTable.COLUMN_NAME_HOUR_ID, l.getLesson ());
-                values.put (LessonTable.COLUMN_NAME_SUBJECT, l.getSubject ());
+                values.put (LessonTable.COLUMN_NAME_SUBJECT_ID, getSubjectId (l.getSubject ()));
                 values.put (LessonTable.COLUMN_NAME_TEACHER_CODE, l.getTeacherCode ());
                 values.put (LessonTable.COLUMN_NAME_CLASSROOM, l.getClassroom ());
                 values.put (LessonTable.COLUMN_NAME_GROUP_ID, l.getGroup ());
@@ -78,20 +79,17 @@ public class DbWriteRunnable implements Runnable
                 }
             }
 
-            for (int i = 0; i < table.getStarthours ().size (); i++)
+            for (int i = 0; i < table.getStarttimes ().size (); i++)
             {
-                Cursor c = db.rawQuery ("SELECT * FROM " + HourTable.TABLE_NAME +
+                Cursor cur = db.rawQuery ("SELECT * FROM " + HourTable.TABLE_NAME +
                         " WHERE " + HourTable._ID + "=" + i, null);
 
-                if (c.getCount () != 0) continue;
+                if (cur.getCount () != 0) continue;
 
                 values = new ContentValues ();
-
                 values.put (HourTable._ID, i);
-                values.put (HourTable.COLUMN_NAME_START_HOUR, table.getStarthours ().get (i).getHour ());
-                values.put (HourTable.COLUMN_NAME_START_MINUTE, table.getStarthours ().get (i).getMinute ());
-                values.put (HourTable.COLUMN_NAME_END_HOUR, table.getEndhours ().get (i).getHour ());
-                values.put (HourTable.COLUMN_NAME_END_MINUTE, table.getEndhours ().get (i).getMinute ());
+                values.put (HourTable.COLUMN_NAME_START_TIME, table.getStarttimes ().get (i));
+                values.put (HourTable.COLUMN_NAME_END_TIME, table.getEndtimes ().get (i));
 
                 db.insert (HourTable.TABLE_NAME, null, values);
 
@@ -123,5 +121,23 @@ public class DbWriteRunnable implements Runnable
         }
 
         task.handleDbWriteState (WRITE_COMPLETED);
+    }
+
+    public int getSubjectId (String subject)
+    {
+        Integer subjectId = task.manager.subjects.get (subject);
+
+        if (subjectId == null)
+        {
+            subjectId = task.manager.subjects.size () + 1;
+            task.manager.subjects.put (subject, subjectId);
+
+            ContentValues values = new ContentValues ();
+            values.put (TimeTableContract.SubjectTable._ID, subjectId);
+            values.put (TimeTableContract.SubjectTable.COLUMN_NAME_SUBJECT_NAME, subject);
+            db.insert (TimeTableContract.SubjectTable.TABLE_NAME, null, values);
+        }
+
+        return subjectId;
     }
 }

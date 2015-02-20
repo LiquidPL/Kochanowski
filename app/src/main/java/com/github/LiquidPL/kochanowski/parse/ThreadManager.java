@@ -1,5 +1,6 @@
 package com.github.LiquidPL.kochanowski.parse;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,6 +41,8 @@ public class ThreadManager
 
     private final ThreadPoolExecutor downloadPool;
     private final ThreadPoolExecutor dbWritePool;
+
+    protected TreeMap<String, Integer> subjects = new TreeMap<> ();
 
     private static ThreadManager instance;
 

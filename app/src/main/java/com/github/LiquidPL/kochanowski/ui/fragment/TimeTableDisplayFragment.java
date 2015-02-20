@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +18,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.HourTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
+import com.github.LiquidPL.kochanowski.db.TimeTableContract.*;
+import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,13 +40,13 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     }
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_TABLE_NAME = "tablename";
+    private static final String ARG_TIME_TABLE_NAME = "timetablename";
     private static final String ARG_TABLE_TYPE = "tabletype";
     private static final String ARG_DAY_ID     = "dayid";
     private static final String ARG_GROUP_ID   = "groupid";
 
     // the given fragments parameters
-    private String tableName;
+    private String timetableName;
     private int tableType;
     private int dayId;
     private int groupId;
@@ -64,17 +62,22 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
+
         private Cursor cur;
         private Cursor oldCur;
 
         private Context context;
 
-        private String tableName;
+        private String timetableName;
         private int tableType;
         private int dayId;
         private int groupId;
 
-        private int resource;
+        private String selection;
+        private String[] selectionArgs;
+        private String orderBy;
+
 
         public class LessonViewHolder extends RecyclerView.ViewHolder
         {
@@ -96,56 +99,59 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             }
         }
 
-        public LessonListAdapter (int resource, String tableName, int tableType, int dayId, int groupId, Context context)
+        public LessonListAdapter (String timetableName, int tableType, int dayId, int groupId, Context context)
         {
-            this.tableName = tableName;
+            this.timetableName = timetableName;
             this.tableType = tableType;
             this.dayId = dayId;
             this.groupId = groupId;
             this.context = context;
 
-            this.resource = resource;
-
-            cur = formQuery (tableName, tableType, dayId, groupId);
+            cur = formQuery ();
         }
 
-        private Cursor formQuery (String tableName, int tableType, int dayId, int groupId)
+        private Cursor formQuery ()
         {
-            String query = "SELECT * FROM " + LessonTable.TABLE_NAME +
-                    " JOIN " + TeacherTable.TABLE_NAME +
-                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
-                    "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE +
-                    " JOIN " + ClassTable.TABLE_NAME +
-                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
-                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
-                    " JOIN " + HourTable.TABLE_NAME +
-                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_HOUR_ID +
-                    "=" + HourTable.TABLE_NAME + "." + HourTable._ID;
+            queryBuilder.setTables (LessonTable.TABLE_NAME +
+                                    " INNER JOIN " + SubjectTable.TABLE_NAME +
+                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_SUBJECT_ID +
+                                        "=" + SubjectTable.TABLE_NAME + "." + SubjectTable._ID +
+                                    " INNER JOIN " + ClassTable.TABLE_NAME +
+                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
+                                        "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
+                                    " INNER JOIN " + HourTable.TABLE_NAME +
+                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_HOUR_ID +
+                                        "=" + HourTable.TABLE_NAME + "." + HourTable._ID +
+                                    " INNER JOIN " + TeacherTable.TABLE_NAME +
+                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
+                                        "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE);
+
+            selection = LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_DAY + "=?";
+            selectionArgs = new String[] {Integer.toString (dayId), timetableName};
+
+            if (groupId != 0)
+            {
+                selection += " AND (" + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=? OR " +
+                                        LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=?)";
+                selectionArgs = new String[] {Integer.toString (dayId), Integer.toString (groupId), "0", timetableName};
+            }
 
             switch (tableType)
             {
                 case TimeTableType.CLASS:
-                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "='" + tableName + "'";
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "=?";
                     break;
                 case TimeTableType.TEACHER:
-                    query += " WHERE " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "='" + tableName + "'";
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "=?";
                     break;
                 case TimeTableType.CLASSROOM:
-                    query += " WHERE " + LessonTable.COLUMN_NAME_CLASSROOM + "='" + tableName + "'";
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASSROOM + "=?";
                     break;
             }
 
-            query += " AND " + LessonTable.COLUMN_NAME_DAY + "=" + dayId;
+            orderBy = LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
 
-            if (groupId != 0)
-            {
-                query += " AND (" + LessonTable.COLUMN_NAME_GROUP_ID + "=" + "0" +
-                        " OR " + LessonTable.COLUMN_NAME_GROUP_ID + "=" + groupId + ")";
-            }
-
-            query += " ORDER BY " + LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
-
-            return DbUtils.getReadableDatabase ().rawQuery (query, null);
+            return queryBuilder.query (DbUtils.getReadableDatabase (), null, selection, selectionArgs, null, null, orderBy);
         }
 
         @Override
@@ -153,70 +159,35 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         {
             cur.moveToPosition (position);
 
-            String subject = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_SUBJECT));
-            String classroom = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
-            String add;
-            String add2;
-            String add3;
-
-            int starthour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_HOUR));
-            int startminute = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_MINUTE));
-            int endhour = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_HOUR));
-            int endminute = cur.getInt (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_MINUTE));
-
-            //holder.subjectName.setText (subject);
-            //holder.classroomName.setText (classroom);
-
-            switch (tableType)
+            holder.subjectName.setText (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
+            holder.hour.setText (cur.getString (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_TIME)) + "-" +
+                                 cur.getString (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_TIME)));
+            if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
             {
-                case TimeTableType.CLASS:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classroom);
-                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
-
-                    break;
-                case TimeTableType.TEACHER:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classroom);
-                    holder.teacherName.setText (add2 + " (" + add + ")");
-
-                    break;
-                case TimeTableType.CLASSROOM:
-                    add = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_CODE));
-                    add2 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    add3 = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-
-                    String classname = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT));
-
-                    holder.subjectName.setText (subject);
-                    holder.classroomName.setText (classname);
-                    holder.teacherName.setText (add2 + " " + add3 + " (" + add + ")");
-
-                    break;
-            }
-
-            String hour = "" + starthour + ":" + startminute; if (startminute == 0) hour += "0";
-            hour += "-" + endhour + ":" + endminute; if (endminute == 0) hour += "0";
-
-            holder.hour.setText (hour);
-
-            int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
-            if (group != 0)
-            {
-                holder.groupName.setText ("GRUPA " + group);
-                holder.groupName.setVisibility (View.VISIBLE);
+                holder.groupName.setText (getResources ().getString(R.string.lesson_list_group) +
+                                          cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)));
             }
             else
             {
                 holder.groupName.setText ("");
-                holder.groupName.setVisibility (View.GONE);
+            }
+
+            switch (tableType)
+            {
+                case TimeTableType.CLASS:
+                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                                                cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
+                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
+                    break;
+                case TimeTableType.TEACHER:
+                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)));
+                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
+                    break;
+                case TimeTableType.CLASSROOM:
+                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                                                cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
+                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)));
+                    break;
             }
         }
 
@@ -236,64 +207,47 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         public void setGroup (int groupId)
         {
-            if (this.groupId == groupId) return;
-
-            oldCur = cur;
-            cur = formQuery (tableName, tableType, dayId, groupId);
-
             int previousGroup = this.groupId;
-            boolean bothGroups = false;
-            boolean toBothGroups = false;
-
-            if (previousGroup == 0) bothGroups = true;
-
             this.groupId = groupId;
 
+            oldCur = cur;
+            cur = formQuery ();
+
+            /*if (groupId == 2)
+            {
+                notifyItemRemoved (3);
+                notifyItemRemoved (4);
+            }
             if (groupId == 0)
             {
-                toBothGroups = true;
+                notifyItemInserted (3);
+                notifyItemInserted (5);
+            }*/
 
-                switch (previousGroup)
-                {
-                    case 1:
-                        groupId = 2;
-                        break;
-                    case 2:
-                        groupId = 1;
-                        break;
-                }
-            }
-
+            int mod = 0;
             oldCur.moveToFirst ();
-            int offset = 0;
-
-            if (!toBothGroups) do
+            if (groupId != 0) do
             {
                 int group = oldCur.getInt (oldCur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
-
                 if (group != 0 && group != groupId)
                 {
-                    notifyItemRemoved (oldCur.getPosition () - offset);
-                    offset++;
+                    notifyItemRemoved (oldCur.getPosition () - mod++);
                 }
-
                 oldCur.moveToNext ();
             }
             while (!oldCur.isAfterLast ());
 
-            if (bothGroups) return;
 
+
+            mod = 0;
             cur.moveToFirst ();
-
-            do
+            if (previousGroup != 0) do
             {
                 int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
-
-                if (group == groupId)
+                if ((groupId == 0 && group != previousGroup && group != 0) || (groupId != 0 && group == groupId))
                 {
                     notifyItemInserted (cur.getPosition ());
                 }
-
                 cur.moveToNext ();
             }
             while (!cur.isAfterLast ());
@@ -310,18 +264,18 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param tableName Name of the timetable, corresponding to a column in the database
+     * @param timetableName Name of the timetable, corresponding to a column in the database
      * @param tableType The timetable type to display (class/classroom)
      * @param groupId The group to be displayed
      *
      * @return A new instance of fragment TimeTableDisplayFragment.
      */
-    public static TimeTableDisplayFragment newInstance (String tableName, int tableType, int dayId, int groupId)
+    public static TimeTableDisplayFragment newInstance (String timetableName, int tableType, int dayId, int groupId)
     {
         TimeTableDisplayFragment fragment = new TimeTableDisplayFragment ();
         Bundle args = new Bundle ();
 
-        args.putString (ARG_TABLE_NAME, tableName);
+        args.putString (ARG_TIME_TABLE_NAME, timetableName);
         args.putInt (ARG_TABLE_TYPE, tableType);
         args.putInt (ARG_DAY_ID, dayId);
         args.putInt (ARG_GROUP_ID, groupId);
@@ -341,7 +295,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         super.onCreate (savedInstanceState);
         if (getArguments () != null)
         {
-            tableName = getArguments ().getString (ARG_TABLE_NAME);
+            timetableName = getArguments ().getString (ARG_TIME_TABLE_NAME);
             tableType = getArguments ().getInt (ARG_TABLE_TYPE);
             dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
@@ -362,14 +316,14 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         noTimeTablesAlert = (TextView) view.findViewById (R.id.alert_no_timetables);
 
-        resetVisibility ();
+        resetSyncAlertVisibility ();
 
         layoutManager = new LinearLayoutManager (activity);
         recyclerView.setLayoutManager (layoutManager);
         recyclerView.setItemAnimator (new DefaultItemAnimator ());
 
-        adapter = new LessonListAdapter (R.layout.lesson_item,
-                tableName,
+        adapter = new LessonListAdapter (
+                timetableName,
                 tableType,
                 dayId,
                 groupId,
@@ -398,7 +352,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         this.dayId = day;
     }
 
-    private void resetVisibility ()
+    private void resetSyncAlertVisibility ()
     {
         if (PrefUtils.hasSyncedTimeTables (getActivity ()))
         {
@@ -416,11 +370,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
     public void refresh ()
     {
-        resetVisibility ();
+        resetSyncAlertVisibility ();
 
         adapter = new LessonListAdapter (
-                R.layout.lesson_item,
-                tableName,
+                timetableName,
                 tableType,
                 dayId,
                 groupId,
@@ -431,6 +384,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
     public void setGroup (int groupId) // 1,2, or 0 (both groups)
     {
+        if (groupId == this.groupId) return;
         this.groupId = groupId;
 
         ((LessonListAdapter) adapter).setGroup (groupId);
@@ -448,14 +402,14 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         }
     }
 
-    public void setTableName (String table)
+    public void setTimetableName (String table)
     {
-        this.tableName = table;
+        this.timetableName = table;
     }
 
-    public String getTableName ()
+    public String getTimetableName ()
     {
-        return tableName;
+        return timetableName;
     }
 
     public int getTableType ()

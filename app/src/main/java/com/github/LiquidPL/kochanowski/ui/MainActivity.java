@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ public class MainActivity
     static final String ARG_DAY = "day";
     static final String ARG_GROUP = "group";
 
-    private String currentTable = "";
+    private String currentTimetable = "";
     private int currentDay = -1;
     private int currentGroup = -1;
 
@@ -161,7 +162,7 @@ public class MainActivity
 
         spinner = (Spinner) findViewById (R.id.main_activity_spinner);
 
-        currentTable = PrefUtils.getTableName (this);
+        currentTimetable = PrefUtils.getTableName (this);
         currentDay = getCurrentDay ();
         currentGroup = PrefUtils.getDefaultGroup (this);
 
@@ -182,7 +183,7 @@ public class MainActivity
 
         if (displayFragment == null)
         {
-            displayFragment = TimeTableDisplayFragment.newInstance (currentTable,
+            displayFragment = TimeTableDisplayFragment.newInstance (currentTimetable,
                                                                     TimeTableType.CLASS, currentDay,
                                                                     currentGroup);
             getSupportFragmentManager ().beginTransaction ().
@@ -364,16 +365,16 @@ public class MainActivity
 
         if (key.equals (PrefUtils.PREF_TABLE_NAME))
         {
-            currentTable = PrefUtils.getTableName (this);
-            displayFragment.setTableName (currentTable);
+            currentTimetable = PrefUtils.getTableName (this);
+            displayFragment.setTimetableName (currentTimetable);
             displayFragment.refresh ();
         }
 
         if (key.equals (PrefUtils.PREF_TABLES_SYNCED))
         {
-            currentTable = PrefUtils.getTableName (this);
+            currentTimetable = PrefUtils.getTableName (this);
 
-            displayFragment.setTableName (currentTable);
+            displayFragment.setTimetableName (currentTimetable);
             displayFragment.refresh ();
         }
     }
