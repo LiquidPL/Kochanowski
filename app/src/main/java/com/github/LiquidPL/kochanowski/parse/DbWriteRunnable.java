@@ -8,7 +8,6 @@ import android.os.Process;
 
 import com.github.LiquidPL.kochanowski.db.TimeTableContract;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.HourTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.parse.table.Lesson;
 import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
@@ -64,7 +63,9 @@ public class DbWriteRunnable implements Runnable
                 values = new ContentValues ();
 
                 values.put (LessonTable.COLUMN_NAME_DAY, l.getDay ());
-                values.put (LessonTable.COLUMN_NAME_HOUR_ID, l.getLesson ());
+                values.put (LessonTable.COLUMN_NAME_START_TIME, table.getStarttimes ().get (l.getLesson ()));
+                values.put (LessonTable.COLUMN_NAME_END_TIME, table.getEndtimes ().get (l.getLesson ()));
+//                values.put (LessonTable.COLUMN_NAME_HOUR_ID, l.getLesson ());
                 values.put (LessonTable.COLUMN_NAME_SUBJECT_ID, getSubjectId (l.getSubject ()));
                 values.put (LessonTable.COLUMN_NAME_TEACHER_CODE, l.getTeacherCode ());
                 values.put (LessonTable.COLUMN_NAME_CLASSROOM, l.getClassroom ());
@@ -79,7 +80,7 @@ public class DbWriteRunnable implements Runnable
                 }
             }
 
-            for (int i = 0; i < table.getStarttimes ().size (); i++)
+            /*for (int i = 0; i < table.getStarttimes ().size (); i++)
             {
                 Cursor cur = db.rawQuery ("SELECT * FROM " + HourTable.TABLE_NAME +
                         " WHERE " + HourTable._ID + "=" + i, null);
@@ -97,7 +98,7 @@ public class DbWriteRunnable implements Runnable
                 {
                     throw new InterruptedException ();
                 }
-            }
+            }*/
 
             values = new ContentValues ();
             values.put (ClassTable.COLUMN_NAME_NAME_SHORT, table.getShortName ());

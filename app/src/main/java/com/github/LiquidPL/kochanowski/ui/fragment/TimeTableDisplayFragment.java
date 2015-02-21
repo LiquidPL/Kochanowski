@@ -119,9 +119,9 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                                     " INNER JOIN " + ClassTable.TABLE_NAME +
                                         " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
                                         "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
-                                    " INNER JOIN " + HourTable.TABLE_NAME +
+                                    /*" INNER JOIN " + HourTable.TABLE_NAME +
                                         " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_HOUR_ID +
-                                        "=" + HourTable.TABLE_NAME + "." + HourTable._ID +
+                                        "=" + HourTable.TABLE_NAME + "." + HourTable._ID +*/
                                     " INNER JOIN " + TeacherTable.TABLE_NAME +
                                         " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
                                         "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE);
@@ -149,7 +149,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     break;
             }
 
-            orderBy = LessonTable.COLUMN_NAME_HOUR_ID + " ASC";
+            orderBy = "datetime (" + LessonTable.COLUMN_NAME_START_TIME + ") ASC";
 
             return queryBuilder.query (DbUtils.getReadableDatabase (), null, selection, selectionArgs, null, null, orderBy);
         }
@@ -160,8 +160,8 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             cur.moveToPosition (position);
 
             holder.subjectName.setText (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
-            holder.hour.setText (cur.getString (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_START_TIME)) + "-" +
-                                 cur.getString (cur.getColumnIndexOrThrow (HourTable.COLUMN_NAME_END_TIME)));
+            holder.hour.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME)) + "-" +
+                                 cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME)));
             if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
             {
                 holder.groupName.setText (getResources ().getString(R.string.lesson_list_group) +

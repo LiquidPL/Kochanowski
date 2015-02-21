@@ -25,17 +25,19 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + TEXT_TYPE + ");";
 
-    private static final String SQL_CREATE_TABLE_HOURS =
+    /*private static final String SQL_CREATE_TABLE_HOURS =
             "CREATE TABLE " + TimeTableContract.HourTable.TABLE_NAME + " (" +
                     TimeTableContract.HourTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.HourTable.COLUMN_NAME_START_TIME + TEXT_TYPE + COMMA_SEP +
-                    TimeTableContract.HourTable.COLUMN_NAME_END_TIME + TEXT_TYPE + ");";
+                    TimeTableContract.HourTable.COLUMN_NAME_END_TIME + TEXT_TYPE + ");";*/
 
     private static final String SQL_CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TimeTableContract.LessonTable.TABLE_NAME + " (" +
                     TimeTableContract.LessonTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_DAY + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
+//                    TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_START_TIME + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_END_TIME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_TEACHER_CODE + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM + TEXT_TYPE + COMMA_SEP +
@@ -54,8 +56,8 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     private static final String SQL_DELETE_TABLE_CLASSES =
             "DROP TABLE IF EXISTS " + TimeTableContract.ClassTable.TABLE_NAME;
 
-    private static final String SQL_DELETE_TABLE_HOURS =
-            "DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME;
+    /*private static final String SQL_DELETE_TABLE_HOURS =
+            "DROP TABLE IF EXISTS " + TimeTableContract.HourTable.TABLE_NAME;*/
 
     private static final String SQL_DELETE_TABLE_LESSONS =
             "DROP TABLE IF EXISTS " + TimeTableContract.LessonTable.TABLE_NAME;
@@ -65,7 +67,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
 
     private final Context context;
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "timetables.db";
 
     public TimeTableDbHelper (Context context)
@@ -97,7 +99,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     {
         db.execSQL (SQL_CREATE_TABLE_TEACHERS);
         db.execSQL (SQL_CREATE_TABLE_CLASSES);
-        db.execSQL (SQL_CREATE_TABLE_HOURS);
+//        db.execSQL (SQL_CREATE_TABLE_HOURS);
         db.execSQL (SQL_CREATE_TABLE_LESSONS);
         db.execSQL (SQL_CREATE_TABLE_SUBJECTS);
     }
@@ -106,7 +108,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     {
         db.execSQL (SQL_DELETE_TABLE_TEACHERS);
         db.execSQL (SQL_DELETE_TABLE_CLASSES);
-        db.execSQL (SQL_DELETE_TABLE_HOURS);
+//        db.execSQL (SQL_DELETE_TABLE_HOURS);
         db.execSQL (SQL_DELETE_TABLE_LESSONS);
         db.execSQL (SQL_DELETE_TABLE_SUBJECTS);
     }
