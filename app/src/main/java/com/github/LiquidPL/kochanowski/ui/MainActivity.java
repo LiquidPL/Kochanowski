@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,11 +15,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment.Group;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -184,7 +183,7 @@ public class MainActivity
         if (displayFragment == null)
         {
             displayFragment = TimeTableDisplayFragment.newInstance (currentTimetable,
-                                                                    TimeTableType.CLASS, currentDay,
+                                                                    Type.CLASS, currentDay,
                                                                     currentGroup);
             getSupportFragmentManager ().beginTransaction ().
                     replace (R.id.fragment_stub, displayFragment).commit ();

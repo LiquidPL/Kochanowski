@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
+import com.github.LiquidPL.kochanowski.parse.DbWriter;
 import com.github.LiquidPL.kochanowski.parse.MasterlistDownloadRunnable;
 import com.github.LiquidPL.kochanowski.parse.ThreadManager;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
@@ -164,7 +166,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         progressBar.setIndeterminate (false);
         progressBar.setMax (urls.size ());
         currentCount.setText ("0/" + urls.size ());
-        manager.setTimeTableCount (urls.size ());
+        manager.setTimetableCount (urls.size ());
 
         manager = ThreadManager.getInstance ();
 
@@ -172,7 +174,8 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
         for (String url : urls)
         {
-            manager.parseTimeTable (url);
+            Log.i ("liquid", url);
+            manager.parseTimetable (url);
         }
     }
 
@@ -180,7 +183,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     {
         switch (manager.getResult ())
         {
-            case ThreadManager.DOWNLOAD_FAILED:
+            case ThreadManager.TASK_FAILED:
                 syncResult.setText (R.string.sync_result_failure);
                 PrefUtils.setTimeTablesSynced (this, false);
 

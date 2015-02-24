@@ -11,9 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment;
 import com.github.LiquidPL.kochanowski.ui.widget.SlidingTabLayout;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -83,7 +83,7 @@ public class TimeTableTabActivity extends BaseActivity
         slidingTabLayout.setSelectedIndicatorColors (getResources ().getColor (R.color.accent));
 
         getSupportActionBar ().setTitle (longName + " (" + shortName + ")");
-        if (tableType == TimeTableType.CLASSROOM) getSupportActionBar ().setTitle (shortName);
+        if (tableType == Type.CLASSROOM) getSupportActionBar ().setTitle (shortName);
 
         getSupportActionBar ().setDisplayHomeAsUpEnabled (true);
     }

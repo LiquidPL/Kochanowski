@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.*;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
@@ -108,6 +108,8 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             this.context = context;
 
             cur = formQuery ();
+
+            Log.i ("liquid", "" + cur.getCount ());
         }
 
         private Cursor formQuery ()
@@ -119,9 +121,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                                     " INNER JOIN " + ClassTable.TABLE_NAME +
                                         " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
                                         "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
-                                    /*" INNER JOIN " + HourTable.TABLE_NAME +
-                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_HOUR_ID +
-                                        "=" + HourTable.TABLE_NAME + "." + HourTable._ID +*/
                                     " INNER JOIN " + TeacherTable.TABLE_NAME +
                                         " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
                                         "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE);
@@ -138,13 +137,13 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             switch (tableType)
             {
-                case TimeTableType.CLASS:
+                case Type.CLASS:
                     selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "=?";
                     break;
-                case TimeTableType.TEACHER:
+                case Type.TEACHER:
                     selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "=?";
                     break;
-                case TimeTableType.CLASSROOM:
+                case Type.CLASSROOM:
                     selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASSROOM + "=?";
                     break;
             }
@@ -174,16 +173,16 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             switch (tableType)
             {
-                case TimeTableType.CLASS:
+                case Type.CLASS:
                     holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
                                                 cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
                     holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
                     break;
-                case TimeTableType.TEACHER:
+                case Type.TEACHER:
                     holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)));
                     holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
                     break;
-                case TimeTableType.CLASSROOM:
+                case Type.CLASSROOM:
                     holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
                                                 cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
                     holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)));
@@ -213,17 +212,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             oldCur = cur;
             cur = formQuery ();
 
-            /*if (groupId == 2)
-            {
-                notifyItemRemoved (3);
-                notifyItemRemoved (4);
-            }
-            if (groupId == 0)
-            {
-                notifyItemInserted (3);
-                notifyItemInserted (5);
-            }*/
-
             int mod = 0;
             oldCur.moveToFirst ();
             if (groupId != 0) do
@@ -237,9 +225,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             }
             while (!oldCur.isAfterLast ());
 
-
-
-            mod = 0;
             cur.moveToFirst ();
             if (previousGroup != 0) do
             {

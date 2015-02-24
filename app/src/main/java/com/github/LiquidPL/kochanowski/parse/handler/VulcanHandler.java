@@ -1,12 +1,15 @@
 package com.github.LiquidPL.kochanowski.parse.handler;
 
-import com.github.LiquidPL.kochanowski.parse.table.Lesson;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTable;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.DbWriter;
+import com.github.LiquidPL.kochanowski.parse.TimeTableDownloadRunnable;
+import com.github.LiquidPL.kochanowski.parse.Type;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A handler for the SAX parser.
@@ -15,9 +18,14 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Krzysztof Gutkowski (LiquidPL)
  * @version dev
  */
-public class SaxHandler extends DefaultHandler
+public class VulcanHandler
+        extends DefaultHandler
 {
-    private TimeTable owner;
+    private TimeTableDownloadRunnable runnable;
+    private int tableType;
+
+    private String shortName;
+    private String longName;
 
     private int currentLesson = -4;// currentLesson and currentDay are set to negative values
     private int currentDay = -3;   // because of the <tr> and <td> tags at the beginning of
@@ -31,14 +39,17 @@ public class SaxHandler extends DefaultHandler
     private String currentClassroom = "";
     private String currentClass = "";
 
+    private List<String> startTimes = new ArrayList<> ();
+    private List<String> endTimes = new ArrayList<> ();
+
     /**
      * Class constructor
      *
-     * @param table TimeTable object in which this handler is supposed to be created
      */
-    public SaxHandler (TimeTable table)
+    public VulcanHandler (TimeTableDownloadRunnable runnable, int tableType)
     {
-        this.owner = table;
+        this.runnable = runnable;
+        this.tableType = tableType;
     }
 
     @Override
@@ -82,8 +93,16 @@ public class SaxHandler extends DefaultHandler
         if ("br".equals (qName) && currentGroup == 1 && currentDay >= 0 && currentDay <= 4 &&
                 !checkIfEmpty (currentSubject, currentTeacher, currentClassroom, currentClass))
         {
-            owner.getLessons (). add (new Lesson (currentDay, currentLesson, currentSubject, currentTeacher, currentClassroom, currentClass));
-            owner.getCurrentLesson ().setGroup (currentGroup);
+            DbWriter.insertLesson (
+                    currentDay,
+                    startTimes.get (currentLesson),
+                    endTimes.get (currentLesson),
+                    currentLesson,
+                    currentGroup,
+                    currentSubject,
+                    currentTeacher,
+                    currentClassroom,
+                    shortName);
             currentSubject = ""; currentTeacher = ""; currentClassroom = ""; currentClass = "";
         }
     }
@@ -95,10 +114,31 @@ public class SaxHandler extends DefaultHandler
         if ("td".equals (qName) && currentDay >= 0 && currentDay <= 4 &&
             !checkIfEmpty (currentSubject, currentTeacher, currentClassroom, currentClass))
         {
-            owner.getLessons ().add (new Lesson (currentDay, currentLesson, currentSubject, currentTeacher, currentClassroom, currentClass));
             if (currentGroup == 1 || currentGroup == 2)
             {
-                owner.getCurrentLesson ().setGroup (currentGroup);
+                DbWriter.insertLesson (
+                        currentDay,
+                        startTimes.get (currentLesson),
+                        endTimes.get (currentLesson),
+                        currentLesson,
+                        currentGroup,
+                        currentSubject,
+                        currentTeacher,
+                        currentClassroom,
+                        shortName);
+            }
+            else
+            {
+                DbWriter.insertLesson (
+                        currentDay,
+                        startTimes.get (currentLesson),
+                        endTimes.get (currentLesson),
+                        currentLesson,
+                        0,
+                        currentSubject,
+                        currentTeacher,
+                        currentClassroom,
+                        shortName);
             }
             currentGroup = 0;
             currentSubject = ""; currentTeacher = ""; currentClassroom = ""; currentClass = "";
@@ -130,8 +170,8 @@ public class SaxHandler extends DefaultHandler
         if ("td".equals (currentName) && currentDay == -1) // storing the lessons begin and end hours
         {
             String[] values = new String (value.toCharArray (), 3, value.length () - 3).split ("-");
-            owner.getStarttimes ().add (values[0]);
-            owner.getEndtimes ().add (values[1]);
+            startTimes.add (values[0]);
+            endTimes.add (values[1]);
         }
         if ("span".equals (currentName) && "-------".equals (value)) // this means that only group 2 has a lesson at this hour
         {
@@ -140,17 +180,17 @@ public class SaxHandler extends DefaultHandler
         // storing the timetable name, works different for class/teacher and classroom
         if ("span".equals (currentName) && "tytulnapis".equals (currentAttribute))
         {
-            if (owner.getTableType () == TimeTableType.CLASS || owner.getTableType () == TimeTableType.TEACHER)
+            String values[] = value.split (" \\(");
+
+            longName = values[0];
+            shortName = new String (values[1].toCharArray (), 0, values[1].length () - 1);
+
+            if (tableType == Type.CLASS)
             {
-                String[] values = value.split (" \\(");
-                owner.setLongName (values[0]);
-                owner.setShortName (new String (values[1].toCharArray (), 0, values[1].length () - 1));
+                DbWriter.insertClass (shortName, longName);
+                runnable.setTableName (longName + " (" + shortName + ")");
             }
-            else
-            {
-                owner.setShortName (new String (value.toCharArray (), 1, value.length () - 2));
-                owner.setLongName (owner.getShortName ());
-            }
+
             currentAttribute = "";
         }
     }

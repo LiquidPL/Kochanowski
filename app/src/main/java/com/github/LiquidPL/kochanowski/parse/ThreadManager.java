@@ -1,59 +1,45 @@
 package com.github.LiquidPL.kochanowski.parse;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
-import com.github.LiquidPL.kochanowski.util.DbUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Created by liquid on 24.02.15.
+ */
 public class ThreadManager
+    implements TimeTableDownloadRunnable.DownloadRunnableMethods
 {
-    public static final int DOWNLOAD_FAILED = -1;
-    static final int DOWNLOAD_STARTED = 1;
-    static final int DOWNLOAD_COMPLETE = 2;
-    static final int DB_WRITE_STARTED = 3;
-    public static final int TASK_COMPLETED = 4;
+    public static final int TASK_FAILED = -1;
+    public static final int TASK_STARTED = 1;
+    public static final int TASK_COMPLETED = 2;
 
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT;
     private static final int CORE_POOL_SIZE = 8;
     private static final int MAX_POOL_SIZE = 8;
-    private static int CORE_NUMBER = Runtime.getRuntime ().availableProcessors ();
+    private static final int CORE_NUMBER = Runtime.getRuntime ().availableProcessors ();
 
-    private final BlockingQueue <Runnable> downloadQueue;
-    private final BlockingQueue <Runnable> dbWriteQueue;
-    private final List<ParseTask> parseTaskList;
-
-    private final ThreadPoolExecutor downloadPool;
-    private final ThreadPoolExecutor dbWritePool;
-
-    protected TreeMap<String, Integer> subjects = new TreeMap<> ();
+    private final BlockingQueue<Runnable> taskQueue;
+    private final ThreadPoolExecutor taskPool;
 
     private static ThreadManager instance;
+    private Handler handler;
 
-    private static Handler handler;
+    private SyncActivity activity;
 
-    private static SyncActivity context;
-
-    private static SQLiteDatabase db;
-
-    private static int currentTimeTable;
-    private static int timeTableCount;
+    private static int currentTimetable = 0;
+    private static int timetableCount;
 
     private static int result;
 
@@ -63,29 +49,16 @@ public class ThreadManager
         instance = new ThreadManager ();
     }
 
-    private ThreadManager ()
+    ThreadManager ()
     {
-        downloadQueue = new LinkedBlockingQueue<Runnable> ();
-        dbWriteQueue = new LinkedBlockingQueue <Runnable> ();
-        //parseTaskQueue = new LinkedBlockingQueue <ParseTask> ();
-        parseTaskList = new ArrayList <ParseTask> ();
+        taskQueue = new LinkedBlockingQueue<> ();
 
-        db = DbUtils.getWritableDatabase ();
-
-        downloadPool = new ThreadPoolExecutor (
+        taskPool = new ThreadPoolExecutor (
                 CORE_POOL_SIZE,
                 MAX_POOL_SIZE,
                 KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT,
-                downloadQueue
-        );
-
-        dbWritePool = new ThreadPoolExecutor (
-                CORE_POOL_SIZE,
-                MAX_POOL_SIZE,
-                KEEP_ALIVE_TIME,
-                KEEP_ALIVE_TIME_UNIT,
-                dbWriteQueue
+                taskQueue
         );
 
         handler = new Handler (Looper.getMainLooper ())
@@ -93,128 +66,121 @@ public class ThreadManager
             @Override
             public void handleMessage (Message msg)
             {
-                ParseTask task = (ParseTask) msg.obj;
-                String name;
-                if (task != null) name = task.getTable ().getLongName () + " (" + task.getTable ().getShortName () + ")";
-                else name = "";
+                TimeTableDownloadRunnable runnable = ((TimeTableDownloadRunnable) msg.obj);
+
+                String name = "";
+                if (runnable != null) name = runnable.getTableName ();
 
                 switch (msg.what)
                 {
                     case TASK_COMPLETED:
-                        currentTimeTable++;
-                        context.currentDownload.setText (context.getResources ().getString (R.string.downloaded_timetable) + ": " + name);
-                        context.currentCount.setText (currentTimeTable + "/" + timeTableCount);
-                        context.progressBar.setProgress (currentTimeTable);
+                        currentTimetable++;
+                        activity.currentDownload.setText (activity.getResources ().getString (R.string.downloaded_timetable) +
+                                                                  " " + name);
+                        activity.currentCount.setText (currentTimetable + "/" + timetableCount);
+                        activity.progressBar.setProgress (currentTimetable);
 
-                        result = TASK_COMPLETED;
-
-                        if (task != null)
+                        if (currentTimetable == timetableCount)
                         {
-                            task.recycle ();
+                            result = TASK_COMPLETED;
+                        }
+
+                        if (runnable != null)
+                        {
+                            runnable = null;
                         }
                         break;
-                    case DOWNLOAD_FAILED:
-                        if (task != null)
+                    case TASK_FAILED:
+                        if (runnable != null)
                         {
-                            task.recycle ();
+                            runnable = null;
                         }
-                        result = DOWNLOAD_FAILED;
-                        context.finishSync ();
+                        result = TASK_FAILED;
+                        activity.finishSync ();
                         break;
                 }
 
-                if (currentTimeTable == timeTableCount) context.finishSync ();
+                if (currentTimetable == timetableCount)
+                {
+                    activity.finishSync ();
+                }
             }
         };
     }
 
-    public void resetManager ()
+    public static void parseTimetable (String url)
     {
-        currentTimeTable = 0;
-        timeTableCount = 0;
-        result = 0;
-
-        parseTaskList.clear ();
-        downloadQueue.clear ();
-        dbWriteQueue.clear ();
-    }
-
-    public static void setTimeTableCount (int timeTableCount)
-    {
-        ThreadManager.timeTableCount = timeTableCount;
-    }
-
-    public static int getResult ()
-    {
-        return result;
-    }
-
-    public static void setContext (Context context)
-    {
-        ThreadManager.context = (SyncActivity) context;
-    }
-
-    public void handleState (ParseTask task, int state)
-    {
-        switch (state)
-        {
-            case TASK_COMPLETED:
-                Message completeMessage = handler.obtainMessage (state, task);
-                completeMessage.sendToTarget ();
-                break;
-            case DOWNLOAD_COMPLETE:
-                dbWritePool.execute (task.getDbWriteRunnable ());
-                break;
-            default:
-                handler.obtainMessage (state, task).sendToTarget ();
-                break;
-        }
-    }
-
-    private void recycleTask (ParseTask task)
-    {
-        task.recycle ();
-
-        //parseTaskQueue.offer (task);
-        parseTaskList.remove (task);
-    }
-
-    public static void parseTimeTable (String url)
-    {
-        ParseTask task = new ParseTask (db);
-
         try
         {
-            task.setUrl (new URL (url));
+            TimeTableDownloadRunnable downloadRunnable = new TimeTableDownloadRunnable (new URL (url));
+
+            instance.taskPool.execute (downloadRunnable);
         }
         catch (MalformedURLException e)
         {
             e.printStackTrace ();
         }
-
-        instance.parseTaskList.add (task);
-
-        instance.downloadPool.execute (task.getDownloadRunnable ());
     }
 
     public static void cancelAll ()
     {
         synchronized (instance)
         {
-            for (ParseTask task : instance.parseTaskList)
+            for (Runnable runnable : instance.taskQueue)
             {
-                Thread thread = task.getCurrentThread ();
+                Thread thread = ((TimeTableDownloadRunnable) runnable).getCurrentThread ();
 
                 if (thread != null)
                 {
                     thread.interrupt ();
                 }
             }
-        }
-        instance.downloadPool.shutdownNow ();
-        instance.dbWritePool.shutdownNow ();
 
-        handler.obtainMessage (DOWNLOAD_FAILED, new ParseTask (db)).sendToTarget ();
+            instance.taskPool.shutdownNow ();
+        }
+    }
+
+    @Override
+    public void handleState (TimeTableDownloadRunnable runnable, int state)
+    {
+        switch (state)
+        {
+            case TASK_COMPLETED:
+                handler.obtainMessage (state, runnable).sendToTarget ();
+                break;
+            default:
+                handler.obtainMessage (state, runnable).sendToTarget ();
+                break;
+        }
+    }
+
+    public static void resetManager ()
+    {
+        timetableCount = 0;
+        currentTimetable = 0;
+        result = 0;
+
+        instance.taskQueue.clear ();
+    }
+
+    public void setContext (SyncActivity activity)
+    {
+        this.activity = activity;
+    }
+
+    public static void setTimetableCount (int timetableCount)
+    {
+        ThreadManager.timetableCount = timetableCount;
+    }
+
+    public static int getTimetableCount ()
+    {
+        return timetableCount;
+    }
+
+    public static int getResult ()
+    {
+        return result;
     }
 
     public static ThreadManager getInstance ()

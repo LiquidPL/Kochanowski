@@ -2,10 +2,10 @@ package com.github.LiquidPL.kochanowski.parse;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -37,11 +37,12 @@ public class MasterlistHandler extends DefaultHandler
         {
             if (attributes.getQName (i).equals ("href"))
             {
-                if (checkType (attributes.getValue (i)) == TimeTableType.CLASS)
+                if (checkType (attributes.getValue (i)) == Type.CLASS)
                 {
                     urls.add (school_url + attributes.getValue (i));
+                    Log.i ("liquid", school_url + attributes.getValue (i));
                 }
-                if (checkType (attributes.getValue (i)) == TimeTableType.TEACHER)
+                if (checkType (attributes.getValue (i)) == Type.TEACHER)
                 {
                     currentAttribute = "teacher";
                 }
@@ -66,12 +67,8 @@ public class MasterlistHandler extends DefaultHandler
                 teacher[1] = teacher[2];
             }
 
-            ContentValues values = new ContentValues ();
-            values.put (TeacherTable.COLUMN_NAME_TEACHER_CODE, teacher[teacher.length - 1]);
-            values.put (TeacherTable.COLUMN_NAME_TEACHER_NAME, teacher[0]);
-            values.put (TeacherTable.COLUMN_NAME_TEACHER_SURNAME, teacher[1]);
+            DbWriter.insertTeacher (teacher[teacher.length - 1], teacher[0], teacher[1]);
 
-            db.insert (TeacherTable.TABLE_NAME, null, values);
             currentAttribute = "";
         }
     }
@@ -79,18 +76,18 @@ public class MasterlistHandler extends DefaultHandler
     private int checkType (String url)
     {
         String values[] = url.split ("/");
-        int ret = TimeTableType.NONE;
-        if (values.length != 2) return TimeTableType.NONE;
+        int ret = Type.NONE;
+        if (values.length != 2) return Type.NONE;
         switch (values[1].charAt (0))
         {
             case 'o':
-                ret = TimeTableType.CLASS;
+                ret = Type.CLASS;
                 break;
             case 'n':
-                ret = TimeTableType.TEACHER;
+                ret = Type.TEACHER;
                 break;
             case 's':
-                ret = TimeTableType.CLASSROOM;
+                ret = Type.CLASSROOM;
                 break;
         }
         return ret;

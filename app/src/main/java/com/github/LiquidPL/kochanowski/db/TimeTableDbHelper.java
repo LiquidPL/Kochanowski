@@ -35,7 +35,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
             "CREATE TABLE " + TimeTableContract.LessonTable.TABLE_NAME + " (" +
                     TimeTableContract.LessonTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_DAY + INT_TYPE + COMMA_SEP +
-//                    TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_START_TIME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_END_TIME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP +

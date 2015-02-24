@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 
 public class SearchActivity
@@ -29,7 +29,7 @@ public class SearchActivity
         if (intent.ACTION_SEARCH.equals (intent.getAction ()))
         {
             searchQuery = intent.getStringExtra (SearchManager.QUERY);
-            tableType = intent.getIntExtra ("type", TimeTableType.NONE);
+            tableType = intent.getIntExtra ("type", Type.NONE);
         }
 
         Log.i ("liquid", searchQuery);

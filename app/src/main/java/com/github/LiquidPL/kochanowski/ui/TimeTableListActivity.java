@@ -11,7 +11,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableListFragment;
 
 public class TimeTableListActivity
@@ -29,7 +29,7 @@ public class TimeTableListActivity
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_timetable_list);
 
-        tableType = TimeTableType.CLASS;
+        tableType = Type.CLASS;
 
         listFragment = TimeTableListFragment.newInstance (tableType, null);
 
@@ -80,21 +80,21 @@ public class TimeTableListActivity
         {
             case R.id.filter_class:
                 item.setChecked (true);
-                listFragment.setFilter (TimeTableType.CLASS);
-                tableType = TimeTableType.CLASS;
+                listFragment.setFilter (Type.CLASS);
+                tableType = Type.CLASS;
                 getToolbar ().setTitle (getString (R.string.classes));
                 return true;
             case R.id.filter_teachers:
                 item.setChecked (true);
-                listFragment.setFilter (TimeTableType.TEACHER);
-                tableType = TimeTableType.TEACHER;
+                listFragment.setFilter (Type.TEACHER);
+                tableType = Type.TEACHER;
                 getToolbar ().setTitle (getString (R.string.teachers));
                 return true;
             case R.id.filter_classrooms:
                 item.setChecked (true);
-                listFragment.setFilter (TimeTableType.CLASSROOM);
+                listFragment.setFilter (Type.CLASSROOM);
                 getToolbar ().setTitle (getString (R.string.classrooms));
-                tableType = TimeTableType.CLASSROOM;
+                tableType = Type.CLASSROOM;
                 return true;
         }
 

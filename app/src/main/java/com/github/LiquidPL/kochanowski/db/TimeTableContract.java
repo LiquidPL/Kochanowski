@@ -30,7 +30,7 @@ public final class TimeTableContract
     {
         public static final String TABLE_NAME = "lessons";
         public static final String COLUMN_NAME_DAY = "day";
-//        public static final String COLUMN_NAME_HOUR_ID = "hourid";
+        public static final String COLUMN_NAME_HOUR_ID = "hourid";
         public static final String COLUMN_NAME_START_TIME = "starttime";
         public static final String COLUMN_NAME_END_TIME = "endtime";
         public static final String COLUMN_NAME_SUBJECT_ID = "subjectid";

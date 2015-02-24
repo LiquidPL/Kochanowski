@@ -17,8 +17,8 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
+import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
-import com.github.LiquidPL.kochanowski.parse.table.TimeTableType;
 
 import org.lucasr.twowayview.ItemClickSupport;
 import org.lucasr.twowayview.TwoWayLayoutManager;
@@ -69,19 +69,19 @@ public class TimeTableListFragment extends Fragment
 
             switch (type)
             {
-                case TimeTableType.CLASS:
+                case Type.CLASS:
                     distinct = false;
                     tableName = TimeTableContract.ClassTable.TABLE_NAME;
                     columns = null;
                     orderBy = TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + " ASC";
                     break;
-                case TimeTableType.TEACHER:
+                case Type.TEACHER:
                     distinct = false;
                     tableName = TimeTableContract.TeacherTable.TABLE_NAME;
                     columns = null;
                     orderBy = TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME + " ASC";
                     break;
-                case TimeTableType.CLASSROOM:
+                case Type.CLASSROOM:
                     distinct = true;
                     tableName = TimeTableContract.LessonTable.TABLE_NAME;
                     columns = new String[] {TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM};
@@ -93,16 +93,16 @@ public class TimeTableListFragment extends Fragment
             {
                 switch (tableType)
                 {
-                    case TimeTableType.CLASS:
+                    case Type.CLASS:
                         selection = ClassTable.COLUMN_NAME_NAME_SHORT + " LIKE '%" + searchQuery + "%' OR " +
                                 ClassTable.COLUMN_NAME_NAME_LONG + " LIKE '%" + searchQuery + "%'";
                         break;
-                    case TimeTableType.TEACHER:
+                    case Type.TEACHER:
                         selection = TeacherTable.COLUMN_NAME_TEACHER_CODE + " LIKE '%" + searchQuery + "%' OR " +
                                 TeacherTable.COLUMN_NAME_TEACHER_NAME + " LIKE '%" + searchQuery + "%' OR " +
                                 TeacherTable.COLUMN_NAME_TEACHER_SURNAME + " LIKE '%" + searchQuery + "%'";
                         break;
-                    case TimeTableType.CLASSROOM:
+                    case Type.CLASSROOM:
                         selection = LessonTable.COLUMN_NAME_CLASSROOM + " LIKE '%" + searchQuery + "%'";
                         break;
                 }
@@ -126,20 +126,20 @@ public class TimeTableListFragment extends Fragment
 
             switch (tableType)
             {
-                case TimeTableType.CLASS:
+                case Type.CLASS:
                     String shortname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT));
                     String longname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG));
 
                     holder.name.setText (longname + " (" + shortname + ")");
                     break;
-                case TimeTableType.TEACHER:
+                case Type.TEACHER:
                     String name = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME));
                     String surname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
                     String code = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE));
 
                     holder.name.setText (name + " " + surname + " (" + code + ")");
                     break;
-                case TimeTableType.CLASSROOM:
+                case Type.CLASSROOM:
                     String classroomName = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM));
 
                     holder.name.setText (classroomName);
@@ -260,16 +260,16 @@ public class TimeTableListFragment extends Fragment
 
                 switch (tableType)
                 {
-                    case TimeTableType.CLASS:
+                    case Type.CLASS:
                         shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
                         longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
                         break;
-                    case TimeTableType.TEACHER:
+                    case Type.TEACHER:
                         shortName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE));
                         longName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) +
                                 " " + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
                         break;
-                    case TimeTableType.CLASSROOM:
+                    case Type.CLASSROOM:
                         shortName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
                         break;
                 }
