@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
@@ -53,6 +54,41 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
     private SQLiteDatabase db;
 
+    private class LoadItemFromDatabase extends AsyncTask<Integer, Void, String>
+    {
+        private Cursor cur;
+
+        private int resource;
+        private ViewGroup viewGroup;
+
+        private TextView textView;
+
+        private LoadItemFromDatabase (Cursor cur, int resource, ViewGroup viewGroup, TextView textView)
+        {
+            this.cur = cur;
+            this.resource = resource;
+            this.viewGroup = viewGroup;
+            this.textView = textView;
+        }
+
+        @Override
+        protected String doInBackground (Integer... params)
+        {
+            cur.moveToPosition (params[0]);
+
+            return cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
+                    cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")";
+        }
+
+        @Override
+        protected void onPostExecute (String s)
+        {
+            super.onPostExecute (s);
+
+            textView.setText (s);
+        }
+    }
+
     private class ClassSelectAdapter extends ArrayAdapter<String>
     {
         private SQLiteDatabase db;
@@ -94,11 +130,14 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         {
             TextView view = (TextView) LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
 
-            cur.moveToPosition (position);
+            /*cur.moveToPosition (position);
             String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
             String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
 
-            view.setText (longname + " (" + shortname + ")");
+            view.setText (longname + " (" + shortname + ")");*/
+            
+            new LoadItemFromDatabase (cur, resource, parent, view).execute (position);
+
             return view;
         }
 

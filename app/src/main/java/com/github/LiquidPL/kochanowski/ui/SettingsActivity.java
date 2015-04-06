@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -13,6 +15,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,18 +29,70 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
     Cursor cur;
-    CharSequence[] entries;
-    CharSequence[] values;
 
     ListPreference defaultClass;
     ListPreference defaultGroup;
     CheckBoxPreference notifyDevice;
     CheckBoxPreference notifyWearable;
     Preference removeTables;
+
+    private class LoadItemsFromDatabaseTask extends AsyncTask<Void, Void, Pair<CharSequence[], CharSequence[]>>
+    {
+        @Override
+        protected Pair<CharSequence[], CharSequence[]> doInBackground (Void... params)
+        {
+            SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
+            queryBuilder.setTables (ClassTable.TABLE_NAME);
+
+            String orderBy = ClassTable.COLUMN_NAME_NAME_SHORT + " ASC";
+
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+            Cursor cur = queryBuilder.query (db, null, null, null, null, null, orderBy);
+
+            int length = cur.getCount ();
+
+            CharSequence[] entries = new CharSequence[length];
+            CharSequence[] entryValues = new CharSequence[length];
+
+            cur.moveToFirst ();
+            for (int i = 0; i < length; i++)
+            {
+                CharSequence shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+                CharSequence longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+
+                entries[i] = longName + " (" + shortName + ")";
+                entryValues[i] = shortName;
+
+                cur.moveToNext ();
+            }
+
+            return Pair.create (entries, entryValues);
+        }
+
+        @Override
+        protected void onPostExecute (Pair<CharSequence[], CharSequence[]> listListPair)
+        {
+            super.onPostExecute (listListPair);
+
+            CharSequence[] entries = (listListPair.first);
+            CharSequence[] values = (listListPair.second);
+
+            defaultClass.setEntries (entries);
+            defaultClass.setEntryValues (values);
+
+            if (defaultClass.getEntry () != null)
+            {
+                defaultClass.setSummary (defaultClass.getEntry ());
+            }
+        }
+    }
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -50,29 +105,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (this);
         prefs.registerOnSharedPreferenceChangeListener (this);
-
-        SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
-        cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME +
-                " ORDER BY " + ClassTable.COLUMN_NAME_NAME_SHORT +
-                " ASC", null);
-
-        int length = cur.getCount ();
-
-        entries = new CharSequence[length];
-        values = new CharSequence[length];
-
-        for (int i = 0; i < length; i++)
-        {
-            cur.moveToPosition (i);
-
-            CharSequence shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-            CharSequence longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-
-            entries[i] = longname + " (" + shortname + ")";
-            values[i] = shortname;
-        }
-
-        DbUtils.getInstance ().closeDatabase ();
 
         defaultClass = (ListPreference) findPreference (getString (R.string.pref_table_name));
         defaultGroup = (ListPreference) findPreference (getString (R.string.pref_default_group));
@@ -114,13 +146,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     {
         super.onResume ();
 
-        defaultClass.setEntries (entries);
-        defaultClass.setEntryValues (values);
-
-        if (defaultClass.getEntry () != null)
-        {
-            defaultClass.setSummary (defaultClass.getEntry ());
-        }
+        new LoadItemsFromDatabaseTask ().execute ();
 
         if (defaultGroup.getEntry () != null)
         {
