@@ -158,9 +158,16 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         {
             cur.moveToPosition (position);
 
+            String startTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME));
+            String endTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME));
+
+            // the time strings are compliant with ISO 8601 standard,
+            // so they have leading zeroes if hour < 10. we remove them here
+            if (startTime.startsWith ("0")) startTime = startTime.substring (1);
+            if (endTime.startsWith ("0")) endTime = endTime.substring (1);
+
             holder.subjectName.setText (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
-            holder.hour.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME)) + "-" +
-                                 cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME)));
+            holder.hour.setText (startTime + "-" + endTime);
             if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
             {
                 holder.groupName.setText (getResources ().getString(R.string.lesson_list_group) +

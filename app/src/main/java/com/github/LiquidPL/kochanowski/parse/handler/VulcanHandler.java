@@ -170,6 +170,12 @@ public class VulcanHandler
         if ("td".equals (currentName) && currentDay == -1) // storing the lessons begin and end hours
         {
             String[] values = new String (value.toCharArray (), 3, value.length () - 3).split ("-");
+
+            // time must comply with the ISO 8601 standard, so we add a leading zero
+            // to the time string if it's only 4 characters in length (eg. 8:55 goes into 08:55)
+            if (values[0].length () == 4) values[0] = '0' + values[0];
+            if (values[1].length () == 4) values[1] = '0' + values[1];
+
             startTimes.add (values[0]);
             endTimes.add (values[1]);
         }
