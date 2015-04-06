@@ -1,16 +1,15 @@
 package com.github.LiquidPL.kochanowski.ui.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,14 +59,15 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private Button syncButton;
     private TextView noTimeTablesAlert;
 
+    private SQLiteDatabase db;
+
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
+        SQLiteDatabase db;
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
 
         private Cursor cur;
         private Cursor oldCur;
-
-        private Context context;
 
         private String timetableName;
         private int tableType;
@@ -99,20 +99,18 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             }
         }
 
-        public LessonListAdapter (String timetableName, int tableType, int dayId, int groupId, Context context)
+        public LessonListAdapter (SQLiteDatabase db, String timetableName, int tableType, int dayId, int groupId)
         {
+            this.db = db;
             this.timetableName = timetableName;
             this.tableType = tableType;
             this.dayId = dayId;
             this.groupId = groupId;
-            this.context = context;
 
-            cur = formQuery ();
-
-            Log.i ("liquid", "" + cur.getCount ());
+            cur = formCursor ();
         }
 
-        private Cursor formQuery ()
+        private Cursor formCursor ()
         {
             queryBuilder.setTables (LessonTable.TABLE_NAME +
                                     " INNER JOIN " + SubjectTable.TABLE_NAME +
@@ -150,7 +148,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
             orderBy = "datetime (" + LessonTable.COLUMN_NAME_START_TIME + ") ASC";
 
-            return queryBuilder.query (DbUtils.getReadableDatabase (), null, selection, selectionArgs, null, null, orderBy);
+            return queryBuilder.query (db, null, selection, selectionArgs, null, null, orderBy);
         }
 
         @Override
@@ -218,7 +216,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             this.groupId = groupId;
 
             oldCur = cur;
-            cur = formQuery ();
+            cur = formCursor ();
 
             int mod = 0;
             oldCur.moveToFirst ();
@@ -293,6 +291,8 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
         }
+
+        db = DbUtils.getInstance ().openDatabase ();
     }
 
     @Override
@@ -316,11 +316,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         recyclerView.setItemAnimator (new DefaultItemAnimator ());
 
         adapter = new LessonListAdapter (
+                db,
                 timetableName,
                 tableType,
                 dayId,
-                groupId,
-                this.getActivity ());
+                groupId);
 
         recyclerView.setAdapter (adapter);
 
@@ -332,6 +332,14 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     {
         super.onAttach (activity);
         this.activity = activity;
+    }
+
+    @Override
+    public void onDestroy ()
+    {
+        super.onDestroy ();
+
+        DbUtils.getInstance ().closeDatabase ();
     }
 
     @Override
@@ -366,11 +374,11 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         resetSyncAlertVisibility ();
 
         adapter = new LessonListAdapter (
+                db,
                 timetableName,
                 tableType,
                 dayId,
-                groupId,
-                this.getActivity ());
+                groupId);
 
         recyclerView.setAdapter (adapter);
     }

@@ -99,7 +99,6 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     {
         db.execSQL (SQL_CREATE_TABLE_TEACHERS);
         db.execSQL (SQL_CREATE_TABLE_CLASSES);
-//        db.execSQL (SQL_CREATE_TABLE_HOURS);
         db.execSQL (SQL_CREATE_TABLE_LESSONS);
         db.execSQL (SQL_CREATE_TABLE_SUBJECTS);
     }
@@ -108,7 +107,6 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     {
         db.execSQL (SQL_DELETE_TABLE_TEACHERS);
         db.execSQL (SQL_DELETE_TABLE_CLASSES);
-//        db.execSQL (SQL_DELETE_TABLE_HOURS);
         db.execSQL (SQL_DELETE_TABLE_LESSONS);
         db.execSQL (SQL_DELETE_TABLE_SUBJECTS);
     }

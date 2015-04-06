@@ -32,8 +32,26 @@ import org.lucasr.twowayview.widget.ListLayoutManager;
  */
 public class TimeTableListFragment extends Fragment
 {
+    // the fragment initialization parameters
+    private static final String ARG_TYPE = "type";
+    private static final String ARG_QUERY = "query";
+
+    private int tableType;
+    private String searchQuery;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
+    private ItemClickSupport clickSupport;
+
+    private OnTimeTableSelectedListener listener;
+
+    private SQLiteDatabase db;
+
     public class TimeTableListAdapter extends RecyclerView.Adapter<TimeTableListAdapter.ListViewHolder>
     {
+        private SQLiteDatabase db;
         private Cursor cur;
 
         private int tableType;
@@ -56,17 +74,16 @@ public class TimeTableListFragment extends Fragment
             }
         }
 
-        public TimeTableListAdapter (int tableType, String query)
+        public TimeTableListAdapter (SQLiteDatabase db, int tableType, String query)
         {
+            this.db = db;
             this.tableType = tableType;
 
-            cur = formQuery (tableType, query);
+            cur = formCursor (tableType, query);
         }
 
-        private Cursor formQuery (int type, String query)
+        private Cursor formCursor (int type, String query)
         {
-            SQLiteDatabase db = DbUtils.getReadableDatabase ();
-
             switch (type)
             {
                 case Type.CLASS:
@@ -108,7 +125,7 @@ public class TimeTableListFragment extends Fragment
                 }
             }
 
-            return  db.query (distinct, tableName, columns, selection, null, null, null, orderBy, null);
+            return db.query (distinct, tableName, columns, selection, null, null, null, orderBy, null);
         }
 
         @Override
@@ -164,21 +181,6 @@ public class TimeTableListFragment extends Fragment
         public void onTimeTableSelected (String shortName, String longName, int tableType);
     }
 
-    // the fragment initialization parameters
-    private static final String ARG_TYPE = "type";
-    private static final String ARG_QUERY = "query";
-
-    private int tableType;
-    private String searchQuery;
-
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
-
-    private ItemClickSupport clickSupport;
-
-    private OnTimeTableSelectedListener listener;
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -228,6 +230,8 @@ public class TimeTableListFragment extends Fragment
             tableType = getArguments ().getInt (ARG_TYPE);
             searchQuery = getArguments ().getString (ARG_QUERY);
         }
+
+        db = DbUtils.getInstance ().openDatabase ();
     }
 
     @Override
@@ -241,7 +245,7 @@ public class TimeTableListFragment extends Fragment
         layoutManager = new ListLayoutManager (this.getActivity (), TwoWayLayoutManager.Orientation.VERTICAL);
         recyclerView.setLayoutManager (layoutManager);
 
-        adapter = new TimeTableListAdapter (tableType, searchQuery);
+        adapter = new TimeTableListAdapter (db, tableType, searchQuery);
 
         recyclerView.setAdapter (adapter);
 
@@ -281,12 +285,20 @@ public class TimeTableListFragment extends Fragment
         return v;
     }
 
+    @Override
+    public void onDestroy ()
+    {
+        super.onDestroy ();
+
+        DbUtils.getInstance ().closeDatabase ();
+    }
+
     public void setFilter (int filter)
     {
         if (filter == tableType) return;
 
         tableType = filter;
-        adapter = new TimeTableListAdapter (tableType, searchQuery);
+        adapter = new TimeTableListAdapter (db, tableType, searchQuery);
         recyclerView.setAdapter (adapter);
     }
 

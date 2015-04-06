@@ -29,7 +29,6 @@ import com.github.LiquidPL.kochanowski.util.PrefUtils;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
-    SQLiteDatabase db;
     Cursor cur;
     CharSequence[] entries;
     CharSequence[] values;
@@ -45,17 +44,19 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     {
         super.onCreate (savedInstanceState);
 
-        DbUtils.initHelper (this);
+        DbUtils.initialize (this);
 
         addPreferencesFromResource (R.xml.preferences);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (this);
         prefs.registerOnSharedPreferenceChangeListener (this);
 
-        db = DbUtils.getReadableDatabase ();
+        SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
         cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME +
                 " ORDER BY " + ClassTable.COLUMN_NAME_NAME_SHORT +
                 " ASC", null);
+        DbUtils.getInstance ().closeDatabase ();
+
         int length = cur.getCount ();
 
         entries = new CharSequence[length];

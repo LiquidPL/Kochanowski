@@ -40,7 +40,6 @@ public class MasterlistDownloadRunnable implements Runnable
     public MasterlistDownloadRunnable (List<String> urls, Context context, Handler handler)
     {
         this.urls = urls;
-        db = DbUtils.getWritableDatabase ();
         this.context = (SyncActivity) context;
         this.handler = handler;
     }
@@ -88,9 +87,14 @@ public class MasterlistDownloadRunnable implements Runnable
             SAXParserFactory factory = SAXParserFactory.newInstance ();
             SAXParser parser = factory.newSAXParser ();
 
-            DefaultHandler handler = new MasterlistHandler (urls, header_url[0]);
+            // opening the database for the handler to write in
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+
+            DefaultHandler handler = new MasterlistHandler (urls, header_url[0], db);
             parser.parse (istr, handler);
 
+            // closing the database as we're done with parsing
+            DbUtils.getInstance ().closeDatabase ();
         }
         catch (java.io.IOException e)
         {

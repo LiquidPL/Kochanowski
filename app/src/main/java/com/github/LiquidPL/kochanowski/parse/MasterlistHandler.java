@@ -23,11 +23,11 @@ public class MasterlistHandler extends DefaultHandler
     private String currentName = "";
     private String currentAttribute = "";
 
-    public MasterlistHandler (List<String> urls, String school_url)
+    public MasterlistHandler (List<String> urls, String school_url, SQLiteDatabase db)
     {
         this.urls = urls;
         this.school_url = school_url;
-        db = DbUtils.getWritableDatabase ();
+        this.db = db;
     }
 
     @Override

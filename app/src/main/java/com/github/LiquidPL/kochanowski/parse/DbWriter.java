@@ -4,6 +4,7 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.*;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 
 import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.TreeMap;
@@ -29,7 +30,9 @@ public class DbWriter
         values.put (LessonTable.COLUMN_NAME_CLASSROOM, classroom);
         values.put (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT, className);
 
-        DbUtils.getWritableDatabase ().insert (LessonTable.TABLE_NAME, null, values);
+        SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+        db.insert (LessonTable.TABLE_NAME, null, values);
+        DbUtils.getInstance ().closeDatabase ();
     }
 
     public static void insertClass (String shortName, String longName)
@@ -39,7 +42,9 @@ public class DbWriter
         values.put (ClassTable.COLUMN_NAME_NAME_SHORT, shortName);
         values.put (ClassTable.COLUMN_NAME_NAME_LONG, longName);
 
-        DbUtils.getWritableDatabase ().insert (ClassTable.TABLE_NAME, null, values);
+        SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+        db.insert (ClassTable.TABLE_NAME, null, values);
+        DbUtils.getInstance ().closeDatabase ();
     }
 
     public static void insertTeacher (String teacherCode, String name, String surname)
@@ -50,7 +55,9 @@ public class DbWriter
         values.put (TeacherTable.COLUMN_NAME_TEACHER_NAME, name);
         values.put (TeacherTable.COLUMN_NAME_TEACHER_SURNAME, surname);
 
-        DbUtils.getWritableDatabase ().insert (TeacherTable.TABLE_NAME, null, values);
+        SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+        db.insert (TeacherTable.TABLE_NAME, null, values);
+        DbUtils.getInstance ().closeDatabase ();
     }
 
     private static int getSubjectId (String subjectName)
@@ -72,7 +79,9 @@ public class DbWriter
             values.put (SubjectTable._ID, subjects.size ());
             values.put (SubjectTable.COLUMN_NAME_SUBJECT_NAME, subjectName);
 
-            DbUtils.getWritableDatabase ().insert (SubjectTable.TABLE_NAME, null, values);
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+            db.insert (SubjectTable.TABLE_NAME, null, values);
+            DbUtils.getInstance ().closeDatabase ();
         }
 
         return subjectId;

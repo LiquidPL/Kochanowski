@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -40,8 +41,6 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
     private List<String> urls;
 
-    private SQLiteDatabase db;
-
     public TextView currentDownload;
     public TextView currentCount;
     public ProgressBar progressBar;
@@ -50,15 +49,33 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     protected Button continueButton;
 
     protected Spinner classSelect;
+    private ClassSelectAdapter classSelectAdapter;
+
+    private SQLiteDatabase db;
 
     private class ClassSelectAdapter extends ArrayAdapter<String>
     {
+        private SQLiteDatabase db;
         private Cursor cur;
 
-        public ClassSelectAdapter (Context context, int resource)
+        public ClassSelectAdapter (Context context, SQLiteDatabase db, int resource)
         {
             super (context, resource);
-            cur = DbUtils.getReadableDatabase ().rawQuery ("SELECT * FROM classes ORDER BY longname ASC", null);
+
+            this.db = db;
+
+            cur = formCursor ();
+        }
+
+        private Cursor formCursor ()
+        {
+            SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
+
+            queryBuilder.setTables (ClassTable.TABLE_NAME);
+
+            String orderBy = ClassTable.COLUMN_NAME_NAME_LONG + " ASC";
+
+            return queryBuilder.query (db, null, null, null, null, null, orderBy);
         }
 
         @Override
@@ -90,6 +107,11 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         {
             return cur.getCount ();
         }
+
+        public Cursor getCursor ()
+        {
+            return cur;
+        }
     }
 
     @Override
@@ -97,6 +119,8 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_sync);
+
+        db = DbUtils.getInstance ().openDatabase ();
 
         currentDownload = (TextView) findViewById (R.id.current_download);
         currentCount = (TextView) findViewById (R.id.current_count);
@@ -106,8 +130,6 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         continueButton = (Button) findViewById (R.id.continue_button);
 
         classSelect = (Spinner) findViewById (R.id.class_select);
-
-        db = DbUtils.getReadableDatabase ();
 
         if (!PrefUtils.hasSyncedTimeTables (this))
         {
@@ -142,7 +164,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
             continueButton.setVisibility (View.INVISIBLE);
             classSelect.setVisibility (View.INVISIBLE);
 
-            DbUtils.resetTables ();
+            DbUtils.getInstance ().resetTables ();
 
             Handler syncActivityHandler = new Handler ();
             Runnable runnable = new MasterlistDownloadRunnable (urls, this, syncActivityHandler);
@@ -201,9 +223,9 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
         classSelect.setVisibility (View.VISIBLE);
 
-        ClassSelectAdapter adapter = new ClassSelectAdapter (this, R.layout.sync_spinner_item);
+        classSelectAdapter = new ClassSelectAdapter (this, db, R.layout.sync_spinner_item);
 
-        classSelect.setAdapter (adapter);
+        classSelect.setAdapter (classSelectAdapter);
         classSelect.setOnItemSelectedListener (this);
 
         manager.resetManager ();
@@ -215,6 +237,14 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         super.onStop ();
 
         if (!PrefUtils.hasSyncedTimeTables (this)) ThreadManager.cancelAll ();
+    }
+
+    @Override
+    protected void onDestroy ()
+    {
+        super.onDestroy ();
+
+        DbUtils.getInstance ().closeDatabase ();
     }
 
     @Override
@@ -267,7 +297,8 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     @Override
     public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
     {
-        Cursor cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME + " ORDER BY " + ClassTable.COLUMN_NAME_NAME_LONG + " ASC", null);
+        Cursor cur = classSelectAdapter.getCursor ();
+
         cur.moveToPosition (position);
         String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
 

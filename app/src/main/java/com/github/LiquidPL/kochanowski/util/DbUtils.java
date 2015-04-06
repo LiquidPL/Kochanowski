@@ -10,40 +10,62 @@ import com.github.LiquidPL.kochanowski.db.TimeTableDbHelper;
  */
 public class DbUtils
 {
+    private static DbUtils instance;
     private static TimeTableDbHelper helper;
+    private SQLiteDatabase database;
 
-    private static SQLiteDatabase readableDb;
-    private static SQLiteDatabase writableDb;
+    private int openCounter = 0;
 
     private DbUtils ()
     {
 
     }
 
-    public static void initHelper (Context context)
+    public static synchronized void initialize (Context context)
     {
         if (helper == null)
         {
+            instance = new DbUtils ();
             helper = new TimeTableDbHelper (context);
-
-            readableDb = helper.getReadableDatabase ();
-            writableDb = helper.getWritableDatabase ();
         }
     }
 
-    public static SQLiteDatabase getWritableDatabase ()
+    public static synchronized DbUtils getInstance ()
     {
-        return writableDb;
+        if (instance == null)
+        {
+            throw new IllegalStateException (DbUtils.class.getSimpleName () +
+                                                     " is not initialized, call initialize () method first");
+        }
+        return instance;
     }
 
-    public static SQLiteDatabase getReadableDatabase ()
+    public synchronized SQLiteDatabase openDatabase ()
     {
-        return readableDb;
+        openCounter++;
+        if (openCounter == 1)
+        {
+            // opening new database
+            database = helper.getWritableDatabase ();
+        }
+        return database;
     }
 
-    public static void resetTables ()
+    public synchronized void closeDatabase ()
     {
-        helper.dropTables (writableDb);
-        helper.createTables (writableDb);
+        openCounter--;
+        if (openCounter == 0)
+        {
+            // closing the database
+            database.close ();
+        }
+    }
+
+    public void resetTables ()
+    {
+        SQLiteDatabase db = openDatabase ();
+        helper.dropTables (db);
+        helper.createTables (db);
+        closeDatabase ();
     }
 }

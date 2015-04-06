@@ -95,7 +95,7 @@ public class BaseActivity
 
         handler = new Handler ();
 
-        DbUtils.initHelper (getApplicationContext ());
+        DbUtils.initialize (getApplicationContext ());
     }
 
     @Override
