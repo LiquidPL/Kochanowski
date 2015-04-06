@@ -55,7 +55,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         cur = db.rawQuery ("SELECT * FROM " + ClassTable.TABLE_NAME +
                 " ORDER BY " + ClassTable.COLUMN_NAME_NAME_SHORT +
                 " ASC", null);
-        DbUtils.getInstance ().closeDatabase ();
 
         int length = cur.getCount ();
 
@@ -72,6 +71,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             entries[i] = longname + " (" + shortname + ")";
             values[i] = shortname;
         }
+
+        DbUtils.getInstance ().closeDatabase ();
 
         defaultClass = (ListPreference) findPreference (getString (R.string.pref_table_name));
         defaultGroup = (ListPreference) findPreference (getString (R.string.pref_default_group));
