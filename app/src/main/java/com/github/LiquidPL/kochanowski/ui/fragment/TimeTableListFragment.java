@@ -4,8 +4,10 @@ package com.github.LiquidPL.kochanowski.ui.fragment;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +50,55 @@ public class TimeTableListFragment extends Fragment
     private OnTimeTableSelectedListener listener;
 
     private SQLiteDatabase db;
+
+    private class LoadItemFromDatabaseTask extends AsyncTask<Integer, Void, String>
+    {
+        private Cursor cur;
+
+        private TimeTableListAdapter.ListViewHolder viewHolder;
+
+        private LoadItemFromDatabaseTask (Cursor cur,
+                                          TimeTableListAdapter.ListViewHolder viewHolder)
+        {
+            this.cur = cur;
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        protected String doInBackground (Integer... params)
+        {
+            // moving the cursor to the required position
+            cur.moveToPosition (params[0]);
+
+            String result = "";
+
+            switch (tableType)
+            {
+                case Type.CLASS:
+                    result = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
+                             cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")";
+                    break;
+                case Type.CLASSROOM:
+                    result = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
+                    break;
+                case Type.TEACHER:
+                    result = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                             cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) + " (" +
+                             cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")";
+                    break;
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute (String s)
+        {
+            super.onPostExecute (s);
+
+            viewHolder.name.setText (s);
+        }
+    }
 
     public class TimeTableListAdapter extends RecyclerView.Adapter<TimeTableListAdapter.ListViewHolder>
     {
@@ -139,29 +190,7 @@ public class TimeTableListFragment extends Fragment
         @Override
         public void onBindViewHolder (ListViewHolder holder, int position)
         {
-            cur.moveToPosition (position);
-
-            switch (tableType)
-            {
-                case Type.CLASS:
-                    String shortname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_SHORT));
-                    String longname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG));
-
-                    holder.name.setText (longname + " (" + shortname + ")");
-                    break;
-                case Type.TEACHER:
-                    String name = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME));
-                    String surname = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-                    String code = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE));
-
-                    holder.name.setText (name + " " + surname + " (" + code + ")");
-                    break;
-                case Type.CLASSROOM:
-                    String classroomName = cur.getString (cur.getColumnIndexOrThrow (TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM));
-
-                    holder.name.setText (classroomName);
-                    break;
-            }
+            new LoadItemFromDatabaseTask (cur, holder).execute (position);
         }
 
         @Override
@@ -242,7 +271,7 @@ public class TimeTableListFragment extends Fragment
         View v =  inflater.inflate (R.layout.fragment_time_table_list, container, false);
 
         recyclerView = (RecyclerView) v.findViewById (R.id.timetable_list);
-        layoutManager = new ListLayoutManager (this.getActivity (), TwoWayLayoutManager.Orientation.VERTICAL);
+        layoutManager = new LinearLayoutManager (getActivity ());
         recyclerView.setLayoutManager (layoutManager);
 
         adapter = new TimeTableListAdapter (db, tableType, searchQuery);

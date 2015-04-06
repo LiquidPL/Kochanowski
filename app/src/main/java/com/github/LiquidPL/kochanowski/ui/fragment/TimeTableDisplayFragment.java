@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,9 @@ import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,8 +55,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private int dayId;
     private int groupId;
 
-    private Activity activity;
-
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -60,6 +63,108 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private TextView noTimeTablesAlert;
 
     private SQLiteDatabase db;
+
+
+    /**
+     * An AsyncTask loading a single lesson item from the database
+     * and putting it into the {@link LessonListAdapter.LessonViewHolder}.
+     *
+     * It is called by the {@link LessonListAdapter#onCreateViewHolder}
+     * when a view needs to be filled with data from the database.
+     */
+    private class LoadItemFromDatabaseTask extends AsyncTask<Integer, Void, List<String>>
+    {
+        private Cursor cur;
+
+        private LessonListAdapter.LessonViewHolder viewHolder;
+
+        private LoadItemFromDatabaseTask (Cursor cur,
+                                          LessonListAdapter.LessonViewHolder viewHolder)
+        {
+            this.cur = cur;
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        protected List<String> doInBackground (Integer... params)
+        {
+            List<String> data = new ArrayList<> ();
+
+            // moving the cursor to the required position
+            cur.moveToPosition (params[0]);
+
+            // getting the subject name
+            data.add (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
+
+            // getting the lesson start and end time
+            int hourId = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_HOUR_ID));
+            String startTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME));
+            String endTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME));
+
+            // the time strings are compliant with ISO 8601 standard,
+            // so they have leading zeroes if hour < 10. we remove them here
+            if (startTime.startsWith ("0")) startTime = startTime.substring (1);
+            if (endTime.startsWith ("0")) endTime = endTime.substring (1);
+
+            data.add (hourId + ". " + startTime + "-" + endTime);
+
+            switch (tableType)
+            {
+                case Type.CLASS:
+                    // getting the teacher name, surname, and id
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                              cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) +
+                              " (" + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")");
+                    // getting the classroom name
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
+                    break;
+                case Type.CLASSROOM:
+                    // getting the teacher name, surname, and id
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                                      cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) +
+                                      " (" + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")");
+                    // getting the class name
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
+                              cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")");
+                    break;
+                case Type.TEACHER:
+                    // getting the class name
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
+                                      cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")");
+                    // getting the classroom name
+                    data.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
+                    break;
+            }
+
+            // adding the string containing the group name, if required
+            if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
+            {
+                data.add (getString (R.string.lesson_list_group) +
+                          cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)));
+            }
+
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute (List<String> strings)
+        {
+            super.onPostExecute (strings);
+
+            viewHolder.subjectName.setText (strings.get (0));
+            viewHolder.hour.setText (strings.get (1));
+            viewHolder.teacherName.setText (strings.get (2));
+            viewHolder.classroomName.setText (strings.get (3));
+            if (strings.size () == 5)
+            {
+                viewHolder.groupName.setText (strings.get (4));
+            }
+            else
+            {
+                viewHolder.groupName.setText ("");
+            }
+        }
+    }
 
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
@@ -154,46 +259,10 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         @Override
         public void onBindViewHolder (LessonViewHolder holder, int position)
         {
-            cur.moveToPosition (position);
-
-            int hourId = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_HOUR_ID));
-            String startTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME));
-            String endTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME));
-
-            // the time strings are compliant with ISO 8601 standard,
-            // so they have leading zeroes if hour < 10. we remove them here
-            if (startTime.startsWith ("0")) startTime = startTime.substring (1);
-            if (endTime.startsWith ("0")) endTime = endTime.substring (1);
-
-            holder.subjectName.setText (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
-            holder.hour.setText (hourId + ". " + startTime + "-" + endTime);
-            if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
-            {
-                holder.groupName.setText (getResources ().getString(R.string.lesson_list_group) +
-                                          cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)));
-            }
-            else
-            {
-                holder.groupName.setText ("");
-            }
-
-            switch (tableType)
-            {
-                case Type.CLASS:
-                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
-                                                cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
-                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
-                    break;
-                case Type.TEACHER:
-                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)));
-                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
-                    break;
-                case Type.CLASSROOM:
-                    holder.teacherName.setText (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
-                                                cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)));
-                    holder.classroomName.setText (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)));
-                    break;
-            }
+            // simply calling the LoadItemFromDatabaseTask which handles
+            // reading lesson data from the database and inserting it
+            // into a viewholder
+            new LoadItemFromDatabaseTask (cur, holder).execute (position);
         }
 
         @Override
@@ -311,7 +380,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
 
         resetSyncAlertVisibility ();
 
-        layoutManager = new LinearLayoutManager (activity);
+        layoutManager = new LinearLayoutManager (getActivity ());
         recyclerView.setLayoutManager (layoutManager);
         recyclerView.setItemAnimator (new DefaultItemAnimator ());
 
@@ -331,7 +400,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     public void onAttach (Activity activity)
     {
         super.onAttach (activity);
-        this.activity = activity;
     }
 
     @Override
