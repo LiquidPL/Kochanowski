@@ -16,6 +16,7 @@
 
 package com.github.LiquidPL.kochanowski.ui.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
@@ -32,6 +33,8 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -76,7 +79,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private ColorStateList mColorList = null;
 
     private ViewPager mViewPager;
-    private SparseArray<String> mContentDescriptions = new SparseArray<String>();
+    private SparseArray<String> mContentDescriptions = new SparseArray<>();
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
@@ -173,6 +176,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * Create a default view to be used for tabs. This is called if a custom tab view is not set via
      * {@link #setCustomTabView(int, int)}.
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     protected TextView createDefaultTabView(Context context) {
         TextView textView = new TextView(context);
         textView.setGravity(Gravity.CENTER);
@@ -236,7 +240,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
             else
             {
-                tabTitleView.setText (adapter.getPageTitle (i).toString ().toUpperCase ());
+                tabTitleView.setText (adapter.getPageTitle (i).toString ().toUpperCase (Locale.getDefault()));
             }
 
             tabView.setOnClickListener(tabClickListener);

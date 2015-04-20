@@ -1,5 +1,6 @@
 package com.github.LiquidPL.kochanowski.ui;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -94,6 +95,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {

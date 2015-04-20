@@ -49,7 +49,6 @@
     <string name="navdrawer_browse_timetables">Timetables</string>
     <string name="menu_filter">Filter…</string>
     <string name="title_activity_search">Search</string>
-    <string name="hello_world">Hello world!</string>
     <string name="searchable_hint">timetables</string>
     <string name="pref_should_notify" translatable="false">pref_should_notify</string>
     <string name="pref_should_notify_title">Notify about ongoing lessons</string>

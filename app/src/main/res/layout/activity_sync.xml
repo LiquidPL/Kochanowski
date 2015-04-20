@@ -18,6 +18,7 @@
             android:id="@+id/current_download"
             android:layout_below="@id/toolbar"
             android:layout_toStartOf="@+id/current_count"
+            android:layout_toLeftOf="@+id/current_count"
             android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
