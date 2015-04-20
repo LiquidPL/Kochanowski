@@ -1,0 +1,14 @@
+language: android
+android:
+  components:
+    - platform-tools
+    - tools
+
+    # build tools
+    - build-tools-21.1.2
+
+    # android sdk 21 (lollipop)
+    - android-21
+
+    # support libraries
+    - extra-android-support
