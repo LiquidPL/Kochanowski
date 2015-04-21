@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.github.LiquidPL.kochanowski.db.TimeTableDbHelper;
 
-/**
- * Created by liquid on 21.12.14.
- */
 public class DbUtils
 {
     private static DbUtils instance;

@@ -9,11 +9,11 @@
     <string name="downloading_metadata">Pobieranie listy planów lekcji…</string>
     <string name="button_sync">Synchronizuj teraz</string>
     <string name="tables_not_found">Nie znaleziono żadnych planów</string>
-    <string name="day_name_0">Poniedziałek</string>
-    <string name="day_name_1">Wtorek</string>
-    <string name="day_name_2">Środa</string>
-    <string name="day_name_3">Czwartek</string>
-    <string name="day_name_4">Piątek</string>
+    <string name="day_name_monday">Poniedziałek</string>
+    <string name="day_name_tuesday">Wtorek</string>
+    <string name="day_name_wednesday">Środa</string>
+    <string name="day_name_thursday">Czwartek</string>
+    <string name="day_name_friday">Piątek</string>
     <string name="day_name_today">Dzisiaj</string>
     <string name="classes">Klasy</string>
     <string name="teachers">Nauczyciele</string>
@@ -49,4 +49,5 @@
     <string name="dbreset_dialog_message">Musisz pobrać ponownie plany lekcji.\nCzy chcesz kontynuować?</string>
     <string name="dbreset_dialog_title">Wymagane ponowne pobranie planów lekcji</string>
     <string name="lesson_list_group">GRUPA\u00A0;</string>
+    <string name="date_format_month_worded">dd MMMM</string>
 </resources>

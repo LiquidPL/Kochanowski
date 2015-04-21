@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-/**
- * Created by liquid on 29.12.14.
- */
 public class PrefUtils
 {
     private final static String TAG = "PrefUtils";
@@ -24,7 +21,7 @@ public class PrefUtils
     /**
      * String preference that holds a name of users preferred timetable.
      */
-    public static final String PREF_TABLE_NAME = "pref_table_name";
+    public static final String PREF_DEFAULT_TABLE_NAME = "pref_table_name";
 
     /**
      * Integer preference that holds the user preferred group (1,2 or both, values 0/1/2)
@@ -74,18 +71,18 @@ public class PrefUtils
         prefs.edit ().putBoolean (PREF_DATABASE_UPGRADED, upgraded).apply ();
     }
 
-    public static String getTableName (final Context context)
+    public static String getDefaultTableName (final Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        return prefs.getString (PREF_TABLE_NAME, "");
+        return prefs.getString (PREF_DEFAULT_TABLE_NAME, "");
     }
 
     public static void setTableName (final Context context, String tableName)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences (context);
 
-        prefs.edit ().putString (PREF_TABLE_NAME, tableName).apply ();
+        prefs.edit ().putString (PREF_DEFAULT_TABLE_NAME, tableName).apply ();
     }
 
     public static int getDefaultGroup (final Context context)

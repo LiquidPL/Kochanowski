@@ -5,13 +5,9 @@ import com.github.LiquidPL.kochanowski.util.DbUtils;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.TreeMap;
 
-/**
- * Created by liquid on 23.02.15.
- */
 public class DbWriter
 {
     private static TreeMap <String, Integer> subjects;
@@ -20,14 +16,14 @@ public class DbWriter
     {
         ContentValues values = new ContentValues ();
 
-        values.put (LessonTable.COLUMN_NAME_DAY, day);
+        values.put (LessonTable.COLUMN_NAME_DAY_ID, day);
         values.put (LessonTable.COLUMN_NAME_START_TIME, startTime);
         values.put (LessonTable.COLUMN_NAME_END_TIME, endTime);
         values.put (LessonTable.COLUMN_NAME_HOUR_ID, hourId);
         values.put (LessonTable.COLUMN_NAME_GROUP_ID, groupId);
         values.put (LessonTable.COLUMN_NAME_SUBJECT_ID, getSubjectId (subjectName));
-        values.put (LessonTable.COLUMN_NAME_TEACHER_CODE, teacherCode);
-        values.put (LessonTable.COLUMN_NAME_CLASSROOM, classroom);
+        values.put (LessonTable.COLUMN_NAME_TEACHER_ID, teacherCode);
+        values.put (LessonTable.COLUMN_NAME_CLASSROOM_NAME, classroom);
         values.put (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT, className);
 
         SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
@@ -51,7 +47,7 @@ public class DbWriter
     {
         ContentValues values = new ContentValues ();
 
-        values.put (TeacherTable.COLUMN_NAME_TEACHER_CODE, teacherCode);
+        values.put (TeacherTable.COLUMN_NAME_TEACHER_ID, teacherCode);
         values.put (TeacherTable.COLUMN_NAME_TEACHER_NAME, name);
         values.put (TeacherTable.COLUMN_NAME_TEACHER_SURNAME, surname);
 

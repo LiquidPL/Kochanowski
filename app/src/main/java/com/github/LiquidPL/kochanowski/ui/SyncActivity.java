@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
-import com.github.LiquidPL.kochanowski.parse.DbWriter;
 import com.github.LiquidPL.kochanowski.parse.MasterlistDownloadRunnable;
 import com.github.LiquidPL.kochanowski.parse.ThreadManager;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
@@ -42,6 +41,11 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
     private List<String> urls;
 
+    // names of all the classes stored in the database, loaded using an AsyncTask
+    private List<String> classNames = new ArrayList<> ();
+    // class ids corresponding to the classes stored in classNames
+    private List<String> classValues = new ArrayList<> ();
+
     public TextView currentDownload;
     public TextView currentCount;
     public ProgressBar progressBar;
@@ -52,66 +56,53 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     protected Spinner classSelect;
     private ClassSelectAdapter classSelectAdapter;
 
-    private SQLiteDatabase db;
-
-    private class LoadItemFromDatabase extends AsyncTask<Integer, Void, String>
+    private class LoadClassesToSpinnerTask
+            extends AsyncTask<Void, Void, Void>
     {
-        private Cursor cur;
-
-        private int resource;
-        private ViewGroup viewGroup;
-
-        private TextView textView;
-
-        private LoadItemFromDatabase (Cursor cur, int resource, ViewGroup viewGroup, TextView textView)
-        {
-            this.cur = cur;
-            this.resource = resource;
-            this.viewGroup = viewGroup;
-            this.textView = textView;
-        }
-
         @Override
-        protected String doInBackground (Integer... params)
-        {
-            cur.moveToPosition (params[0]);
-
-            return cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
-                    cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")";
-        }
-
-        @Override
-        protected void onPostExecute (String s)
-        {
-            super.onPostExecute (s);
-
-            textView.setText (s);
-        }
-    }
-
-    private class ClassSelectAdapter extends ArrayAdapter<String>
-    {
-        private SQLiteDatabase db;
-        private Cursor cur;
-
-        public ClassSelectAdapter (Context context, SQLiteDatabase db, int resource)
-        {
-            super (context, resource);
-
-            this.db = db;
-
-            cur = formCursor ();
-        }
-
-        private Cursor formCursor ()
+        protected Void doInBackground (Void... params)
         {
             SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
 
             queryBuilder.setTables (ClassTable.TABLE_NAME);
 
-            String orderBy = ClassTable.COLUMN_NAME_NAME_LONG + " ASC";
+            String orderBy = ClassTable.COLUMN_NAME_NAME_SHORT + " ASC";
 
-            return queryBuilder.query (db, null, null, null, null, null, orderBy);
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+            Cursor cur = queryBuilder.query (db, null, null, null, null, null, orderBy);
+
+            cur.moveToFirst ();
+            while (!cur.isAfterLast ())
+            {
+                String shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
+                String longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
+
+                classNames.add (longName + " (" + shortName + ")");
+                classValues.add (shortName);
+
+                cur.moveToNext ();
+            }
+
+            DbUtils.getInstance ().closeDatabase ();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute (Void aVoid)
+        {
+            super.onPostExecute (aVoid);
+
+            classSelectAdapter = new ClassSelectAdapter (getActivity (), R.layout.sync_spinner_item);
+            classSelect.setAdapter (classSelectAdapter);
+        }
+    }
+
+    private class ClassSelectAdapter extends ArrayAdapter<String>
+    {
+        public ClassSelectAdapter (Context context, int resource)
+        {
+            super (context, resource);
         }
 
         @Override
@@ -130,13 +121,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         {
             TextView view = (TextView) LayoutInflater.from (parent.getContext ()).inflate (resource, parent, false);
 
-            /*cur.moveToPosition (position);
-            String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-            String longname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-
-            view.setText (longname + " (" + shortname + ")");*/
-            
-            new LoadItemFromDatabase (cur, resource, parent, view).execute (position);
+            view.setText (classNames.get (position));
 
             return view;
         }
@@ -144,12 +129,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
         @Override
         public int getCount ()
         {
-            return cur.getCount ();
-        }
-
-        public Cursor getCursor ()
-        {
-            return cur;
+            return classNames.size ();
         }
     }
 
@@ -158,8 +138,6 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_sync);
-
-        db = DbUtils.getInstance ().openDatabase ();
 
         currentDownload = (TextView) findViewById (R.id.current_download);
         currentCount = (TextView) findViewById (R.id.current_count);
@@ -262,9 +240,9 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
 
         classSelect.setVisibility (View.VISIBLE);
 
-        classSelectAdapter = new ClassSelectAdapter (this, db, R.layout.sync_spinner_item);
+        // loading class selections to the spinner
+        new LoadClassesToSpinnerTask ().execute ();
 
-        classSelect.setAdapter (classSelectAdapter);
         classSelect.setOnItemSelectedListener (this);
 
         manager.resetManager ();
@@ -282,8 +260,6 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     protected void onDestroy ()
     {
         super.onDestroy ();
-
-        DbUtils.getInstance ().closeDatabase ();
     }
 
     @Override
@@ -336,12 +312,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
     @Override
     public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
     {
-        Cursor cur = classSelectAdapter.getCursor ();
-
-        cur.moveToPosition (position);
-        String shortname = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-
-        PrefUtils.setTableName (this, shortname);
+        PrefUtils.setTableName (this, classValues.get (position));
     }
 
     @Override

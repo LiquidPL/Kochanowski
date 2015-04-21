@@ -30,9 +30,6 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
@@ -44,7 +41,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     CheckBoxPreference notifyWearable;
     Preference removeTables;
 
-    private class LoadItemsFromDatabaseTask extends AsyncTask<Void, Void, Pair<CharSequence[], CharSequence[]>>
+    private class LoadClassesFromDatabaseTask
+            extends AsyncTask<Void, Void, Pair<CharSequence[], CharSequence[]>>
     {
         @Override
         protected Pair<CharSequence[], CharSequence[]> doInBackground (Void... params)
@@ -148,7 +146,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     {
         super.onResume ();
 
-        new LoadItemsFromDatabaseTask ().execute ();
+        new LoadClassesFromDatabaseTask ().execute ();
 
         if (defaultGroup.getEntry () != null)
         {

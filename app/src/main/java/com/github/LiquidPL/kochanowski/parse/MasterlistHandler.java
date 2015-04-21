@@ -1,11 +1,7 @@
 package com.github.LiquidPL.kochanowski.parse;
 
-import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
-import com.github.LiquidPL.kochanowski.util.DbUtils;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

@@ -30,8 +30,7 @@
             android:layout_alignBaseline="@+id/app_name"
             android:layout_toRightOf="@+id/app_name"
             android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:text="0.2"/>
+            android:paddingRight="4dp"/>
 
     </RelativeLayout>
 

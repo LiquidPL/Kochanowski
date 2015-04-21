@@ -14,9 +14,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by liquid on 24.02.15.
- */
 public class ThreadManager
     implements TimeTableDownloadRunnable.DownloadRunnableMethods
 {

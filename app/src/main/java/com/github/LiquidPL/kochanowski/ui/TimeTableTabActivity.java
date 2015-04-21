@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.fragment.TimeTableDisplayFragment;
 import com.github.LiquidPL.kochanowski.ui.widget.SlidingTabLayout;
 
@@ -21,12 +20,14 @@ import java.util.Locale;
 
 public class TimeTableTabActivity extends BaseActivity
 {
-    static final String ARG_TABLE_NAME_SHORT = "shortname";
-    static final String ARG_TABLE_NAME_LONG = "longname";
+    // timetable's display name
+    static final String ARG_TABLE_NAME = "name";
+    // timetable's name in database
+    static final String ARG_TABLE_VALUE = "value";
     static final String ARG_TABLE_TYPE = "type";
 
-    private String shortName;
-    private String longName;
+    private String name;
+    private String value;
     private int tableType;
 
     private SlidingTabLayout slidingTabLayout;
@@ -42,7 +43,7 @@ public class TimeTableTabActivity extends BaseActivity
         @Override
         public Fragment getItem (int position)
         {
-            return TimeTableDisplayFragment.newInstance(shortName, tableType, position, 0);
+            return TimeTableDisplayFragment.newInstance (value, tableType, position, 0);
         }
 
         @Override
@@ -69,8 +70,8 @@ public class TimeTableTabActivity extends BaseActivity
 
         Bundle extras = getIntent ().getExtras ();
 
-        shortName = extras.getString (ARG_TABLE_NAME_SHORT);
-        longName = extras.getString (ARG_TABLE_NAME_LONG);
+        name = extras.getString (ARG_TABLE_NAME);
+        value = extras.getString (ARG_TABLE_VALUE);
         tableType = extras.getInt (ARG_TABLE_TYPE);
 
         slidingTabLayout = (SlidingTabLayout) findViewById (R.id.sliding_tabs);
@@ -82,8 +83,7 @@ public class TimeTableTabActivity extends BaseActivity
 
         slidingTabLayout.setSelectedIndicatorColors (getResources ().getColor (R.color.accent));
 
-        getSupportActionBar ().setTitle (longName + " (" + shortName + ")");
-        if (tableType == Type.CLASSROOM) getSupportActionBar ().setTitle (shortName);
+        getSupportActionBar ().setTitle (name);
 
         getSupportActionBar ().setDisplayHomeAsUpEnabled (true);
     }
@@ -92,7 +92,7 @@ public class TimeTableTabActivity extends BaseActivity
     public boolean onCreateOptionsMenu (Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater ().inflate (R.menu.menu_time_table_tab, menu);
+        getMenuInflater ().inflate (R.menu.menu_timetable_tab, menu);
         return true;
     }
 

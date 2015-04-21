@@ -1,6 +1,5 @@
 package com.github.LiquidPL.kochanowski.ui.fragment;
 
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,149 +14,100 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.LiquidPL.kochanowski.R;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.ClassTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.LessonTable;
-import com.github.LiquidPL.kochanowski.db.TimeTableContract.TeacherTable;
+import com.github.LiquidPL.kochanowski.db.TimeTableContract.*;
 import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
 
-import org.lucasr.twowayview.ItemClickSupport;
-import org.lucasr.twowayview.TwoWayLayoutManager;
-import org.lucasr.twowayview.widget.ListLayoutManager;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link TimeTableListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TimeTableListFragment extends Fragment
+public class TimeTableListFragment
+        extends Fragment
 {
     // the fragment initialization parameters
-    private static final String ARG_TYPE = "type";
-    private static final String ARG_QUERY = "query";
+    private static final String ARG_TABLE_TYPE = "type";
+    private static final String ARG_SEARCH_QUERY = "query";
 
+    // the parameters initialized in newInstance ()
     private int tableType;
     private String searchQuery;
 
+    // list containing names apppearing in the recycler view
+    private List<String> names;
+    // values corresponding to the names in list above,
+    // passed to TimeTableDisplayFragment
+    private List<String> values;
+
+    // RecyclerView in which items are displayed
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+
+    // LayoutManager managing the RecyclerView above
     private RecyclerView.LayoutManager layoutManager;
 
-    private ItemClickSupport clickSupport;
-
+    // Listener to an activity which have created the fragment
+    // and is responsible for receving the clicks
     private OnTimeTableSelectedListener listener;
 
-    private SQLiteDatabase db;
+    // Adapter providing items to the RecyclerView
+    RecyclerView.Adapter adapter;
 
-    private class LoadItemFromDatabaseTask extends AsyncTask<Integer, Void, String>
+    public interface OnTimeTableSelectedListener
     {
-        private Cursor cur;
+        void onTimeTableSelected (String name, String value, int tableType);
+    }
 
-        private TimeTableListAdapter.ListViewHolder viewHolder;
+    private class LoadTablesIntoAdapterTask
+            extends AsyncTask<Integer, Void, Void>
+    {
+        String searchQuery;
 
-        private LoadItemFromDatabaseTask (Cursor cur,
-                                          TimeTableListAdapter.ListViewHolder viewHolder)
+        private LoadTablesIntoAdapterTask (String searchQuery)
         {
-            this.cur = cur;
-            this.viewHolder = viewHolder;
+            this.searchQuery = searchQuery;
         }
 
         @Override
-        protected String doInBackground (Integer... params)
+        protected Void doInBackground (Integer... params)
         {
-            // moving the cursor to the required position
-            cur.moveToPosition (params[0]);
+            int tableType = params[0];
 
-            String result = "";
+            boolean distinct = false;
+            String tableName = "";
+            String columns[] = new String[] {};
+            String selection = "";
+            String orderBy = "";
 
+            // setting up the database query
             switch (tableType)
             {
                 case Type.CLASS:
-                    result = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
-                             cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")";
-                    break;
-                case Type.CLASSROOM:
-                    result = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
-                    break;
-                case Type.TEACHER:
-                    result = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
-                             cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) + " (" +
-                             cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")";
-                    break;
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute (String s)
-        {
-            super.onPostExecute (s);
-
-            viewHolder.name.setText (s);
-        }
-    }
-
-    public class TimeTableListAdapter extends RecyclerView.Adapter<TimeTableListAdapter.ListViewHolder>
-    {
-        private SQLiteDatabase db;
-        private Cursor cur;
-
-        private int tableType;
-
-        boolean distinct;
-        String tableName;
-        String[] columns;
-        String selection;
-        String orderBy;
-
-        public class ListViewHolder extends RecyclerView.ViewHolder
-        {
-            TextView name;
-
-            public ListViewHolder (View v)
-            {
-                super (v);
-
-                name = (TextView) v.findViewById (R.id.timetable_name);
-            }
-        }
-
-        public TimeTableListAdapter (SQLiteDatabase db, int tableType, String query)
-        {
-            this.db = db;
-            this.tableType = tableType;
-
-            cur = formCursor (tableType, query);
-        }
-
-        private Cursor formCursor (int type, String query)
-        {
-            switch (type)
-            {
-                case Type.CLASS:
                     distinct = false;
-                    tableName = TimeTableContract.ClassTable.TABLE_NAME;
+                    tableName = ClassTable.TABLE_NAME;
                     columns = null;
-                    orderBy = TimeTableContract.ClassTable.COLUMN_NAME_NAME_LONG + " ASC";
+                    orderBy = ClassTable.COLUMN_NAME_NAME_SHORT + " ASC";
                     break;
                 case Type.TEACHER:
                     distinct = false;
-                    tableName = TimeTableContract.TeacherTable.TABLE_NAME;
+                    tableName = TeacherTable.TABLE_NAME;
                     columns = null;
-                    orderBy = TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME + " ASC";
+                    orderBy = TeacherTable.COLUMN_NAME_TEACHER_SURNAME + " ASC";
                     break;
                 case Type.CLASSROOM:
                     distinct = true;
-                    tableName = TimeTableContract.LessonTable.TABLE_NAME;
-                    columns = new String[] {TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM};
-                    orderBy = TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM + " ASC";
+                    tableName = LessonTable.TABLE_NAME;
+                    columns = new String[] {LessonTable.COLUMN_NAME_CLASSROOM_NAME};
+                    orderBy = LessonTable.COLUMN_NAME_CLASSROOM_NAME + " ASC";
                     break;
             }
 
-            if (query != null)
+            if (searchQuery != null)
             {
                 switch (tableType)
                 {
@@ -166,17 +116,103 @@ public class TimeTableListFragment extends Fragment
                                 ClassTable.COLUMN_NAME_NAME_LONG + " LIKE '%" + searchQuery + "%'";
                         break;
                     case Type.TEACHER:
-                        selection = TeacherTable.COLUMN_NAME_TEACHER_CODE + " LIKE '%" + searchQuery + "%' OR " +
+                        selection = TeacherTable.COLUMN_NAME_TEACHER_ID + " LIKE '%" + searchQuery + "%' OR " +
                                 TeacherTable.COLUMN_NAME_TEACHER_NAME + " LIKE '%" + searchQuery + "%' OR " +
                                 TeacherTable.COLUMN_NAME_TEACHER_SURNAME + " LIKE '%" + searchQuery + "%'";
                         break;
                     case Type.CLASSROOM:
-                        selection = LessonTable.COLUMN_NAME_CLASSROOM + " LIKE '%" + searchQuery + "%'";
+                        selection = LessonTable.COLUMN_NAME_CLASSROOM_NAME + " LIKE '%" + searchQuery + "%'";
                         break;
                 }
             }
 
-            return db.query (distinct, tableName, columns, selection, null, null, null, orderBy, null);
+            // getting the database instance
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+
+            // performing the query
+            Cursor cur = db.query (distinct, tableName, columns, selection, null, null, null, orderBy, null);
+
+            // cleaning up the lists in case that we need to redo the query
+            names = new ArrayList<> ();
+            values = new ArrayList<> ();
+
+            // reading the database
+            cur.moveToFirst ();
+
+            while (!cur.isAfterLast ())
+            {
+                switch (tableType)
+                {
+                    case Type.CLASS:
+                        names.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
+                                           cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")");
+
+                        values.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)));
+                        break;
+                    case Type.TEACHER:
+                        names.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
+                                           cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) + " (" +
+                                           cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_ID)) + ")");
+
+                        values.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_ID)));
+                        break;
+                    case Type.CLASSROOM:
+                        names.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM_NAME)));
+
+                        values.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM_NAME)));
+                        break;
+                }
+
+                cur.moveToNext ();
+            }
+
+            // closing the database
+            cur.close ();
+            DbUtils.getInstance ().closeDatabase ();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute (Void aVoid)
+        {
+            super.onPostExecute (aVoid);
+
+            adapter = new TimeTableListAdapter ();
+            recyclerView.setAdapter (adapter);
+        }
+    }
+
+    private class TimeTableListAdapter extends RecyclerView.Adapter<TimeTableListAdapter.ListViewHolder>
+    {
+        public class ListViewHolder
+                extends RecyclerView.ViewHolder
+                implements View.OnClickListener
+        {
+            // TextView widget containing the name of a timetable
+            public TextView name;
+
+            public ListViewHolder (View v)
+            {
+                super (v);
+
+                // setting an ItemClickListener for the view
+                v.setOnClickListener (this);
+
+                name = (TextView) v.findViewById (R.id.timetable_name);
+            }
+
+            @Override
+            public void onClick (View v)
+            {
+                // position of an item in a recycler view
+                int position = getPosition ();
+
+                listener.onTimeTableSelected (
+                        names.get (position),
+                        values.get (position),
+                        tableType);
+            }
         }
 
         @Override
@@ -190,42 +226,36 @@ public class TimeTableListFragment extends Fragment
         @Override
         public void onBindViewHolder (ListViewHolder holder, int position)
         {
-            new LoadItemFromDatabaseTask (cur, holder).execute (position);
+            holder.name.setText (names.get (position));
         }
 
         @Override
         public int getItemCount ()
         {
-            return cur.getCount ();
+            return names.size ();
         }
-
-        public Cursor getCursor ()
-        {
-            return cur;
-        }
-    }
-
-    public interface OnTimeTableSelectedListener
-    {
-        public void onTimeTableSelected (String shortName, String longName, int tableType);
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * This factory method creates a new TimeTableListFragment
+     * given the following parameters.
      *
-     * @param tableType
-     * @return A new instance of fragment TimeTableListFragment.
+     * @param tableType The timetable type (class, teacher, classroom)
+     * @param searchQuery String to be searched in the database query.
+     *                    If null, all items are shown.
+     * @return A new instance of TimeTableListFragment.
      */
-    public static TimeTableListFragment newInstance (int tableType, String query)
+    public static TimeTableListFragment newInstance (int tableType, String searchQuery)
     {
         TimeTableListFragment fragment = new TimeTableListFragment ();
+
         Bundle args = new Bundle ();
 
-        args.putInt (ARG_TYPE, tableType);
-        args.putString (ARG_QUERY, query);
+        args.putInt (ARG_TABLE_TYPE, tableType);
+        args.putString (ARG_SEARCH_QUERY, searchQuery);
 
         fragment.setArguments (args);
+
         return fragment;
     }
 
@@ -235,109 +265,61 @@ public class TimeTableListFragment extends Fragment
     }
 
     @Override
-    public void onAttach (Activity activity)
-    {
-        super.onAttach (activity);
-
-        try
-        {
-            listener = (OnTimeTableSelectedListener) activity;
-        }
-        catch (ClassCastException e)
-        {
-            throw new ClassCastException (activity.toString () + " must implement OnTimeTableSelectListener");
-        }
-    }
-
-    @Override
     public void onCreate (Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
-
         if (getArguments () != null)
         {
-            tableType = getArguments ().getInt (ARG_TYPE);
-            searchQuery = getArguments ().getString (ARG_QUERY);
+            tableType = getArguments ().getInt (ARG_TABLE_TYPE);
+            searchQuery = getArguments ().getString (ARG_SEARCH_QUERY);
         }
-
-        db = DbUtils.getInstance ().openDatabase ();
     }
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
-        View v =  inflater.inflate (R.layout.fragment_time_table_list, container, false);
+        // inflate layout for this fragment
+        View view = inflater.inflate (R.layout.fragment_time_table_list, container, false);
 
-        recyclerView = (RecyclerView) v.findViewById (R.id.timetable_list);
+        // get instance of RecyclerView and set it up
+        recyclerView = (RecyclerView) view.findViewById (R.id.timetable_list);
         layoutManager = new LinearLayoutManager (getActivity ());
         recyclerView.setLayoutManager (layoutManager);
 
-        adapter = new TimeTableListAdapter (db, tableType, searchQuery);
+        // loading items from database and attaching an adapter to the RecyclerView
+        new LoadTablesIntoAdapterTask (searchQuery).execute (tableType);
 
-        recyclerView.setAdapter (adapter);
-
-        clickSupport = ItemClickSupport.addTo (recyclerView);
-
-        clickSupport.setOnItemClickListener (new ItemClickSupport.OnItemClickListener ()
-        {
-            @Override
-            public void onItemClick (RecyclerView recyclerView, View view, int position, long id)
-            {
-                String shortName = "";
-                String longName = "";
-
-                Cursor cur = ((TimeTableListAdapter) adapter).getCursor ();
-                cur.moveToPosition (position);
-
-                switch (tableType)
-                {
-                    case Type.CLASS:
-                        shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
-                        longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
-                        break;
-                    case Type.TEACHER:
-                        shortName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE));
-                        longName = cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) +
-                                " " + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME));
-                        break;
-                    case Type.CLASSROOM:
-                        shortName = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM));
-                        break;
-                }
-
-                listener.onTimeTableSelected (shortName, longName, tableType);
-            }
-        });
-
-        return v;
+        return view;
     }
 
     @Override
-    public void onDestroy ()
+    public void onAttach (Activity activity)
     {
-        super.onDestroy ();
+        super.onAttach (activity);
 
-        DbUtils.getInstance ().closeDatabase ();
+        try
+        {
+            this.listener = ((OnTimeTableSelectedListener) activity);
+        }
+        catch (ClassCastException e)
+        {
+            throw new ClassCastException (activity.getClass ().getSimpleName () +
+                                          " must implement OnTimeTableSelectedListener");
+        }
     }
 
-    public void setFilter (int filter)
+    @Override
+    public void onDetach ()
     {
-        if (filter == tableType) return;
-
-        tableType = filter;
-        adapter = new TimeTableListAdapter (db, tableType, searchQuery);
-        recyclerView.setAdapter (adapter);
+        super.onDetach ();
     }
 
-    public void performSearch (String query)
+    public void setFilter (int tableType)
     {
+        this.tableType = tableType;
 
-    }
-
-    public int getTableType ()
-    {
-        return tableType;
+        // rereading data from database and reattaching the adapter
+        new LoadTablesIntoAdapterTask (searchQuery).execute (tableType);
     }
 }

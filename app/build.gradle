@@ -17,13 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions {
-        // set to true to turn off analysis progress reporting by lint
-        quiet true
-        // if true, stop the gradle build if errors are found
-        abortOnError true
-
-    }
 }
 
 repositories {
@@ -31,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compile files ('libs/htmlcleaner/htmlcleaner-2.10.jar')
+    compile files('libs/htmlcleaner/htmlcleaner-2.10.jar')
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.3'
 }

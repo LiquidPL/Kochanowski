@@ -1,5 +1,6 @@
 package com.github.LiquidPL.kochanowski.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,9 +24,7 @@ import com.github.LiquidPL.kochanowski.ui.widget.ScrimInsetsScrollView;
 
 import java.util.ArrayList;
 
-/**
- * Created by liquid on 29.12.14.
- */
+@SuppressLint ("Registered")
 public class BaseActivity
         extends ActionBarActivity
         implements TimeTableListFragment.OnTimeTableSelectedListener
@@ -399,6 +398,35 @@ public class BaseActivity
         return itemId == NAVDRAWER_ITEM_SETTINGS;
     }
 
+
+    /**
+     * This method handles clicks from TimeTableListFragment,
+     * and launches respective TimeTableTabActivities.
+     *
+     * It is implemented in BaseActivity
+     * because there are several Activities that use it.
+     * @param name
+     * @param value
+     * @param tableType
+     */
+    @Override
+    public void onTimeTableSelected (String name, String value, int tableType)
+    {
+        final Intent intent = new Intent (this, TimeTableTabActivity.class);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME, name);
+        intent.putExtra (TimeTableTabActivity.ARG_TABLE_VALUE, value);
+
+        handler.postDelayed (new Runnable ()
+        {
+            @Override
+            public void run ()
+            {
+                startActivity (intent);
+            }
+        }, ACTIVITY_LAUNCH_DELAY);
+    }
+
     @Override
     protected void onPostCreate (Bundle savedInstanceState)
     {
@@ -419,23 +447,5 @@ public class BaseActivity
             }
         }
         return toolbar;
-    }
-
-    @Override
-    public void onTimeTableSelected (String shortName, String longName, int tableType)
-    {
-        final Intent intent = new Intent (this, TimeTableTabActivity.class);
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_TYPE, tableType);
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_SHORT, shortName);
-        intent.putExtra (TimeTableTabActivity.ARG_TABLE_NAME_LONG, longName);
-
-        handler.postDelayed (new Runnable ()
-        {
-            @Override
-            public void run ()
-            {
-                startActivity (intent);
-            }
-        }, ACTIVITY_LAUNCH_DELAY);
     }
 }

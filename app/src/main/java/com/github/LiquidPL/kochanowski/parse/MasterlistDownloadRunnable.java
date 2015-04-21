@@ -25,9 +25,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-/**
- * Created by liquid on 06.12.14.
- */
 public class MasterlistDownloadRunnable implements Runnable
 {
     private List <String> urls;
@@ -96,15 +93,7 @@ public class MasterlistDownloadRunnable implements Runnable
             // closing the database as we're done with parsing
             DbUtils.getInstance ().closeDatabase ();
         }
-        catch (java.io.IOException e)
-        {
-            e.printStackTrace ();
-        }
-        catch (ParserConfigurationException e)
-        {
-            e.printStackTrace ();
-        }
-        catch (SAXException e)
+        catch (java.io.IOException | SAXException | ParserConfigurationException e)
         {
             e.printStackTrace ();
         }

@@ -213,7 +213,6 @@ public class VulcanHandler
     {
         if (name.length () != 0 && code.length () != 0 && room.length () != 0) return false;
         else if (_class.length () != 0 && name.length () != 0 && room.length () != 0) return false;
-        else if (code.length () != 0 && _class.length () != 0 && name.length () != 0) return false;
-        else return true;
+        else return !(code.length () != 0 && _class.length () != 0 && name.length () != 0);
     }
 }

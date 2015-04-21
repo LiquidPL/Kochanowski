@@ -12,9 +12,7 @@ import com.github.LiquidPL.kochanowski.R;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 
-/**
- * Created by liquid on 26.01.15.
- */
+
 public class DbResetDialog extends DialogFragment
 {
     @NonNull

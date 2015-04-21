@@ -9,11 +9,11 @@
     <string name="downloading_metadata">Downloading timetable list…</string>
     <string name="button_sync">Synchronize now</string>
     <string name="tables_not_found">No timetables found</string>
-    <string name="day_name_0">Monday</string>
-    <string name="day_name_1">Tuesday</string>
-    <string name="day_name_2">Wednesday</string>
-    <string name="day_name_3">Thursday</string>
-    <string name="day_name_4">Friday</string>
+    <string name="day_name_monday">Monday</string>
+    <string name="day_name_tuesday">Tuesday</string>
+    <string name="day_name_wednesday">Wednesday</string>
+    <string name="day_name_thursday">Thursday</string>
+    <string name="day_name_friday">Friday</string>
     <string name="day_name_today">Today</string>
     <string name="classes">Classes</string>
     <string name="teachers">Teachers</string>
@@ -49,4 +49,5 @@
     <string name="dbreset_dialog_message">You need to redownload your timetables.\nDo you want to continue?</string>
     <string name="dbreset_dialog_title">Timetable redownload required</string>
     <string name="lesson_list_group">GROUP\u00A0</string>
+    <string name="date_format_month_worded">MMMM dd</string>
 </resources>

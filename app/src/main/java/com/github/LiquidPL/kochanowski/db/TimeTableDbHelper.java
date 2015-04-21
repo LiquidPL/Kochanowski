@@ -15,7 +15,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     private static final String SQL_CREATE_TABLE_TEACHERS =
             "CREATE TABLE " + TimeTableContract.TeacherTable.TABLE_NAME + " (" +
                     TimeTableContract.TeacherTable._ID + INT_TYPE + COMMA_SEP +
-                    TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_CODE + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
+                    TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_ID + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_NAME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.TeacherTable.COLUMN_NAME_TEACHER_SURNAME + TEXT_TYPE + ");";
 
@@ -34,13 +34,13 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
     private static final String SQL_CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TimeTableContract.LessonTable.TABLE_NAME + " (" +
                     TimeTableContract.LessonTable._ID + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
-                    TimeTableContract.LessonTable.COLUMN_NAME_DAY + INT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_DAY_ID + INT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_HOUR_ID + INT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_START_TIME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_END_TIME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP +
-                    TimeTableContract.LessonTable.COLUMN_NAME_TEACHER_CODE + TEXT_TYPE + COMMA_SEP +
-                    TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_TEACHER_ID + TEXT_TYPE + COMMA_SEP +
+                    TimeTableContract.LessonTable.COLUMN_NAME_CLASSROOM_NAME + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + TEXT_TYPE + COMMA_SEP +
                     TimeTableContract.LessonTable.COLUMN_NAME_GROUP_ID + INT_TYPE + ");";
 
@@ -67,7 +67,7 @@ public class TimeTableDbHelper extends SQLiteOpenHelper
 
     private final Context context;
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "timetables.db";
 
     public TimeTableDbHelper (Context context)

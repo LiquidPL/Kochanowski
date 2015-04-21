@@ -21,9 +21,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-/**
- * Created by liquid on 24.02.15.
- */
 public class TimeTableDownloadRunnable
     implements Runnable
 {
@@ -89,17 +86,7 @@ public class TimeTableDownloadRunnable
                 DefaultHandler handler = new VulcanHandler (this, getTableType (url));
                 parser.parse (istr, handler);
             }
-            catch (IOException e)
-            {
-                manager.handleState (this, ThreadManager.TASK_FAILED);
-                e.printStackTrace ();
-            }
-            catch (ParserConfigurationException e)
-            {
-                manager.handleState (this, ThreadManager.TASK_FAILED);
-                e.printStackTrace ();
-            }
-            catch (SAXException e)
+            catch (IOException | SAXException | ParserConfigurationException e)
             {
                 manager.handleState (this, ThreadManager.TASK_FAILED);
                 e.printStackTrace ();
@@ -120,7 +107,7 @@ public class TimeTableDownloadRunnable
 
     private int getTableType (URL url)
     {
-        String path = url.getPath ();;
+        String path = url.getPath ();
 
         String[] values = path.split ("/");
         String filename = values[values.length - 1];

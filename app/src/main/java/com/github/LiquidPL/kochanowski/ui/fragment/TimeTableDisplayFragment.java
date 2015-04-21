@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import com.github.LiquidPL.kochanowski.db.TimeTableContract.*;
 import com.github.LiquidPL.kochanowski.parse.Type;
 import com.github.LiquidPL.kochanowski.ui.SyncActivity;
 import com.github.LiquidPL.kochanowski.util.DbUtils;
+import com.github.LiquidPL.kochanowski.util.Lesson;
 import com.github.LiquidPL.kochanowski.util.PrefUtils;
 
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private int dayId;
     private int groupId;
 
+    // the RecyclerView displaying the lessons
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -62,127 +63,113 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     private Button syncButton;
     private TextView noTimeTablesAlert;
 
-    private SQLiteDatabase db;
-
-
-    /**
-     * An AsyncTask loading a single lesson item from the database
-     * and putting it into the {@link LessonListAdapter.LessonViewHolder}.
-     *
-     * It is called by the {@link LessonListAdapter#onCreateViewHolder}
-     * when a view needs to be filled with data from the database.
-     */
-    private class LoadItemFromDatabaseTask extends AsyncTask<Integer, Void, List<String>>
+    private class LoadLessonsFromDatabaseTask extends AsyncTask<Void, Void, List<Lesson>>
     {
-        private Cursor cur;
+        private String tableName;
+        private int tableType;
+        private int dayId;
+        private int groupId;
 
-        private LessonListAdapter.LessonViewHolder viewHolder;
-
-        private LoadItemFromDatabaseTask (Cursor cur,
-                                          LessonListAdapter.LessonViewHolder viewHolder)
+        public LoadLessonsFromDatabaseTask (String tableName, int tableType, int dayId, int groupId)
         {
-            this.cur = cur;
-            this.viewHolder = viewHolder;
+            this.tableName = tableName;
+            this.tableType = tableType;
+            this.dayId = dayId;
+            this.groupId = groupId;
         }
 
-        @Override
-        protected List<String> doInBackground (Integer... params)
+        @Override protected List<Lesson> doInBackground (Void... params)
         {
-            List<String> data = new ArrayList<> ();
+            List<Lesson> lessons = new ArrayList<> ();
 
-            // moving the cursor to the required position
-            cur.moveToPosition (params[0]);
+            String selection;
+            String[] selectionArgs;
+            String orderBy;
 
-            // getting the subject name
-            data.add (cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)));
+            SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
 
-            // getting the lesson start and end time
-            int hourId = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_HOUR_ID));
-            String startTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME));
-            String endTime = cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME));
+            queryBuilder.setTables (LessonTable.TABLE_NAME +
+                                    " INNER JOIN " + SubjectTable.TABLE_NAME +
+                                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_SUBJECT_ID +
+                                    "=" + SubjectTable.TABLE_NAME + "." + SubjectTable._ID +
+                                    " INNER JOIN " + ClassTable.TABLE_NAME +
+                                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
+                                    "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
+                                    " INNER JOIN " + TeacherTable.TABLE_NAME +
+                                    " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_ID +
+                                    "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_ID);
 
-            // the time strings are compliant with ISO 8601 standard,
-            // so they have leading zeroes if hour < 10. we remove them here
-            if (startTime.startsWith ("0")) startTime = startTime.substring (1);
-            if (endTime.startsWith ("0")) endTime = endTime.substring (1);
+            selection = LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_DAY_ID + "=?";
+            selectionArgs = new String[] {Integer.toString (dayId), timetableName};
 
-            data.add (hourId + ". " + startTime + "-" + endTime);
+            if (groupId != 0)
+            {
+                selection += " AND (" + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=? OR " +
+                             LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=?)";
+                selectionArgs = new String[] {Integer.toString (dayId), Integer.toString (groupId), "0", timetableName};
+            }
 
             switch (tableType)
             {
                 case Type.CLASS:
-                    // getting the teacher name, surname, and id
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
-                              cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) +
-                              " (" + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")");
-                    // getting the classroom name
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
-                    break;
-                case Type.CLASSROOM:
-                    // getting the teacher name, surname, and id
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)) + " " +
-                                      cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)) +
-                                      " (" + cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_CODE)) + ")");
-                    // getting the class name
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
-                              cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")");
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "=?";
                     break;
                 case Type.TEACHER:
-                    // getting the class name
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)) + " (" +
-                                      cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT)) + ")");
-                    // getting the classroom name
-                    data.add (cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM)));
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_ID + "=?";
+                    break;
+                case Type.CLASSROOM:
+                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASSROOM_NAME + "=?";
                     break;
             }
 
-            // adding the string containing the group name, if required
-            if (cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)) != 0)
+            orderBy = "datetime (" + LessonTable.COLUMN_NAME_START_TIME + ") ASC";
+
+            SQLiteDatabase db = DbUtils.getInstance ().openDatabase ();
+
+            Cursor cur = queryBuilder.query (db, null, selection, selectionArgs, null, null, orderBy);
+
+            cur.moveToFirst ();
+            while (!cur.isAfterLast ())
             {
-                data.add (getString (R.string.lesson_list_group) +
-                          cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)));
+                lessons.add (new Lesson (
+                        cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_DAY_ID)),
+                        cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_HOUR_ID)),
+                        cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID)),
+                        cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_SUBJECT_ID)),
+                        cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_START_TIME)),
+                        cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_END_TIME)),
+                        cur.getString (cur.getColumnIndexOrThrow (SubjectTable.COLUMN_NAME_SUBJECT_NAME)),
+                        cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_TEACHER_ID)),
+                        cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_NAME)),
+                        cur.getString (cur.getColumnIndexOrThrow (TeacherTable.COLUMN_NAME_TEACHER_SURNAME)),
+                        cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASS_NAME_SHORT)),
+                        cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG)),
+                        cur.getString (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_CLASSROOM_NAME))
+                ));
+
+                cur.moveToNext ();
             }
 
-            return data;
-        }
+            cur.close ();
+            DbUtils.getInstance ().closeDatabase ();
 
-        @Override
-        protected void onPostExecute (List<String> strings)
-        {
-            super.onPostExecute (strings);
-
-            viewHolder.subjectName.setText (strings.get (0));
-            viewHolder.hour.setText (strings.get (1));
-            viewHolder.teacherName.setText (strings.get (2));
-            viewHolder.classroomName.setText (strings.get (3));
-            if (strings.size () == 5)
-            {
-                viewHolder.groupName.setText (strings.get (4));
-            }
-            else
-            {
-                viewHolder.groupName.setText ("");
-            }
+            return lessons;
         }
     }
 
     private class LessonListAdapter extends RecyclerView.Adapter<LessonListAdapter.LessonViewHolder>
     {
-        SQLiteDatabase db;
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder ();
+        // a list containing the lessons appearing on the RecyclerView
+        private List<Lesson> lessons;
 
-        private Cursor cur;
-        private Cursor oldCur;
+        // a list containing the previously displayed lessons (if any)
+        // for comparison when switching groups
+        private List<Lesson> oldLessons;
 
-        private String timetableName;
+        private String tableName;
         private int tableType;
         private int dayId;
         private int groupId;
-
-        private String selection;
-        private String[] selectionArgs;
-        private String orderBy;
-
 
         public class LessonViewHolder extends RecyclerView.ViewHolder
         {
@@ -204,65 +191,86 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             }
         }
 
-        public LessonListAdapter (SQLiteDatabase db, String timetableName, int tableType, int dayId, int groupId)
+        public LessonListAdapter (String tableName, int tableType, int dayId, int groupId)
         {
-            this.db = db;
-            this.timetableName = timetableName;
+            this.tableName = tableName;
             this.tableType = tableType;
             this.dayId = dayId;
             this.groupId = groupId;
 
-            cur = formCursor ();
-        }
-
-        private Cursor formCursor ()
-        {
-            queryBuilder.setTables (LessonTable.TABLE_NAME +
-                                    " INNER JOIN " + SubjectTable.TABLE_NAME +
-                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_SUBJECT_ID +
-                                        "=" + SubjectTable.TABLE_NAME + "." + SubjectTable._ID +
-                                    " INNER JOIN " + ClassTable.TABLE_NAME +
-                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT +
-                                        "=" + ClassTable.TABLE_NAME + "." + ClassTable.COLUMN_NAME_NAME_SHORT +
-                                    " INNER JOIN " + TeacherTable.TABLE_NAME +
-                                        " ON " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE +
-                                        "=" + TeacherTable.TABLE_NAME + "." + TeacherTable.COLUMN_NAME_TEACHER_CODE);
-
-            selection = LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_DAY + "=?";
-            selectionArgs = new String[] {Integer.toString (dayId), timetableName};
-
-            if (groupId != 0)
-            {
-                selection += " AND (" + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=? OR " +
-                                        LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_GROUP_ID + "=?)";
-                selectionArgs = new String[] {Integer.toString (dayId), Integer.toString (groupId), "0", timetableName};
-            }
-
-            switch (tableType)
-            {
-                case Type.CLASS:
-                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASS_NAME_SHORT + "=?";
-                    break;
-                case Type.TEACHER:
-                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_TEACHER_CODE + "=?";
-                    break;
-                case Type.CLASSROOM:
-                    selection += " AND " + LessonTable.TABLE_NAME + "." + LessonTable.COLUMN_NAME_CLASSROOM + "=?";
-                    break;
-            }
-
-            orderBy = "datetime (" + LessonTable.COLUMN_NAME_START_TIME + ") ASC";
-
-            return queryBuilder.query (db, null, selection, selectionArgs, null, null, orderBy);
+            lessons = new LoadLessonsFromDatabaseTask (tableName, tableType, dayId, groupId).doInBackground ();
         }
 
         @Override
         public void onBindViewHolder (LessonViewHolder holder, int position)
         {
-            // simply calling the LoadItemFromDatabaseTask which handles
-            // reading lesson data from the database and inserting it
-            // into a viewholder
-            new LoadItemFromDatabaseTask (cur, holder).execute (position);
+            // getting a lesson object
+            Lesson lesson = lessons.get (position);
+
+            // getting the subject name
+            String subjectName = lesson.getSubjectName ();
+            holder.subjectName.setText (subjectName);
+
+            // getting the lesson start and end time, and hour id
+            String startTime = lesson.getStartTime ();
+            String endTime = lesson.getEndTime ();
+            int hourId = lesson.getHourId ();
+
+            // the time strings are compliant with ISO 8601 standard,
+            // so they have leading zeroes if hour < 10. we remove them here
+            if (startTime.startsWith ("0")) startTime = startTime.substring (1);
+            if (endTime.startsWith ("0")) endTime = endTime.substring (1);
+
+            holder.hour.setText (hourId + ". " + startTime + "-" + endTime);
+
+            switch (tableType)
+            {
+                case Type.CLASS:
+                    // getting the teacher name, surname, and id
+                    String teacherName = lesson.getTeacherName ();
+                    String teacherSurname = lesson.getTeacherSurname ();
+                    String teacherId = lesson.getTeacherId ();
+                    holder.teacherName.setText (teacherName + " " + teacherSurname + " (" + teacherId + ")");
+
+                    // getting the classroom name
+                    String classroomName = lesson.getClassroomName ();
+                    holder.classroomName.setText (classroomName);
+                    break;
+                case Type.CLASSROOM:
+                    // getting the teacher name, surname, and id
+                    teacherName = lesson.getTeacherName ();
+                    teacherSurname = lesson.getTeacherSurname ();
+                    teacherId = lesson.getTeacherId ();
+                    holder.teacherName.setText (teacherName + " " + teacherSurname + " (" + teacherId + ")");
+
+                    // getting the class name
+                    String classNameShort = lesson.getClassNameShort ();
+                    holder.classroomName.setText (classNameShort);
+                    break;
+                case Type.TEACHER:
+                    // getting the class name
+                    classNameShort = lesson.getClassNameShort ();
+                    String classNameLong = lesson.getClassNameLong ();
+                    holder.teacherName.setText (classNameLong + " (" + classNameShort + ")");
+
+                    // getting the classroom name
+                    classroomName = lesson.getClassroomName ();
+                    holder.classroomName.setText (classroomName);
+                    break;
+            }
+
+            // adding the string containing the group name, if required
+            if (lesson.getGroupId () != 0)
+            {
+                holder.groupName.setText (getString (R.string.lesson_list_group) +
+                                          lesson.getGroupId ());
+            }
+            // if a lesson occurs on both groups, we clear the TextView,
+            // so it doesnt appear on the recycled views
+            else
+            {
+                holder.groupName.setText ("");
+            }
         }
 
         @Override
@@ -276,7 +284,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         @Override
         public int getItemCount ()
         {
-            return cur.getCount ();
+            return lessons.size ();
         }
 
         public void setGroup (int groupId)
@@ -284,33 +292,30 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             int previousGroup = this.groupId;
             this.groupId = groupId;
 
-            oldCur = cur;
-            cur = formCursor ();
+            // storing the previous list of lessons so we can compare them
+            oldLessons = lessons;
+
+            // getting a new list of lessons from the database
+            lessons = new LoadLessonsFromDatabaseTask (tableName, tableType, dayId, groupId).doInBackground ();
 
             int mod = 0;
-            oldCur.moveToFirst ();
-            if (groupId != 0) do
+            if (groupId != 0) for (int i = 0; i < oldLessons.size (); i++)
             {
-                int group = oldCur.getInt (oldCur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
+                int group = oldLessons.get (i).getGroupId ();
                 if (group != 0 && group != groupId)
                 {
-                    notifyItemRemoved (oldCur.getPosition () - mod++);
+                    notifyItemRemoved (i - mod++);
                 }
-                oldCur.moveToNext ();
             }
-            while (!oldCur.isAfterLast ());
 
-            cur.moveToFirst ();
-            if (previousGroup != 0) do
+            if (previousGroup != 0) for (int i = 0; i < lessons.size (); i++)
             {
-                int group = cur.getInt (cur.getColumnIndexOrThrow (LessonTable.COLUMN_NAME_GROUP_ID));
+                int group = lessons.get (i).getGroupId ();
                 if ((groupId == 0 && group != previousGroup && group != 0) || (groupId != 0 && group == groupId))
                 {
-                    notifyItemInserted (cur.getPosition ());
+                    notifyItemInserted (i);
                 }
-                cur.moveToNext ();
             }
-            while (!cur.isAfterLast ());
         }
     }
 
@@ -360,8 +365,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
             dayId = getArguments ().getInt (ARG_DAY_ID);
             groupId = getArguments ().getInt (ARG_GROUP_ID);
         }
-
-        db = DbUtils.getInstance ().openDatabase ();
     }
 
     @Override
@@ -385,7 +388,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         recyclerView.setItemAnimator (new DefaultItemAnimator ());
 
         adapter = new LessonListAdapter (
-                db,
                 timetableName,
                 tableType,
                 dayId,
@@ -406,8 +408,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
     public void onDestroy ()
     {
         super.onDestroy ();
-
-        DbUtils.getInstance ().closeDatabase ();
     }
 
     @Override
@@ -442,7 +442,6 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         resetSyncAlertVisibility ();
 
         adapter = new LessonListAdapter (
-                db,
                 timetableName,
                 tableType,
                 dayId,
@@ -471,12 +470,12 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
         }
     }
 
-    public void setTimetableName (String table)
+    public void setTableName (String table)
     {
         this.timetableName = table;
     }
 
-    public String getTimetableName ()
+    public String getTableName ()
     {
         return timetableName;
     }
