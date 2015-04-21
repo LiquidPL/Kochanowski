@@ -12,3 +12,4 @@ android:
 
     # support libraries
     - extra-android-support
+script: "./gradlew build"
