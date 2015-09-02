@@ -55,7 +55,7 @@ public class MasterlistHandler extends DefaultHandler
         if (currentAttribute.equals ("teacher"))
         {
             String[] teacher = value.split (" ");
-            teacher[teacher.length - 1] = new String (teacher[teacher.length - 1].toCharArray (), 1, teacher[teacher.length - 1].length () - 2);
+            /*teacher[teacher.length - 1] = new String (teacher[teacher.length - 1].toCharArray (), 1, teacher[teacher.length - 1].length () - 2);
 
             if (teacher.length == 4)
             {
@@ -63,7 +63,11 @@ public class MasterlistHandler extends DefaultHandler
                 teacher[1] = teacher[2];
             }
 
-            DbWriter.insertTeacher (teacher[teacher.length - 1], teacher[0], teacher[1]);
+            DbWriter.insertTeacher (teacher[teacher.length - 1], teacher[0], teacher[1]);*/
+
+            teacher[1] = teacher[1].substring (1, teacher[1].length () - 1);
+
+            DbWriter.insertTeacher (teacher[1], teacher[0], "");
 
             currentAttribute = "";
         }

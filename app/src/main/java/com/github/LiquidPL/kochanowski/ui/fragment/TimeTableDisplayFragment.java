@@ -230,7 +230,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     String teacherName = lesson.getTeacherName ();
                     String teacherSurname = lesson.getTeacherSurname ();
                     String teacherId = lesson.getTeacherId ();
-                    holder.teacherName.setText (teacherName + " " + teacherSurname + " (" + teacherId + ")");
+                    holder.teacherName.setText (teacherName + " (" + teacherId + ")");
 
                     // getting the classroom name
                     String classroomName = lesson.getClassroomName ();
@@ -241,7 +241,7 @@ public class TimeTableDisplayFragment extends Fragment implements View.OnClickLi
                     teacherName = lesson.getTeacherName ();
                     teacherSurname = lesson.getTeacherSurname ();
                     teacherId = lesson.getTeacherId ();
-                    holder.teacherName.setText (teacherName + " " + teacherSurname + " (" + teacherId + ")");
+                    holder.teacherName.setText (teacherName + " (" + teacherId + ")");
 
                     // getting the class name
                     String classNameShort = lesson.getClassNameShort ();

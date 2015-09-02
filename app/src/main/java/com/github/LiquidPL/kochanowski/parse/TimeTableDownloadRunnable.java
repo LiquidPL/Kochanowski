@@ -69,7 +69,7 @@ public class TimeTableDownloadRunnable
 
                 manager.handleState (this, ThreadManager.TASK_STARTED);
 
-                TagNode node = cleaner.clean (connection.getInputStream (), "iso-8859-2");
+                TagNode node = cleaner.clean (connection.getInputStream ());
 
                 ByteArrayOutputStream ostr = new ByteArrayOutputStream ();
                 new CompactHtmlSerializer (props).writeToStream (node, ostr, "utf-8");

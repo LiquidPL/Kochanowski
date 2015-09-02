@@ -77,7 +77,7 @@ public class SyncActivity extends BaseActivity implements AdapterView.OnItemSele
                 String shortName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_SHORT));
                 String longName = cur.getString (cur.getColumnIndexOrThrow (ClassTable.COLUMN_NAME_NAME_LONG));
 
-                classNames.add (longName + " (" + shortName + ")");
+                classNames.add (shortName);
                 classValues.add (shortName);
 
                 cur.moveToNext ();

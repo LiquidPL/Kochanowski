@@ -75,7 +75,7 @@ public class MasterlistDownloadRunnable implements Runnable
             URL url = new URL (masterlist_url);
             URLConnection conn = url.openConnection ();
 
-            TagNode node = cleaner.clean (conn.getInputStream (), "iso-8859-2");
+            TagNode node = cleaner.clean (conn.getInputStream ());
 
             ByteArrayOutputStream ostr = new ByteArrayOutputStream ();
             new CompactHtmlSerializer (props).writeToStream (node, ostr, "utf-8");

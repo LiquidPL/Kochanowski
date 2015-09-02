@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -237,6 +238,9 @@ public class MainActivity
         currentTableName = PrefUtils.getDefaultTableName (this);
         currentGroup = PrefUtils.getDefaultGroup (this);
         currentDay = Calendar.getInstance ().get (Calendar.DAY_OF_WEEK) - Calendar.MONDAY; // Calendar.MONDAY == 2
+
+
+        Log.i ("liquid", currentTableName);
 
         // setting the current day to monday if it it outside of monday-friday
         if (currentDay > 4 || currentDay < 0) currentDay = 0;

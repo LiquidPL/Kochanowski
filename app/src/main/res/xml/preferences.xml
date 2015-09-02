@@ -14,7 +14,7 @@
         android:entries="@array/pref_group_entries"
         android:entryValues="@array/pref_group_values"/>
 
-    <CheckBoxPreference
+    <!--<CheckBoxPreference
         android:key="@string/pref_should_notify"
         android:title="@string/pref_should_notify_title"
         android:defaultValue="false"/>
@@ -23,7 +23,7 @@
         android:key="@string/pref_should_notify_wearable"
         android:title="@string/pref_should_notify_wearable_title"
         android:summary="@string/pref_should_notify_wearable_summary"
-        android:defaultValue="false"/>
+        android:defaultValue="false"/>-->
 
     <Preference
         android:key="pref_db_reset"
